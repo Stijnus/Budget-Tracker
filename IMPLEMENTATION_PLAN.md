@@ -116,12 +116,12 @@ This document outlines a step-by-step approach to implementing the Budget Tracke
 - [x] Implement budget API functions:
   - [x] CRUD operations
   - [x] Budget progress calculations
-- [ ] Create budget components:
-  - [ ] BudgetList
-  - [ ] BudgetForm
+- [x] Create budget components:
+  - [x] BudgetList
+  - [x] BudgetForm
   - [x] BudgetSummary (includes progress bar)
-  - [ ] BudgetAlerts
-- [ ] Implement budgets page
+  - [x] BudgetAlerts (integrated into BudgetList)
+- [x] Implement budgets page
 
 ### Step 4: Tags System
 
@@ -262,7 +262,7 @@ We have made significant progress on the Budget Tracker application:
 ### Next Steps:
 
 1. ✅ Implement transaction management forms (add, edit, delete transactions)
-2. Implement budget management forms (create and manage budgets)
+2. ✅ Implement budget management forms (create and manage budgets)
 3. Implement tags system for better transaction organization
 4. Add data visualization with charts and graphs
 5. Implement bills & subscriptions tracking
