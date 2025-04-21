@@ -1,6 +1,19 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { updateUserProfile } from "../../../api/supabase/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export function ProfileForm() {
   const { user, userProfile, refreshUserData } = useAuth();
@@ -50,106 +63,81 @@ export function ProfileForm() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">
-        Profile Information
-      </h2>
-
-      {message && (
-        <div
-          className={`p-3 mb-4 text-sm rounded-md ${
-            message.type === "success"
-              ? "bg-green-50 text-green-600"
-              : "bg-red-50 text-red-600"
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
+    <Card>
+      <CardHeader>
+        <CardTitle>Profile Information</CardTitle>
+        <CardDescription>Update your personal information</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {message && (
+          <Alert
+            variant={message.type === "success" ? "default" : "destructive"}
+            className="mb-4"
           >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={user?.email || ""}
-            disabled
-            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
-          />
-          <p className="mt-1 text-xs text-gray-500">
-            To change your email, use the account settings
-          </p>
-        </div>
-
-        <div>
-          <label
-            htmlFor="fullName"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Full Name
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="avatarUrl"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Avatar URL
-          </label>
-          <input
-            id="avatarUrl"
-            type="text"
-            value={avatarUrl}
-            onChange={(e) => setAvatarUrl(e.target.value)}
-            placeholder="https://example.com/avatar.jpg"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          <p className="mt-1 text-xs text-gray-500">
-            Enter a URL to an image for your profile picture
-          </p>
-        </div>
-
-        {avatarUrl && (
-          <div className="flex justify-center">
-            <div className="w-20 h-20 rounded-full overflow-hidden border border-gray-200">
-              <img
-                src={avatarUrl}
-                alt="Avatar preview"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Handle image load error
-                  (e.target as HTMLImageElement).src =
-                    "https://via.placeholder.com/150?text=Error";
-                }}
-              />
-            </div>
-          </div>
+            {message.type === "success" ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : (
+              <AlertCircle className="h-4 w-4" />
+            )}
+            <AlertDescription>{message.text}</AlertDescription>
+          </Alert>
         )}
 
-        <div className="pt-4">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" value={user?.email || ""} disabled />
+            <p className="text-xs text-muted-foreground">
+              To change your email, use the account settings
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="fullName">Full Name</Label>
+            <Input
+              id="fullName"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="avatarUrl">Avatar URL</Label>
+            <Input
+              id="avatarUrl"
+              type="text"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              placeholder="https://example.com/avatar.jpg"
+            />
+            <p className="text-xs text-muted-foreground">
+              Enter a URL to an image for your profile picture
+            </p>
+          </div>
+
+          {avatarUrl && (
+            <div className="flex justify-center py-2">
+              <Avatar className="w-20 h-20">
+                <AvatarImage
+                  src={avatarUrl}
+                  alt="Avatar preview"
+                  onError={(e) => {
+                    // Handle image load error
+                    (e.target as HTMLImageElement).src =
+                      "https://via.placeholder.com/150?text=Error";
+                  }}
+                />
+                <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
+              </Avatar>
+            </div>
+          )}
+
+          <Button type="submit" className="w-full mt-4" disabled={isLoading}>
             {isLoading ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
-      </form>
-    </div>
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

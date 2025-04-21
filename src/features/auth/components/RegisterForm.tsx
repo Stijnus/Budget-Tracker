@@ -1,6 +1,19 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../../state/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 
 export function RegisterForm() {
   const [fullName, setFullName] = useState("");
@@ -53,143 +66,115 @@ export function RegisterForm() {
 
   if (success) {
     return (
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Registration Successful!
-          </h1>
-          <p className="mt-4 text-gray-600">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="text-center">
+          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+          <CardTitle className="text-2xl">Registration Successful!</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center">
+          <p className="text-muted-foreground">
             Please check your email to verify your account. You will be
             redirected to the login page shortly.
           </p>
-          <Link
-            to="/login"
-            className="mt-6 inline-block text-sm font-medium text-blue-600 hover:text-blue-500"
-          >
-            Go to login page
-          </Link>
-        </div>
-      </div>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <Button asChild variant="link">
+            <Link to="/login">Go to login page</Link>
+          </Button>
+        </CardFooter>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Create an account</h1>
-        <p className="mt-2 text-gray-600">
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">Create an account</CardTitle>
+        <CardDescription>
           Sign up to start tracking your finances
-        </p>
-      </div>
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      {error && (
-        <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
-          {error}
-        </div>
-      )}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Label htmlFor="fullName">Full Name</Label>
+            <Input
+              id="fullName"
+              name="fullName"
+              type="text"
+              autoComplete="name"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
 
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        <div>
-          <label
-            htmlFor="fullName"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Full Name
-          </label>
-          <input
-            id="fullName"
-            name="fullName"
-            type="text"
-            autoComplete="name"
-            required
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Email address
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Password must be at least 8 characters long
+            </p>
+          </div>
 
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          <p className="mt-1 text-xs text-gray-500">
-            Password must be at least 8 characters long
-          </p>
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
 
-        <div>
-          <label
-            htmlFor="confirmPassword"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Confirm Password
-          </label>
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <Button type="submit" className="w-full mt-2" disabled={isLoading}>
             {isLoading ? "Creating account..." : "Create account"}
-          </button>
-        </div>
-      </form>
+          </Button>
 
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-600">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-medium text-blue-600 hover:text-blue-500"
-          >
-            Sign in
-          </Link>
-        </p>
-      </div>
-    </div>
+          <div className="text-center mt-4">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-medium text-primary hover:underline"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
