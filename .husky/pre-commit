@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Run our TypeScript check script
+./scripts/check-typescript.sh
