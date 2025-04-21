@@ -1,4 +1,3 @@
-import React from "react";
 import { Toast, ToastType } from "./Toast";
 
 export interface ToastItem {

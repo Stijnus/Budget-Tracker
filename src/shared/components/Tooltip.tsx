@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  ReactNode,
-} from "react";
+import { useState, useRef, useEffect, useCallback, ReactNode } from "react";
 
 interface TooltipProps {
   children: ReactNode;

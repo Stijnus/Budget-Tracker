@@ -1,4 +1,3 @@
-import React from "react";
 import { X, HelpCircle, Keyboard } from "lucide-react";
 
 interface HelpModalProps {
@@ -193,8 +192,8 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
               <li className="flex items-start">
                 <span className="inline-block w-4 h-4 bg-red-500 rounded-full mr-2 mt-1"></span>
                 <span>
-                  Use the mobile view to track expenses on the go and stay on top
-                  of your finances.
+                  Use the mobile view to track expenses on the go and stay on
+                  top of your finances.
                 </span>
               </li>
             </ul>

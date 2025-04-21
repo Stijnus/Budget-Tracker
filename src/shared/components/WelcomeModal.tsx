@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { X, ChevronRight, ChevronLeft, Check } from "lucide-react";
 
 interface WelcomeModalProps {
@@ -38,13 +38,16 @@ export function WelcomeModal({
       content: (
         <div className="space-y-4">
           <p className="text-gray-700">
-            Start by adding your income and expenses in the Transactions section.
-            You can categorize them and add tags for better organization.
+            Start by adding your income and expenses in the Transactions
+            section. You can categorize them and add tags for better
+            organization.
           </p>
           <div className="bg-blue-50 p-4 rounded-md">
             <p className="text-blue-700 font-medium">Pro Tip:</p>
             <p className="text-blue-700">
-              Use keyboard shortcut <kbd className="px-1 bg-blue-100">N + T</kbd> to quickly add a new transaction.
+              Use keyboard shortcut{" "}
+              <kbd className="px-1 bg-blue-100">N + T</kbd> to quickly add a new
+              transaction.
             </p>
           </div>
         </div>

@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { GoalsList } from "../features/goals/components/GoalsList";

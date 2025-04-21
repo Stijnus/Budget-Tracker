@@ -38,6 +38,28 @@ This document outlines a step-by-step approach to implementing the Budget Tracke
 - [x] Set up shadcn/ui components
   - [x] Install required dependencies
   - [x] Configure component themes
+  - [x] Add UI components:
+    - [x] Button
+    - [x] Card
+    - [x] Dialog
+    - [x] Form
+    - [x] Input
+    - [x] Select
+    - [x] Textarea
+    - [x] Toast
+    - [x] Alert
+    - [x] Avatar
+    - [x] Badge
+    - [x] Calendar
+    - [x] Checkbox
+    - [x] Dropdown Menu
+    - [x] Popover
+    - [x] Progress
+    - [x] Sheet
+    - [x] Skeleton
+    - [x] Switch
+    - [x] Tabs
+    - [x] Tooltip
 - [x] Create global styles
 - [x] Set up Lucide React icons
 - [x] Create basic layout components:
