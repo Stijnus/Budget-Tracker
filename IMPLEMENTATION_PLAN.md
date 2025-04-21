@@ -136,16 +136,16 @@ This document outlines a step-by-step approach to implementing the Budget Tracke
 
 ### Step 1: Bills & Subscriptions
 
-- [ ] Implement bills API functions:
-  - [ ] CRUD operations
-  - [ ] Payment tracking
-  - [ ] Due date calculations
-- [ ] Create bills components:
-  - [ ] BillsList
-  - [ ] BillForm
-  - [ ] PaymentTracker
-  - [ ] ReminderSettings
-- [ ] Implement bills & subscriptions page
+- [x] Implement bills API functions:
+  - [x] CRUD operations
+  - [x] Payment tracking
+  - [x] Due date calculations
+- [x] Create bills components:
+  - [x] BillsList
+  - [x] BillForm
+  - [x] BillDetails
+  - [x] PaymentHistory
+- [x] Implement bills & subscriptions page
 
 ### Step 2: Financial Goals
 
@@ -268,7 +268,7 @@ We have made significant progress on the Budget Tracker application:
 2. ✅ Implement budget management forms (create and manage budgets)
 3. ✅ Implement tags system for better transaction organization
 4. ✅ Add data visualization with charts and graphs
-5. Implement bills & subscriptions tracking
+5. ✅ Implement bills & subscriptions tracking
 6. Create financial goals system
 
 ## Resources
