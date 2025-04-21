@@ -120,6 +120,36 @@ export async function deleteBudget(id: string) {
 }
 
 /**
+ * Get all budgets with category information
+ */
+export async function getBudgets() {
+  const { data, error } = await supabase
+    .from("budgets")
+    .select(
+      `
+      *,
+      categories (
+        name,
+        color
+      )
+    `
+    )
+    .order("created_at", { ascending: false });
+
+  // Transform the data to include category_name and category_color
+  const transformedData = data
+    ? data.map((budget) => ({
+        ...budget,
+        category_name: budget.categories?.name,
+        category_color: budget.categories?.color,
+        spent: 0, // Initialize spent to 0, will be calculated later if needed
+      }))
+    : [];
+
+  return { data: transformedData, error };
+}
+
+/**
  * Get budget by ID with category information
  */
 export async function getBudgetById(id: string) {
