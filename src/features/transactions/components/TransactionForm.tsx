@@ -1,6 +1,20 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
-import { X } from "lucide-react";
+import { X, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   createTransaction,
   updateTransaction,
@@ -153,239 +167,191 @@ export function TransactionForm({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">
+    <Card className="max-w-md w-full mx-auto">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xl">
           {transaction ? "Edit Transaction" : "Add Transaction"}
-        </h2>
-        <button
+        </CardTitle>
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-700"
           aria-label="Close"
         >
-          <X size={20} />
-        </button>
-      </div>
+          <X className="h-4 w-4" />
+        </Button>
+      </CardHeader>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
-          {error}
-        </div>
-      )}
+      <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Transaction Type */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <button
-            type="button"
-            className={`py-2 px-4 rounded-md text-center ${
-              type === "expense"
-                ? "bg-red-100 text-red-700 font-medium"
-                : "bg-gray-100 text-gray-700"
-            }`}
-            onClick={() => setType("expense")}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Transaction Type */}
+          <Tabs
+            defaultValue={type}
+            onValueChange={(value) => setType(value as "expense" | "income")}
+            className="w-full"
           >
-            Expense
-          </button>
-          <button
-            type="button"
-            className={`py-2 px-4 rounded-md text-center ${
-              type === "income"
-                ? "bg-green-100 text-green-700 font-medium"
-                : "bg-gray-100 text-gray-700"
-            }`}
-            onClick={() => setType("income")}
-          >
-            Income
-          </button>
-        </div>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger
+                value="expense"
+                className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700"
+              >
+                Expense
+              </TabsTrigger>
+              <TabsTrigger
+                value="income"
+                className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
+              >
+                Income
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-        {/* Amount */}
-        <div>
-          <label
-            htmlFor="amount"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Amount
-          </label>
-          <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-              $
-            </span>
-            <input
-              type="number"
-              id="amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              step="0.01"
-              min="0"
-              required
-              className="pl-8 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              placeholder="0.00"
+          {/* Amount */}
+          <div className="space-y-2">
+            <Label htmlFor="amount">Amount</Label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                $
+              </span>
+              <Input
+                type="number"
+                id="amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                step="0.01"
+                min="0"
+                required
+                className="pl-8"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Input
+              type="text"
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="e.g., Grocery shopping"
             />
           </div>
-        </div>
 
-        {/* Description */}
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Description
-          </label>
-          <input
-            type="text"
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="e.g., Grocery shopping"
-          />
-        </div>
+          {/* Date */}
+          <div className="space-y-2">
+            <Label htmlFor="date">Date</Label>
+            <Input
+              type="date"
+              id="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+          </div>
 
-        {/* Date */}
-        <div>
-          <label
-            htmlFor="date"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Date
-          </label>
-          <input
-            type="date"
-            id="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-          />
-        </div>
+          {/* Category */}
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger id="category">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">None</SelectItem>
+                {filteredCategories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Category */}
-        <div>
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Category
-          </label>
-          <select
-            id="category"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-          >
-            <option value="">Select a category</option>
-            {filteredCategories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
+          {/* Payment Method */}
+          <div className="space-y-2">
+            <Label htmlFor="paymentMethod">Payment Method</Label>
+            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+              <SelectTrigger id="paymentMethod">
+                <SelectValue placeholder="Select a payment method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">None</SelectItem>
+                <SelectItem value="cash">Cash</SelectItem>
+                <SelectItem value="credit_card">Credit Card</SelectItem>
+                <SelectItem value="debit_card">Debit Card</SelectItem>
+                <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                <SelectItem value="mobile_payment">Mobile Payment</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Payment Method */}
-        <div>
-          <label
-            htmlFor="paymentMethod"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Payment Method
-          </label>
-          <select
-            id="paymentMethod"
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-          >
-            <option value="">Select a payment method</option>
-            <option value="cash">Cash</option>
-            <option value="credit_card">Credit Card</option>
-            <option value="debit_card">Debit Card</option>
-            <option value="bank_transfer">Bank Transfer</option>
-            <option value="mobile_payment">Mobile Payment</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
+          {/* Status */}
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <Select
+              value={status}
+              onValueChange={(value) =>
+                setStatus(value as "pending" | "completed" | "cancelled")
+              }
+            >
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Status */}
-        <div>
-          <label
-            htmlFor="status"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Status
-          </label>
-          <select
-            id="status"
-            value={status}
-            onChange={(e) =>
-              setStatus(e.target.value as "pending" | "completed" | "cancelled")
-            }
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-          >
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              placeholder="Additional notes..."
+            />
+          </div>
 
-        {/* Notes */}
-        <div>
-          <label
-            htmlFor="notes"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Notes
-          </label>
-          <textarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={3}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-            placeholder="Additional notes..."
-          />
-        </div>
+          {/* Tags */}
+          <div className="space-y-2">
+            <Label htmlFor="tags">Tags</Label>
+            <TagSelector
+              transactionId={transaction?.id}
+              selectedTagIds={selectedTagIds}
+              onTagsChange={setSelectedTagIds}
+            />
+          </div>
 
-        {/* Tags */}
-        <div>
-          <label
-            htmlFor="tags"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Tags
-          </label>
-          <TagSelector
-            transactionId={transaction?.id}
-            selectedTagIds={selectedTagIds}
-            onTagsChange={setSelectedTagIds}
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading
-              ? "Saving..."
-              : transaction
-              ? "Update Transaction"
-              : "Add Transaction"}
-          </button>
-        </div>
-      </form>
-    </div>
+          {/* Submit Button */}
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button type="button" onClick={onClose} variant="outline">
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading
+                ? "Saving..."
+                : transaction
+                ? "Update Transaction"
+                : "Add Transaction"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
