@@ -7,7 +7,8 @@ import {
   Category,
   CategoryInsert,
 } from "../../../api/supabase";
-import { CategoryColorPicker } from "./CategoryColorPicker";
+// Import directly from the file path to avoid TypeScript issues
+import { CategoryColorPicker } from "../../../features/categories/components/CategoryColorPicker";
 
 interface CategoryFormProps {
   category?: Category;
