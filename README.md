@@ -67,7 +67,9 @@ A modern web application that helps users track and manage their personal expens
 - **Modern Interface**:
 
   - Responsive design for all devices
-  - Dark/light theme support
+  - Clean, consistent UI with shadcn components
+  - Global styling with Tailwind CSS
+  - Consistent color scheme and typography
   - Currency preferences
   - Notification settings
   - Intuitive navigation
@@ -91,7 +93,9 @@ A modern web application that helps users track and manage their personal expens
   - Feature-based folder structure
 
 - **Styling & UI**
-  - Tailwind CSS for styling
+  - Tailwind CSS for global styling
+  - shadcn/ui for modern, accessible components
+  - Global style approach (no dark/light mode switching)
   - Lucide React for icons
   - Responsive design patterns
   - CSS Grid and Flexbox layouts
@@ -327,6 +331,8 @@ npm run lint:fix
 - **State Management**: Centralized state management in the `state` directory
 - **Shared Components**: Created a `shared` directory for reusable components
 - **Page Components**: Separated page components into a dedicated `pages` directory
+- **Modern UI Components**: Implemented shadcn/ui components for a consistent, accessible UI
+- **Global Styling**: Adopted a global styling approach with Tailwind CSS instead of theme switching
 
 ### New Features
 
