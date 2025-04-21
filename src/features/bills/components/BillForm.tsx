@@ -2,7 +2,20 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { BillWithCategory, BillInsert } from "../../../api/supabase/bills";
 import { getCategories } from "../../../api/supabase/categories";
-// No need for formatCurrency in this component
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface BillFormProps {
   bill?: BillWithCategory;
@@ -112,45 +125,37 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 text-red-700 rounded-md">{error}</div>
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {/* Bill Name */}
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Bill Name *
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="name">Bill Name *</Label>
+        <Input
           type="text"
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           required
         />
       </div>
 
       {/* Amount */}
-      <div>
-        <label
-          htmlFor="amount"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Amount *
-        </label>
+      <div className="space-y-2">
+        <Label htmlFor="amount">Amount *</Label>
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
             $
           </span>
-          <input
+          <Input
             type="number"
             id="amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full pl-7 px-3 py-2 border border-gray-300 rounded-md"
+            className="pl-7"
             step="0.01"
             min="0"
             required
@@ -159,184 +164,132 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
       </div>
 
       {/* Due Date */}
-      <div>
-        <label
-          htmlFor="dueDate"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Due Date *
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="dueDate">Due Date *</Label>
+        <Input
           type="date"
           id="dueDate"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           required
         />
       </div>
 
       {/* Frequency */}
-      <div>
-        <label
-          htmlFor="frequency"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Frequency *
-        </label>
-        <select
-          id="frequency"
+      <div className="space-y-2">
+        <Label htmlFor="frequency">Frequency *</Label>
+        <Select
           value={frequency}
-          onChange={(e) =>
+          onValueChange={(value) =>
             setFrequency(
-              e.target.value as
-                | "one-time"
-                | "daily"
-                | "weekly"
-                | "monthly"
-                | "yearly"
+              value as "one-time" | "daily" | "weekly" | "monthly" | "yearly"
             )
           }
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          required
         >
-          <option value="one-time">One-time</option>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="yearly">Yearly</option>
-        </select>
+          <SelectTrigger id="frequency">
+            <SelectValue placeholder="Select frequency" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="one-time">One-time</SelectItem>
+            <SelectItem value="daily">Daily</SelectItem>
+            <SelectItem value="weekly">Weekly</SelectItem>
+            <SelectItem value="monthly">Monthly</SelectItem>
+            <SelectItem value="yearly">Yearly</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Category */}
-      <div>
-        <label
-          htmlFor="category"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Category
-        </label>
-        <select
-          id="category"
+      <div className="space-y-2">
+        <Label htmlFor="category">Category</Label>
+        <Select
           value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+          onValueChange={(value) => setCategoryId(value)}
         >
-          <option value="">Select a category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger id="category">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">None</SelectItem>
+            {categories.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Payment Method */}
-      <div>
-        <label
-          htmlFor="paymentMethod"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Payment Method
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="paymentMethod">Payment Method</Label>
+        <Input
           type="text"
           id="paymentMethod"
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           placeholder="e.g., Credit Card, Bank Transfer"
         />
       </div>
 
       {/* Auto Pay */}
-      <div className="flex items-center">
-        <input
-          type="checkbox"
-          id="autoPay"
-          checked={autoPay}
-          onChange={(e) => setAutoPay(e.target.checked)}
-          className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-        />
-        <label htmlFor="autoPay" className="ml-2 block text-sm text-gray-700">
-          Auto Pay
-        </label>
+      <div className="flex items-center space-x-2">
+        <Switch id="autoPay" checked={autoPay} onCheckedChange={setAutoPay} />
+        <Label htmlFor="autoPay">Auto Pay</Label>
       </div>
 
       {/* Reminder Days */}
-      <div>
-        <label
-          htmlFor="reminderDays"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Reminder Days Before Due
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="reminderDays">Reminder Days Before Due</Label>
+        <Input
           type="number"
           id="reminderDays"
           value={reminderDays}
           onChange={(e) => setReminderDays(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           min="0"
           max="30"
         />
       </div>
 
       {/* Status */}
-      <div>
-        <label
-          htmlFor="status"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Status
-        </label>
-        <select
-          id="status"
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select
           value={status}
-          onChange={(e) =>
-            setStatus(e.target.value as "active" | "paused" | "cancelled")
+          onValueChange={(value) =>
+            setStatus(value as "active" | "paused" | "cancelled")
           }
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
         >
-          <option value="active">Active</option>
-          <option value="paused">Paused</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="paused">Paused</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Notes */}
-      <div>
-        <label
-          htmlFor="notes"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Notes
-        </label>
-        <textarea
+      <div className="space-y-2">
+        <Label htmlFor="notes">Notes</Label>
+        <Textarea
           id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           rows={3}
         />
       </div>
 
       {/* Form Actions */}
       <div className="flex justify-end space-x-3 pt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-        >
+        <Button type="button" onClick={onCancel} variant="outline">
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400"
-        >
+        </Button>
+        <Button type="submit" disabled={isLoading}>
           {isLoading ? "Saving..." : bill ? "Update Bill" : "Add Bill"}
-        </button>
+        </Button>
       </div>
     </form>
   );
