@@ -53,14 +53,13 @@ export function BudgetSummary() {
   if (budgets.length === 0) {
     return (
       <div className="p-4 text-center text-gray-500">
-        No budgets found.
+        <p className="mb-4">Create your first budget to track your spending!</p>
         <button
           onClick={() => (window.location.href = "/budgets")}
-          className="text-blue-600 hover:text-blue-800 hover:underline ml-1"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
         >
-          Create your first budget
+          Create Budget
         </button>
-        to track your spending!
       </div>
     );
   }

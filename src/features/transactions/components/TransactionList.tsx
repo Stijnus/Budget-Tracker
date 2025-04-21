@@ -175,10 +175,12 @@ export function TransactionList({
     return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
   }
 
-  if (transactions.length === 0) {
+  if (transactions.length === 0 && !showAddButton) {
     return (
       <div className="p-4 text-center text-gray-500">
-        No transactions found. Add your first transaction to get started!
+        <p className="mb-4">
+          No transactions found. Add your first transaction to get started!
+        </p>
       </div>
     );
   }
@@ -210,16 +212,17 @@ export function TransactionList({
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {transactions.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
-            No transactions found.{" "}
+            <p className="mb-4">
+              No transactions found. Add your first transaction to get started!
+            </p>
             {showAddButton && (
               <button
                 onClick={handleAddTransaction}
-                className="text-blue-600 hover:text-blue-800 hover:underline"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
               >
-                Add your first transaction
+                Add Transaction
               </button>
-            )}{" "}
-            to get started!
+            )}
           </div>
         ) : (
           <ul className="divide-y divide-gray-200">
