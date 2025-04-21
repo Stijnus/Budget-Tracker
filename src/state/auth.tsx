@@ -1,27 +1,7 @@
-import { createContext, useEffect, useState, ReactNode } from "react";
+import { useEffect, useState, ReactNode } from "react";
+import { AuthContext } from "./authContext";
 import { User, AuthError } from "@supabase/supabase-js";
 import * as authApi from "../api/supabase/auth";
-
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  login: (
-    email: string,
-    password: string
-  ) => Promise<{ error: AuthError | null }>;
-  register: (
-    email: string,
-    password: string,
-    fullName: string
-  ) => Promise<{ error: AuthError | null }>;
-  logout: () => Promise<{ error: AuthError | null }>;
-  resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
-  updatePassword: (password: string) => Promise<{ error: AuthError | null }>;
-}
-
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
