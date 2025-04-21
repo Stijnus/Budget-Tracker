@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { getCurrentBudgets } from '../../../api/supabase/budgets';
-import { formatCurrency } from '../../../utils/formatters';
+import { useState, useEffect } from "react";
+import { getCurrentBudgets } from "../../../api/supabase/budgets";
+import { formatCurrency } from "../../../utils/formatters";
 
 interface Budget {
   id: string;
@@ -21,15 +21,15 @@ export function BudgetSummary() {
       try {
         setIsLoading(true);
         const { data, error } = await getCurrentBudgets();
-        
+
         if (error) {
           throw new Error(error.message);
         }
-        
+
         setBudgets(data || []);
       } catch (err) {
-        console.error('Error fetching budgets:', err);
-        setError('Failed to load budgets');
+        console.error("Error fetching budgets:", err);
+        setError("Failed to load budgets");
       } finally {
         setIsLoading(false);
       }
@@ -47,52 +47,83 @@ export function BudgetSummary() {
   }
 
   if (error) {
-    return (
-      <div className="p-4 text-red-500 bg-red-50 rounded-md">
-        {error}
-      </div>
-    );
+    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
   }
 
   if (budgets.length === 0) {
     return (
       <div className="p-4 text-center text-gray-500">
-        No budgets found. Create your first budget to track your spending!
+        No budgets found.
+        <button
+          onClick={() => (window.location.href = "/budgets")}
+          className="text-blue-600 hover:text-blue-800 hover:underline ml-1"
+        >
+          Create your first budget
+        </button>
+        to track your spending!
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {budgets.map((budget) => {
-        const percentage = Math.min(Math.round((budget.spent / budget.amount) * 100), 100);
-        const isOverBudget = budget.spent > budget.amount;
-        
-        return (
-          <div key={budget.id} className="bg-white p-4 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-medium">{budget.name}</h3>
-              <span className="text-sm text-gray-500">
-                {formatCurrency(budget.spent)} / {formatCurrency(budget.amount)}
-              </span>
+    <div>
+      <div className="space-y-4">
+        {budgets.map((budget) => {
+          const percentage = Math.min(
+            Math.round((budget.spent / budget.amount) * 100),
+            100
+          );
+          const isOverBudget = budget.spent > budget.amount;
+
+          return (
+            <div key={budget.id} className="bg-white p-4 rounded-lg shadow">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-medium">{budget.name}</h3>
+                <span className="text-sm text-gray-500">
+                  {formatCurrency(budget.spent)} /{" "}
+                  {formatCurrency(budget.amount)}
+                </span>
+              </div>
+
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className={`h-2.5 rounded-full ${
+                    isOverBudget ? "bg-red-600" : "bg-blue-600"
+                  }`}
+                  style={{
+                    width: `${percentage}%`,
+                    backgroundColor: isOverBudget
+                      ? undefined
+                      : budget.category_color,
+                  }}
+                ></div>
+              </div>
+
+              <div className="flex justify-between items-center mt-1">
+                <span className="text-xs text-gray-500">
+                  {budget.category_name || "General"}
+                </span>
+                <span
+                  className={`text-xs font-medium ${
+                    isOverBudget ? "text-red-600" : "text-gray-500"
+                  }`}
+                >
+                  {percentage}%
+                </span>
+              </div>
             </div>
-            
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div 
-                className={`h-2.5 rounded-full ${isOverBudget ? 'bg-red-600' : 'bg-blue-600'}`}
-                style={{ width: `${percentage}%`, backgroundColor: isOverBudget ? undefined : budget.category_color }}
-              ></div>
-            </div>
-            
-            <div className="flex justify-between items-center mt-1">
-              <span className="text-xs text-gray-500">{budget.category_name || 'General'}</span>
-              <span className={`text-xs font-medium ${isOverBudget ? 'text-red-600' : 'text-gray-500'}`}>
-                {percentage}%
-              </span>
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      <div className="mt-4 text-center">
+        <button
+          onClick={() => (window.location.href = "/budgets")}
+          className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+        >
+          View All Budgets
+        </button>
+      </div>
     </div>
   );
 }

@@ -33,7 +33,10 @@ export function DashboardPage() {
                 <h3 className="text-lg font-semibold text-gray-800">
                   Budget Progress
                 </h3>
-                <button className="text-sm text-blue-600 hover:text-blue-800">
+                <button
+                  onClick={() => (window.location.href = "/budgets")}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
                   View All
                 </button>
               </div>

@@ -8,7 +8,7 @@ import {
   TransactionInsert,
 } from "../../../api/supabase/transactions";
 import { getCategories } from "../../../api/supabase/categories";
-import { formatDate } from "../../../utils/formatters";
+// Import formatters as needed
 
 interface TransactionFormProps {
   transaction?: Transaction;
@@ -30,7 +30,9 @@ export function TransactionForm({
 
   // Form state
   const [amount, setAmount] = useState(transaction?.amount?.toString() || "");
-  const [description, setDescription] = useState(transaction?.description || "");
+  const [description, setDescription] = useState(
+    transaction?.description || ""
+  );
   const [date, setDate] = useState(
     transaction?.date || new Date().toISOString().split("T")[0]
   );
