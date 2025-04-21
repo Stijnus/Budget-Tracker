@@ -9,6 +9,41 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      goal_contributions: {
+        Row: {
+          id: string;
+          goal_id: string;
+          amount: number;
+          contribution_date: string;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          goal_id: string;
+          amount: number;
+          contribution_date: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          goal_id?: string;
+          amount?: number;
+          contribution_date?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "goal_contributions_goal_id_fkey";
+            columns: ["goal_id"];
+            isOneToOne: false;
+            referencedRelation: "financial_goals";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       bill_payments: {
         Row: {
           id: string;
