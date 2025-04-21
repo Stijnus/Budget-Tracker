@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 interface DateRangeSelectorProps {
   startDate: string;
@@ -7,11 +7,11 @@ interface DateRangeSelectorProps {
   className?: string;
 }
 
-export function DateRangeSelector({ 
-  startDate, 
-  endDate, 
+export function DateRangeSelector({
+  startDate,
+  endDate,
   onDateRangeChange,
-  className = '' 
+  className = "",
 }: DateRangeSelectorProps) {
   const [customRange, setCustomRange] = useState(false);
   const [customStartDate, setCustomStartDate] = useState(startDate);
@@ -22,30 +22,31 @@ export function DateRangeSelector({
     const now = new Date();
     let start = new Date();
     let end = new Date();
-    
+
     switch (range) {
-      case 'this-month':
+      case "this-month":
         start = new Date(now.getFullYear(), now.getMonth(), 1);
         end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         break;
-      case 'last-month':
+      case "last-month":
         start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         end = new Date(now.getFullYear(), now.getMonth(), 0);
         break;
-      case 'this-quarter':
+      case "this-quarter": {
         const quarter = Math.floor(now.getMonth() / 3);
         start = new Date(now.getFullYear(), quarter * 3, 1);
         end = new Date(now.getFullYear(), quarter * 3 + 3, 0);
         break;
-      case 'this-year':
+      }
+      case "this-year":
         start = new Date(now.getFullYear(), 0, 1);
         end = new Date(now.getFullYear(), 11, 31);
         break;
-      case 'last-year':
+      case "last-year":
         start = new Date(now.getFullYear() - 1, 0, 1);
         end = new Date(now.getFullYear() - 1, 11, 31);
         break;
-      case 'custom':
+      case "custom":
         setCustomRange(true);
         return;
       default:
@@ -54,11 +55,11 @@ export function DateRangeSelector({
         start.setDate(start.getDate() - 30);
         end = now;
     }
-    
+
     setCustomRange(false);
-    const formattedStart = start.toISOString().split('T')[0];
-    const formattedEnd = end.toISOString().split('T')[0];
-    
+    const formattedStart = start.toISOString().split("T")[0];
+    const formattedEnd = end.toISOString().split("T")[0];
+
     setCustomStartDate(formattedStart);
     setCustomEndDate(formattedEnd);
     onDateRangeChange(formattedStart, formattedEnd);
@@ -73,53 +74,54 @@ export function DateRangeSelector({
 
   return (
     <div className={`bg-white p-4 rounded-lg shadow ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        Date Range
-      </h3>
-      
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">Date Range</h3>
+
       <div className="flex flex-wrap gap-2 mb-4">
         <button
-          onClick={() => handleRangeSelect('this-month')}
+          onClick={() => handleRangeSelect("this-month")}
           className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           This Month
         </button>
         <button
-          onClick={() => handleRangeSelect('last-month')}
+          onClick={() => handleRangeSelect("last-month")}
           className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           Last Month
         </button>
         <button
-          onClick={() => handleRangeSelect('this-quarter')}
+          onClick={() => handleRangeSelect("this-quarter")}
           className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           This Quarter
         </button>
         <button
-          onClick={() => handleRangeSelect('this-year')}
+          onClick={() => handleRangeSelect("this-year")}
           className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           This Year
         </button>
         <button
-          onClick={() => handleRangeSelect('last-year')}
+          onClick={() => handleRangeSelect("last-year")}
           className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           Last Year
         </button>
         <button
-          onClick={() => handleRangeSelect('custom')}
+          onClick={() => handleRangeSelect("custom")}
           className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
         >
           Custom
         </button>
       </div>
-      
+
       {customRange && (
         <div className="flex flex-col sm:flex-row gap-4 items-end">
           <div className="flex-1">
-            <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="start-date"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Start Date
             </label>
             <input
@@ -131,7 +133,10 @@ export function DateRangeSelector({
             />
           </div>
           <div className="flex-1">
-            <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="end-date"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               End Date
             </label>
             <input
@@ -150,9 +155,10 @@ export function DateRangeSelector({
           </button>
         </div>
       )}
-      
+
       <div className="mt-2 text-sm text-gray-500">
-        Current range: {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}
+        Current range: {new Date(startDate).toLocaleDateString()} -{" "}
+        {new Date(endDate).toLocaleDateString()}
       </div>
     </div>
   );

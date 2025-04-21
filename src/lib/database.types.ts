@@ -9,6 +9,44 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      bill_payments: {
+        Row: {
+          id: string;
+          bill_id: string;
+          amount: number;
+          payment_date: string;
+          payment_method: string | null;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          bill_id: string;
+          amount: number;
+          payment_date: string;
+          payment_method?: string | null;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          bill_id?: string;
+          amount?: number;
+          payment_date?: string;
+          payment_method?: string | null;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bill_payments_bill_id_fkey";
+            columns: ["bill_id"];
+            isOneToOne: false;
+            referencedRelation: "bills_subscriptions";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       user_profiles: {
         Row: {
           id: string;
@@ -316,6 +354,9 @@ export interface Database {
           reminder_days: number;
           notes: string | null;
           status: "active" | "paused" | "cancelled";
+          next_due_date: string | null;
+          last_paid_date: string | null;
+          payment_status: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -332,6 +373,9 @@ export interface Database {
           reminder_days?: number;
           notes?: string | null;
           status?: "active" | "paused" | "cancelled";
+          next_due_date?: string | null;
+          last_paid_date?: string | null;
+          payment_status?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -348,6 +392,9 @@ export interface Database {
           reminder_days?: number;
           notes?: string | null;
           status?: "active" | "paused" | "cancelled";
+          next_due_date?: string | null;
+          last_paid_date?: string | null;
+          payment_status?: string | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { getExpensesByCategory } from '../../../api/supabase/analytics';
-import { formatCurrency } from '../../../utils/formatters';
+import { useState, useEffect } from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { getExpensesByCategory } from "../../../api/supabase/analytics";
+import { formatCurrency } from "../../../utils/formatters";
 
 interface ExpenseCategoryChartProps {
   startDate: string;
@@ -16,7 +16,11 @@ interface CategoryData {
   value: number;
 }
 
-export function ExpenseCategoryChart({ startDate, endDate, className = '' }: ExpenseCategoryChartProps) {
+export function ExpenseCategoryChart({
+  startDate,
+  endDate,
+  className = "",
+}: ExpenseCategoryChartProps) {
   const [data, setData] = useState<CategoryData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,17 +30,17 @@ export function ExpenseCategoryChart({ startDate, endDate, className = '' }: Exp
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const { data, error } = await getExpensesByCategory(startDate, endDate);
-        
+
         if (error) {
           throw new Error(error.message);
         }
-        
+
         setData(data || []);
       } catch (err) {
-        console.error('Error fetching category data:', err);
-        setError('Failed to load expense category data');
+        console.error("Error fetching category data:", err);
+        setError("Failed to load expense category data");
       } finally {
         setIsLoading(false);
       }
@@ -46,7 +50,14 @@ export function ExpenseCategoryChart({ startDate, endDate, className = '' }: Exp
   }, [startDate, endDate]);
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: CategoryData;
+    }>;
+  }
+
+  const CustomTooltip = ({ active, payload }: TooltipProps) => {
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       return (
@@ -68,11 +79,7 @@ export function ExpenseCategoryChart({ startDate, endDate, className = '' }: Exp
   }
 
   if (error) {
-    return (
-      <div className="p-4 text-red-500 bg-red-50 rounded-md">
-        {error}
-      </div>
-    );
+    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
   }
 
   if (data.length === 0) {
@@ -91,9 +98,13 @@ export function ExpenseCategoryChart({ startDate, endDate, className = '' }: Exp
     <ul className="flex flex-wrap justify-center mt-4 gap-4">
       {data.map((entry, index) => (
         <li key={`legend-${index}`} className="flex items-center">
-          <div 
-            className="w-3 h-3 rounded-full mr-2" 
-            style={{ backgroundColor: entry.color || `#${Math.floor(Math.random()*16777215).toString(16)}` }}
+          <div
+            className="w-3 h-3 rounded-full mr-2"
+            style={{
+              backgroundColor:
+                entry.color ||
+                `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+            }}
           />
           <span className="text-sm">
             {entry.name} ({((entry.value / total) * 100).toFixed(1)}%)
@@ -105,8 +116,10 @@ export function ExpenseCategoryChart({ startDate, endDate, className = '' }: Exp
 
   return (
     <div className={`bg-white p-4 rounded-lg shadow ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Expenses by Category</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        Expenses by Category
+      </h3>
+
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -118,13 +131,18 @@ export function ExpenseCategoryChart({ startDate, endDate, className = '' }: Exp
               outerRadius={80}
               paddingAngle={2}
               dataKey="value"
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              label={({ name, percent }) =>
+                `${name} ${(percent * 100).toFixed(0)}%`
+              }
               labelLine={false}
             >
               {data.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={entry.color || `#${Math.floor(Math.random()*16777215).toString(16)}`} 
+                <Cell
+                  key={`cell-${index}`}
+                  fill={
+                    entry.color ||
+                    `#${Math.floor(Math.random() * 16777215).toString(16)}`
+                  }
                 />
               ))}
             </Pie>
@@ -132,7 +150,7 @@ export function ExpenseCategoryChart({ startDate, endDate, className = '' }: Exp
           </PieChart>
         </ResponsiveContainer>
       </div>
-      
+
       {renderLegend()}
     </div>
   );

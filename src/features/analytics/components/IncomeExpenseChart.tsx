@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import { useState, useEffect } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
-  ReferenceLine
-} from 'recharts';
-import { getIncomeVsExpenses } from '../../../api/supabase/analytics';
-import { formatCurrency } from '../../../utils/formatters';
+  ReferenceLine,
+} from "recharts";
+import { getIncomeVsExpenses } from "../../../api/supabase/analytics";
+import { formatCurrency } from "../../../utils/formatters";
 
 interface IncomeExpenseChartProps {
   startDate: string;
@@ -25,7 +25,11 @@ interface ChartData {
   fill: string;
 }
 
-export function IncomeExpenseChart({ startDate, endDate, className = '' }: IncomeExpenseChartProps) {
+export function IncomeExpenseChart({
+  startDate,
+  endDate,
+  className = "",
+}: IncomeExpenseChartProps) {
   const [data, setData] = useState<ChartData[]>([]);
   const [netSavings, setNetSavings] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,25 +40,25 @@ export function IncomeExpenseChart({ startDate, endDate, className = '' }: Incom
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const { data, error } = await getIncomeVsExpenses(startDate, endDate);
-        
+
         if (error) {
           throw new Error(error.message);
         }
-        
+
         if (data) {
           const chartData = [
-            { name: 'Income', value: data.income, fill: '#10B981' },
-            { name: 'Expenses', value: data.expenses, fill: '#EF4444' }
+            { name: "Income", value: data.income, fill: "#10B981" },
+            { name: "Expenses", value: data.expenses, fill: "#EF4444" },
           ];
-          
+
           setData(chartData);
           setNetSavings(data.income - data.expenses);
         }
       } catch (err) {
-        console.error('Error fetching income vs expenses data:', err);
-        setError('Failed to load income vs expenses data');
+        console.error("Error fetching income vs expenses data:", err);
+        setError("Failed to load income vs expenses data");
       } finally {
         setIsLoading(false);
       }
@@ -64,7 +68,14 @@ export function IncomeExpenseChart({ startDate, endDate, className = '' }: Incom
   }, [startDate, endDate]);
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: ChartData;
+    }>;
+  }
+
+  const CustomTooltip = ({ active, payload }: TooltipProps) => {
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       return (
@@ -86,11 +97,7 @@ export function IncomeExpenseChart({ startDate, endDate, className = '' }: Incom
   }
 
   if (error) {
-    return (
-      <div className="p-4 text-red-500 bg-red-50 rounded-md">
-        {error}
-      </div>
-    );
+    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
   }
 
   if (data.length === 0) {
@@ -102,28 +109,39 @@ export function IncomeExpenseChart({ startDate, endDate, className = '' }: Incom
   }
 
   // Calculate savings rate
-  const incomeValue = data.find(item => item.name === 'Income')?.value || 0;
-  const savingsRate = incomeValue > 0 ? Math.round((netSavings / incomeValue) * 100) : 0;
+  const incomeValue = data.find((item) => item.name === "Income")?.value || 0;
+  const savingsRate =
+    incomeValue > 0 ? Math.round((netSavings / incomeValue) * 100) : 0;
 
   return (
     <div className={`bg-white p-4 rounded-lg shadow ${className}`}>
       <h3 className="text-lg font-semibold text-gray-800 mb-2">
         Income vs Expenses
       </h3>
-      
+
       <div className="flex justify-between items-center mb-4">
         <div className="text-sm text-gray-500">
-          Net: <span className={netSavings >= 0 ? 'text-green-600' : 'text-red-600'}>
+          Net:{" "}
+          <span className={netSavings >= 0 ? "text-green-600" : "text-red-600"}>
             {formatCurrency(netSavings)}
           </span>
         </div>
         <div className="text-sm text-gray-500">
-          Savings Rate: <span className={savingsRate >= 20 ? 'text-green-600' : savingsRate >= 0 ? 'text-yellow-600' : 'text-red-600'}>
+          Savings Rate:{" "}
+          <span
+            className={
+              savingsRate >= 20
+                ? "text-green-600"
+                : savingsRate >= 0
+                ? "text-yellow-600"
+                : "text-red-600"
+            }
+          >
             {savingsRate}%
           </span>
         </div>
       </div>
-      
+
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -132,10 +150,19 @@ export function IncomeExpenseChart({ startDate, endDate, className = '' }: Incom
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
-            <YAxis tickFormatter={(value) => formatCurrency(value, { compact: true })} />
+            <YAxis
+              tickFormatter={(value) =>
+                formatCurrency(value, { compact: true })
+              }
+            />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
-            <Bar dataKey="value" name="Amount" fill="#8884d8" radius={[4, 4, 0, 0]} />
+            <Bar
+              dataKey="value"
+              name="Amount"
+              fill="#8884d8"
+              radius={[4, 4, 0, 0]}
+            />
             {/* Add a reference line for net savings */}
             <ReferenceLine y={0} stroke="#000" />
           </BarChart>
