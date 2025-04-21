@@ -8,7 +8,8 @@ import {
   TransactionInsert,
 } from "../../../api/supabase/transactions";
 import { getCategories } from "../../../api/supabase/categories";
-// Import formatters as needed
+import { TagSelector } from "../../tags/components/TagSelector";
+import { getTagsForTransaction } from "../../../api/supabase/tags";
 
 interface TransactionFormProps {
   transaction?: Transaction;
@@ -47,6 +48,30 @@ export function TransactionForm({
     transaction?.status || "completed"
   );
   const [notes, setNotes] = useState(transaction?.notes || "");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+
+  // Fetch transaction tags if editing
+  useEffect(() => {
+    if (transaction?.id) {
+      async function fetchTransactionTags() {
+        try {
+          const { data, error } = await getTagsForTransaction(
+            transaction?.id || ""
+          );
+          if (error) throw error;
+
+          if (data) {
+            const tagIds = data.map((item) => item.tag_id);
+            setSelectedTagIds(tagIds);
+          }
+        } catch (err) {
+          console.error("Error fetching transaction tags:", err);
+        }
+      }
+
+      fetchTransactionTags();
+    }
+  }, [transaction]);
 
   // Fetch categories on mount
   useEffect(() => {
@@ -321,6 +346,21 @@ export function TransactionForm({
             rows={3}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="Additional notes..."
+          />
+        </div>
+
+        {/* Tags */}
+        <div>
+          <label
+            htmlFor="tags"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Tags
+          </label>
+          <TagSelector
+            transactionId={transaction?.id}
+            selectedTagIds={selectedTagIds}
+            onTagsChange={setSelectedTagIds}
           />
         </div>
 

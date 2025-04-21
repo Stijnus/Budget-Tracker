@@ -1,37 +1,51 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  ArrowDownCircle, 
-  ArrowUpCircle, 
-  PieChart, 
-  Calendar, 
-  Target, 
-  BarChart3, 
-  Clock, 
-  Settings, 
-  Menu, 
-  X 
-} from 'lucide-react';
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  PieChart,
+  Calendar,
+  Target,
+  BarChart3,
+  Clock,
+  Settings,
+  Menu,
+  X,
+  Tag,
+} from "lucide-react";
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'Expenses', path: '/expenses', icon: <ArrowDownCircle size={20} /> },
-    { name: 'Income', path: '/income', icon: <ArrowUpCircle size={20} /> },
-    { name: 'Categories', path: '/categories', icon: <PieChart size={20} /> },
-    { name: 'Budgets', path: '/budgets', icon: <Calendar size={20} /> },
-    { name: 'Goals', path: '/goals', icon: <Target size={20} /> },
-    { name: 'Analytics', path: '/analytics', icon: <BarChart3 size={20} /> },
-    { name: 'Bills & Subscriptions', path: '/bills', icon: <Clock size={20} /> },
-    { name: 'Settings', path: '/settings', icon: <Settings size={20} /> },
+    {
+      name: "Dashboard",
+      path: "/dashboard",
+      icon: <LayoutDashboard size={20} />,
+    },
+    {
+      name: "Expenses",
+      path: "/expenses",
+      icon: <ArrowDownCircle size={20} />,
+    },
+    { name: "Income", path: "/income", icon: <ArrowUpCircle size={20} /> },
+    { name: "Categories", path: "/categories", icon: <PieChart size={20} /> },
+    { name: "Budgets", path: "/budgets", icon: <Calendar size={20} /> },
+    { name: "Tags", path: "/tags", icon: <Tag size={20} /> },
+    { name: "Goals", path: "/goals", icon: <Target size={20} /> },
+    { name: "Analytics", path: "/analytics", icon: <BarChart3 size={20} /> },
+    {
+      name: "Bills & Subscriptions",
+      path: "/bills",
+      icon: <Clock size={20} />,
+    },
+    { name: "Settings", path: "/settings", icon: <Settings size={20} /> },
   ];
 
   return (
@@ -47,7 +61,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+          isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
@@ -64,7 +78,9 @@ export function Sidebar() {
                   <Link
                     to={item.path}
                     className={`flex items-center px-4 py-3 text-gray-700 rounded-md hover:bg-gray-100 transition-colors ${
-                      location.pathname === item.path ? 'bg-gray-100 font-medium' : ''
+                      location.pathname === item.path
+                        ? "bg-gray-100 font-medium"
+                        : ""
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
