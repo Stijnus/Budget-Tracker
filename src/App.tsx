@@ -9,7 +9,9 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import { AuthProvider, ProtectedRoute } from "./state/auth";
+import { AuthProvider } from "./state/auth"; // Using the AuthProvider from auth.tsx
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { DatabaseCheck } from "./components/DatabaseCheck";
 
 function App() {
   return (
@@ -51,6 +53,9 @@ function App() {
 
           {/* Redirect /home to /dashboard */}
           <Route path="/home" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Database check route */}
+          <Route path="/db-check" element={<DatabaseCheck />} />
 
           {/* 404 route */}
           <Route path="*" element={<NotFoundPage />} />

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { useAuth } from "../../../state/auth";
+import { useAuth } from "../../../state/useAuth";
 import {
   createCategory,
   updateCategory,

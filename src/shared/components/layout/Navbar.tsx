@@ -1,9 +1,9 @@
-import { Bell, User } from 'lucide-react';
-import { useAuth } from '../../../state/auth';
-import { Link } from 'react-router-dom';
+import { Bell, User } from "lucide-react";
+import { useAuth } from "../../../state/useAuth";
+import { Link } from "react-router-dom";
 
 export function Navbar() {
-  const { user, userProfile, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">
@@ -25,18 +25,10 @@ export function Navbar() {
             <div className="relative group">
               <button className="flex items-center space-x-2 focus:outline-none">
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  {userProfile?.avatar_url ? (
-                    <img
-                      src={userProfile.avatar_url}
-                      alt="User avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User size={20} className="text-gray-500" />
-                  )}
+                  <User size={20} className="text-gray-500" />
                 </div>
                 <span className="hidden md:block text-sm font-medium text-gray-700">
-                  {userProfile?.full_name || user.email}
+                  {user?.user_metadata?.full_name || user?.email}
                 </span>
               </button>
 
