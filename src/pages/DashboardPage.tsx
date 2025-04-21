@@ -49,15 +49,15 @@ export function DashboardPage() {
                   Recent Transactions
                 </h3>
                 <div className="flex space-x-2">
-                  <button className="text-sm text-blue-600 hover:text-blue-800">
+                  <button
+                    onClick={() => (window.location.href = "/transactions")}
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                  >
                     View All
-                  </button>
-                  <button className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors">
-                    Add New
                   </button>
                 </div>
               </div>
-              <TransactionList />
+              <TransactionList limit={5} showAddButton={true} />
             </div>
           </div>
         </div>

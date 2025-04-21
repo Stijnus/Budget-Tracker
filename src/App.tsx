@@ -8,6 +8,9 @@ import { LandingPage } from "./pages/LandingPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
+import { TransactionsPage } from "./pages/TransactionsPage";
+import { ExpensesPage } from "./pages/ExpensesPage";
+import { IncomePage } from "./pages/IncomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { AuthProvider } from "./state/auth"; // Using the AuthProvider from auth.tsx
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -47,6 +50,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <CategoriesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <TransactionsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expenses"
+            element={
+              <ProtectedRoute>
+                <ExpensesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/income"
+            element={
+              <ProtectedRoute>
+                <IncomePage />
               </ProtectedRoute>
             }
           />
