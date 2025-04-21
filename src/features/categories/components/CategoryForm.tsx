@@ -1,8 +1,13 @@
-import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import { useAuth } from '../../../state/auth';
-import { createCategory, updateCategory, Category, CategoryInsert } from '../../../api/supabase';
-import { CategoryColorPicker } from './CategoryColorPicker';
+import { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { useAuth } from "../../../state/auth";
+import {
+  createCategory,
+  updateCategory,
+  Category,
+  CategoryInsert,
+} from "../../../api/supabase";
+import { CategoryColorPicker } from "./CategoryColorPicker";
 
 interface CategoryFormProps {
   category?: Category;
@@ -10,12 +15,16 @@ interface CategoryFormProps {
   onSuccess: () => void;
 }
 
-export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps) {
+export function CategoryForm({
+  category,
+  onClose,
+  onSuccess,
+}: CategoryFormProps) {
   const { user } = useAuth();
-  const [name, setName] = useState('');
-  const [type, setType] = useState<'expense' | 'income' | 'both'>('expense');
-  const [color, setColor] = useState('#3B82F6'); // Default blue color
-  const [icon, setIcon] = useState('');
+  const [name, setName] = useState("");
+  const [type, setType] = useState<"expense" | "income" | "both">("expense");
+  const [color, setColor] = useState("#3B82F6"); // Default blue color
+  const [icon, setIcon] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,20 +32,20 @@ export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps
   useEffect(() => {
     if (category) {
       setName(category.name);
-      setType(category.type as 'expense' | 'income' | 'both');
+      setType(category.type as "expense" | "income" | "both");
       setColor(category.color);
-      setIcon(category.icon || '');
+      setIcon(category.icon || "");
     }
   }, [category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) return;
-    
+
     // Validate form
     if (!name.trim()) {
-      setError('Category name is required');
+      setError("Category name is required");
       return;
     }
 
@@ -71,12 +80,16 @@ export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps
 
       // Call success callback
       onSuccess();
-      
+
       // Close the form
       onClose();
-    } catch (err: any) {
-      console.error('Error saving category:', err);
-      setError(err.message || 'Failed to save category. Please try again.');
+    } catch (err) {
+      console.error("Error saving category:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to save category. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +100,7 @@ export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-800">
-            {category ? 'Edit Category' : 'Add Category'}
+            {category ? "Edit Category" : "Add Category"}
           </h2>
           <button
             onClick={onClose}
@@ -105,7 +118,10 @@ export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Category Name
             </label>
             <input
@@ -120,13 +136,18 @@ export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps
           </div>
 
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="type"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Category Type
             </label>
             <select
               id="type"
               value={type}
-              onChange={(e) => setType(e.target.value as 'expense' | 'income' | 'both')}
+              onChange={(e) =>
+                setType(e.target.value as "expense" | "income" | "both")
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="expense">Expense</option>
@@ -143,7 +164,10 @@ export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps
           </div>
 
           <div>
-            <label htmlFor="icon" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="icon"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Icon (Optional)
             </label>
             <input
@@ -155,7 +179,8 @@ export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps
               placeholder="Icon name or URL"
             />
             <p className="mt-1 text-xs text-gray-500">
-              You can use an icon name from Lucide icons or a URL to a custom icon.
+              You can use an icon name from Lucide icons or a URL to a custom
+              icon.
             </p>
           </div>
 
@@ -172,7 +197,11 @@ export function CategoryForm({ category, onClose, onSuccess }: CategoryFormProps
               disabled={isLoading}
               className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Saving...' : category ? 'Update Category' : 'Add Category'}
+              {isLoading
+                ? "Saving..."
+                : category
+                ? "Update Category"
+                : "Add Category"}
             </button>
           </div>
         </form>

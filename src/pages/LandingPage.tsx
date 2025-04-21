@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import {
   LoginForm,
@@ -18,9 +18,12 @@ export function LandingPage() {
   if (pathname === "/forgot-password" || pathname === "/reset-password")
     initialView = "reset-password";
 
-  // We're using the view state but not changing it in this version
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [view, setView] = useState<AuthView>(initialView);
+
+  // Update view when URL changes
+  useEffect(() => {
+    setView(initialView);
+  }, [pathname, initialView]);
 
   return (
     <div className="min-h-screen flex">
