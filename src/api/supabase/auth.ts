@@ -1,10 +1,14 @@
-import { supabase } from './client';
-import type { AuthError, AuthResponse } from '@supabase/supabase-js';
+import { supabase } from "./client";
+import type { AuthError, AuthResponse } from "@supabase/supabase-js";
 
 /**
  * Register a new user with email and password
  */
-export async function register(email: string, password: string, fullName: string): Promise<AuthResponse> {
+export async function register(
+  email: string,
+  password: string,
+  fullName: string
+): Promise<AuthResponse> {
   return supabase.auth.signUp({
     email,
     password,
@@ -19,7 +23,10 @@ export async function register(email: string, password: string, fullName: string
 /**
  * Login with email and password
  */
-export async function login(email: string, password: string): Promise<AuthResponse> {
+export async function login(
+  email: string,
+  password: string
+): Promise<AuthResponse> {
   return supabase.auth.signInWithPassword({
     email,
     password,
@@ -78,7 +85,7 @@ export async function updateEmail(email: string) {
 /**
  * Update user metadata
  */
-export async function updateUserMetadata(metadata: { [key: string]: any }) {
+export async function updateUserMetadata(metadata: { [key: string]: unknown }) {
   return supabase.auth.updateUser({
     data: metadata,
   });
@@ -87,7 +94,9 @@ export async function updateUserMetadata(metadata: { [key: string]: any }) {
 /**
  * Set up auth state change listener
  */
-export function onAuthStateChange(callback: (event: any, session: any) => void) {
+export function onAuthStateChange(
+  callback: (event: string, session: unknown) => void
+) {
   return supabase.auth.onAuthStateChange(callback);
 }
 
@@ -96,25 +105,28 @@ export function onAuthStateChange(callback: (event: any, session: any) => void) 
  */
 export async function getUserProfile(userId: string) {
   const { data, error } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('id', userId)
+    .from("user_profiles")
+    .select("*")
+    .eq("id", userId)
     .single();
-  
+
   return { data, error };
 }
 
 /**
  * Update user profile
  */
-export async function updateUserProfile(userId: string, profile: { full_name?: string; avatar_url?: string }) {
+export async function updateUserProfile(
+  userId: string,
+  profile: { full_name?: string; avatar_url?: string }
+) {
   const { data, error } = await supabase
-    .from('user_profiles')
+    .from("user_profiles")
     .update(profile)
-    .eq('id', userId)
+    .eq("id", userId)
     .select()
     .single();
-  
+
   return { data, error };
 }
 
@@ -123,24 +135,31 @@ export async function updateUserProfile(userId: string, profile: { full_name?: s
  */
 export async function getUserSettings(userId: string) {
   const { data, error } = await supabase
-    .from('user_settings')
-    .select('*')
-    .eq('id', userId)
+    .from("user_settings")
+    .select("*")
+    .eq("id", userId)
     .single();
-  
+
   return { data, error };
 }
 
 /**
  * Update user settings
  */
-export async function updateUserSettings(userId: string, settings: { currency?: string; theme?: string; notification_enabled?: boolean }) {
+export async function updateUserSettings(
+  userId: string,
+  settings: {
+    currency?: string;
+    theme?: string;
+    notification_enabled?: boolean;
+  }
+) {
   const { data, error } = await supabase
-    .from('user_settings')
+    .from("user_settings")
     .update(settings)
-    .eq('id', userId)
+    .eq("id", userId)
     .select()
     .single();
-  
+
   return { data, error };
 }
