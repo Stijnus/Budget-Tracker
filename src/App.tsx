@@ -13,6 +13,7 @@ import { ExpensesPage } from "./pages/ExpensesPage";
 import { IncomePage } from "./pages/IncomePage";
 import { BudgetsPage } from "./pages/BudgetsPage";
 import { TagsPage } from "./pages/TagsPage";
+import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { AuthProvider } from "./state/auth"; // Using the AuthProvider from auth.tsx
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -92,6 +93,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <TagsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <AnalyticsPage />
               </ProtectedRoute>
             }
           />

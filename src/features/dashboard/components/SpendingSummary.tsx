@@ -51,24 +51,7 @@ export function SpendingSummary() {
 
   // If no summary data, show a simplified view with zeros
   if (!summary) {
-    // Get current month name
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    const now = new Date();
-    const month = monthNames[now.getMonth()];
-    const year = now.getFullYear();
+    // Simple view with zeros - no need for month/year in this version
 
     return (
       <div className="grid grid-cols-2 gap-4">
