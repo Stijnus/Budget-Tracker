@@ -1,60 +1,107 @@
-import { Bell, User } from "lucide-react";
+import { Bell, LogOut, Settings as SettingsIcon } from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm">
+    <header className="bg-background border-b shadow-sm">
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
         {/* Left side - Title based on current page */}
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">Dashboard</h1>
+          <h1 className="text-xl font-semibold">Dashboard</h1>
         </div>
 
         {/* Right side - User menu and notifications */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
           {/* Notifications */}
-          <button className="p-2 text-gray-500 rounded-full hover:bg-gray-100">
-            <Bell size={20} />
-          </button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground"
+                >
+                  <Bell size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Notifications</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           {/* User menu */}
           {user ? (
-            <div className="relative group">
-              <button className="flex items-center space-x-2 focus:outline-none">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  <User size={20} className="text-gray-500" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-8 w-8 rounded-full"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={user?.user_metadata?.avatar_url}
+                      alt="User"
+                    />
+                    <AvatarFallback className="bg-primary/10">
+                      {user?.user_metadata?.full_name
+                        ? user.user_metadata.full_name.charAt(0).toUpperCase()
+                        : user.email?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="flex flex-col space-y-1 p-2">
+                  <p className="text-sm font-medium leading-none">
+                    {user?.user_metadata?.full_name || "User"}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.email}
+                  </p>
                 </div>
-                <span className="hidden md:block text-sm font-medium text-gray-700">
-                  {user?.user_metadata?.full_name || user?.email}
-                </span>
-              </button>
-
-              {/* Dropdown menu */}
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
-                <Link
-                  to="/settings"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Settings
-                </Link>
-                <button
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/settings"
+                    className="flex w-full cursor-pointer items-center"
+                  >
+                    <SettingsIcon className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
                   onClick={() => logout()}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="cursor-pointer"
                 >
-                  Logout
-                </button>
-              </div>
-            </div>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
-            <Link
-              to="/login"
-              className="text-sm font-medium text-blue-600 hover:text-blue-500"
-            >
-              Login
-            </Link>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/login">Login</Link>
+            </Button>
           )}
         </div>
       </div>
