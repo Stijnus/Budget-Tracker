@@ -9,7 +9,7 @@ import {
   onAuthStateChange,
   getUserProfile,
   getUserSettings,
-} from "../../api/supabase/auth";
+} from "../../../api/supabase/auth";
 
 // Define types for user profile and settings
 interface UserProfile {

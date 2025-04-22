@@ -18,7 +18,6 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 export function ProfileForm() {
   const { user, userProfile, refreshUserData } = useAuth();
   // Use default values if userProfile is undefined
-  const profile = userProfile || {};
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);

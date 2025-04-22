@@ -4,7 +4,6 @@ import {
   Tag,
   ArrowUpDown,
   Palette,
-  Icon,
   ShoppingBag,
   Home,
   Car,
@@ -74,7 +73,10 @@ interface CategoryFormProps {
 }
 
 // Icon map for the icon picker
-const ICON_MAP: Record<string, React.ReactNode> = {
+const ICON_MAP: Record<
+  string,
+  React.ReactNode & { iconNode?: React.ReactNode }
+> = {
   ShoppingBag: <ShoppingBag size={20} />,
   Home: <Home size={20} />,
   Car: <Car size={20} />,
@@ -250,7 +252,7 @@ export function CategoryForm({
 
         <div className="space-y-2">
           <Label htmlFor="icon" className="flex items-center gap-1">
-            <Icon size={14} />
+            <Tag size={14} />
             <span>Icon</span>
           </Label>
           <div className="grid grid-cols-2 gap-2">

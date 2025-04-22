@@ -45,20 +45,35 @@ export function IncomeExpenseChart({
         setIsLoading(true);
         setError(null);
 
-        const { data, error } = await getIncomeVsExpenses(startDate, endDate);
+        // Get data without grouping to get total income/expenses
+        const { data, error } = await getIncomeVsExpenses(
+          startDate,
+          endDate,
+          "month"
+        );
 
         if (error) {
           throw new Error(error.message);
         }
 
-        if (data) {
+        if (data && Array.isArray(data) && data.length > 0) {
+          // Calculate totals from the array
+          const totalIncome = data.reduce(
+            (sum, item) => sum + (item.income || 0),
+            0
+          );
+          const totalExpenses = data.reduce(
+            (sum, item) => sum + (item.expenses || 0),
+            0
+          );
+
           const chartData = [
-            { name: "Income", value: data.income, fill: "#10B981" },
-            { name: "Expenses", value: data.expenses, fill: "#EF4444" },
+            { name: "Income", value: totalIncome, fill: "#10B981" },
+            { name: "Expenses", value: totalExpenses, fill: "#EF4444" },
           ];
 
           setData(chartData);
-          setNetSavings(data.income - data.expenses);
+          setNetSavings(totalIncome - totalExpenses);
         }
       } catch (err) {
         console.error("Error fetching income vs expenses data:", err);

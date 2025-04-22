@@ -79,7 +79,21 @@ export function SavingsRateChart({
   }, [startDate, endDate]);
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: {
+        name: string;
+        savingsRate: number;
+        income: number;
+        expenses: number;
+        savings: number;
+      };
+    }>;
+    label?: string;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       return (
