@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { getCurrentBudgets } from "../../../api/supabase/budgets";
 import { formatCurrency } from "../../../utils/formatters";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Budget {
   id: string;
@@ -41,25 +45,27 @@ export function BudgetSummary() {
   if (isLoading) {
     return (
       <div className="flex justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
   }
 
   if (budgets.length === 0) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-4 text-center text-muted-foreground">
         <p className="mb-4">Create your first budget to track your spending!</p>
-        <button
-          onClick={() => (window.location.href = "/budgets")}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
-        >
+        <Button onClick={() => (window.location.href = "/budgets")}>
           Create Budget
-        </button>
+        </Button>
       </div>
     );
   }
@@ -75,53 +81,58 @@ export function BudgetSummary() {
           const isOverBudget = budget.spent > budget.amount;
 
           return (
-            <div key={budget.id} className="bg-white p-4 rounded-lg shadow">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="font-medium">{budget.name}</h3>
-                <span className="text-sm text-gray-500">
-                  {formatCurrency(budget.spent)} /{" "}
-                  {formatCurrency(budget.amount)}
-                </span>
-              </div>
+            <Card key={budget.id} className="p-4">
+              <CardContent className="p-0">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-medium">{budget.name}</h3>
+                  <span className="text-sm text-muted-foreground">
+                    {formatCurrency(budget.spent)} /{" "}
+                    {formatCurrency(budget.amount)}
+                  </span>
+                </div>
 
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  className={`h-2.5 rounded-full ${
-                    isOverBudget ? "bg-red-600" : "bg-blue-600"
-                  }`}
-                  style={{
-                    width: `${percentage}%`,
-                    backgroundColor: isOverBudget
-                      ? undefined
-                      : budget.category_color,
-                  }}
-                ></div>
-              </div>
+                <div className="w-full bg-muted rounded-full h-2.5">
+                  <div
+                    className={`h-2.5 rounded-full ${
+                      isOverBudget ? "bg-destructive" : "bg-primary"
+                    }`}
+                    style={{
+                      width: `${percentage}%`,
+                      backgroundColor: isOverBudget
+                        ? undefined
+                        : budget.category_color,
+                    }}
+                  ></div>
+                </div>
 
-              <div className="flex justify-between items-center mt-1">
-                <span className="text-xs text-gray-500">
-                  {budget.category_name || "General"}
-                </span>
-                <span
-                  className={`text-xs font-medium ${
-                    isOverBudget ? "text-red-600" : "text-gray-500"
-                  }`}
-                >
-                  {percentage}%
-                </span>
-              </div>
-            </div>
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-xs text-muted-foreground">
+                    {budget.category_name || "General"}
+                  </span>
+                  <span
+                    className={`text-xs font-medium ${
+                      isOverBudget
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {percentage}%
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
 
       <div className="mt-4 text-center">
-        <button
+        <Button
+          variant="link"
           onClick={() => (window.location.href = "/budgets")}
-          className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+          className="text-sm h-auto p-0"
         >
           View All Budgets
-        </button>
+        </Button>
       </div>
     </div>
   );
