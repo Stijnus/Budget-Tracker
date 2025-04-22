@@ -12,13 +12,16 @@ export function BudgetPage() {
   const { budgetId } = useParams<{ budgetId: string }>();
   const navigate = useNavigate();
   const [budget, setBudget] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(!!budgetId);
+  const [isLoading, setIsLoading] = useState(budgetId && budgetId !== "new");
   const [error, setError] = useState<string | null>(null);
 
   // Fetch budget if editing
   useEffect(() => {
     async function fetchBudget() {
-      if (!budgetId || budgetId === "new") return;
+      if (!budgetId || budgetId === "new") {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         setIsLoading(true);

@@ -17,13 +17,16 @@ export function GoalPage() {
   const { goalId } = useParams<{ goalId: string }>();
   const navigate = useNavigate();
   const [goal, setGoal] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(!!goalId);
+  const [isLoading, setIsLoading] = useState(goalId && goalId !== "new");
   const [error, setError] = useState<string | null>(null);
 
   // Fetch goal if editing
   useEffect(() => {
     async function fetchGoal() {
-      if (!goalId || goalId === "new") return;
+      if (!goalId || goalId === "new") {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         setIsLoading(true);

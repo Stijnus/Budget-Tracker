@@ -3,7 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, Receipt } from "lucide-react";
 import { AppLayout } from "../shared/components/layout";
 import { BillForm } from "../features/bills/components/BillForm";
-import { getBillById, createBill, updateBill, BillInsert } from "../api/supabase/bills";
+import {
+  getBillById,
+  createBill,
+  updateBill,
+  BillInsert,
+} from "../api/supabase/bills";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -12,21 +17,24 @@ export function BillPage() {
   const { billId } = useParams<{ billId: string }>();
   const navigate = useNavigate();
   const [bill, setBill] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(!!billId);
+  const [isLoading, setIsLoading] = useState(billId && billId !== "new");
   const [error, setError] = useState<string | null>(null);
 
   // Fetch bill if editing
   useEffect(() => {
     async function fetchBill() {
-      if (!billId || billId === "new") return;
+      if (!billId || billId === "new") {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         setIsLoading(true);
         const { data, error } = await getBillById(billId);
-        
+
         if (error) throw error;
         if (!data) throw new Error("Bill not found");
-        
+
         setBill(data);
       } catch (err) {
         console.error("Error fetching bill:", err);
@@ -78,9 +86,9 @@ export function BillPage() {
     <AppLayout>
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleClose}
             className="mr-2"
           >

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, Tag as TagIcon } from "lucide-react";
 import { AppLayout } from "../shared/components/layout";
 import { TagForm } from "../features/tags/components/TagForm";
-import { getTagById, createTag, updateTag, TagInsert } from "../api/supabase/tags";
+import { getTagById } from "../api/supabase/tags";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -12,21 +12,24 @@ export function TagPage() {
   const { tagId } = useParams<{ tagId: string }>();
   const navigate = useNavigate();
   const [tag, setTag] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(!!tagId);
+  const [isLoading, setIsLoading] = useState(tagId && tagId !== "new");
   const [error, setError] = useState<string | null>(null);
 
   // Fetch tag if editing
   useEffect(() => {
     async function fetchTag() {
-      if (!tagId || tagId === "new") return;
+      if (!tagId || tagId === "new") {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         setIsLoading(true);
         const { data, error } = await getTagById(tagId);
-        
+
         if (error) throw error;
         if (!data) throw new Error("Tag not found");
-        
+
         setTag(data);
       } catch (err) {
         console.error("Error fetching tag:", err);
@@ -61,9 +64,9 @@ export function TagPage() {
     <AppLayout>
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleClose}
             className="mr-2"
           >
