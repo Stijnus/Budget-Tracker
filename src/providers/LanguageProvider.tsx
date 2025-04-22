@@ -72,6 +72,14 @@ i18n
           "dashboard.welcome": "Welcome back",
           "dashboard.summary": "Financial Summary",
           "dashboard.recent": "Recent Transactions",
+          "dashboard.overview": "Overview",
+          "dashboard.finances": "Finances",
+          "dashboard.goals": "Goals",
+          "dashboard.billReminders": "Bill Reminders",
+          "dashboard.budgetProgress": "Budget Progress",
+          "dashboard.expenseCategories": "Expense Categories",
+          "common.user": "User",
+          "common.viewAll": "View All",
 
           // Settings
           "settings.title": "Settings",
@@ -129,6 +137,14 @@ i18n
           "dashboard.welcome": "Welkom terug",
           "dashboard.summary": "Financieel Overzicht",
           "dashboard.recent": "Recente Transacties",
+          "dashboard.overview": "Overzicht",
+          "dashboard.finances": "Financiën",
+          "dashboard.goals": "Doelen",
+          "dashboard.billReminders": "Betalingsherinneringen",
+          "dashboard.budgetProgress": "Budget Voortgang",
+          "dashboard.expenseCategories": "Uitgavencategorieën",
+          "common.user": "Gebruiker",
+          "common.viewAll": "Bekijk Alles",
 
           // Settings
           "settings.title": "Instellingen",
@@ -186,6 +202,14 @@ i18n
           "dashboard.welcome": "Bienvenue",
           "dashboard.summary": "Résumé financier",
           "dashboard.recent": "Transactions récentes",
+          "dashboard.overview": "Aperçu",
+          "dashboard.finances": "Finances",
+          "dashboard.goals": "Objectifs",
+          "dashboard.billReminders": "Rappels de factures",
+          "dashboard.budgetProgress": "Progression du budget",
+          "dashboard.expenseCategories": "Catégories de dépenses",
+          "common.user": "Utilisateur",
+          "common.viewAll": "Voir tout",
 
           // Settings
           "settings.title": "Paramètres",
@@ -243,6 +267,14 @@ i18n
           "dashboard.welcome": "Willkommen zurück",
           "dashboard.summary": "Finanzübersicht",
           "dashboard.recent": "Neueste Transaktionen",
+          "dashboard.overview": "Übersicht",
+          "dashboard.finances": "Finanzen",
+          "dashboard.goals": "Ziele",
+          "dashboard.billReminders": "Rechnungserinnerungen",
+          "dashboard.budgetProgress": "Budget-Fortschritt",
+          "dashboard.expenseCategories": "Ausgabenkategorien",
+          "common.user": "Benutzer",
+          "common.viewAll": "Alle anzeigen",
 
           // Settings
           "settings.title": "Einstellungen",
