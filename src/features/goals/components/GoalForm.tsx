@@ -42,7 +42,7 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
     goal?.start_date || new Date().toISOString().split("T")[0]
   );
   const [targetDate, setTargetDate] = useState(goal?.target_date || "");
-  const [categoryId, setCategoryId] = useState(goal?.category_id || "");
+  const [categoryId, setCategoryId] = useState(goal?.category_id || "none");
   const [notes, setNotes] = useState(goal?.notes || "");
   const [status, setStatus] = useState<
     "in_progress" | "achieved" | "cancelled"
@@ -96,7 +96,7 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
         current_amount: parseFloat(currentAmount || "0"),
         start_date: startDate,
         target_date: targetDate || null,
-        category_id: categoryId || null,
+        category_id: categoryId === "none" ? null : categoryId,
         notes: notes || null,
         status,
       };
@@ -197,7 +197,7 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">None</SelectItem>
+            <SelectItem value="none">None</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.name}
