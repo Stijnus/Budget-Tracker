@@ -28,7 +28,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Feature highlights */}
-      <div className="hidden lg:flex lg:flex-1 bg-blue-600 text-white p-12 flex-col justify-center">
+      <div className="hidden lg:flex lg:flex-1 bg-primary text-primary-foreground p-12 flex-col justify-center">
         <div className="max-w-md mx-auto">
           <h1 className="text-4xl font-bold mb-6">Budget Tracker</h1>
           <p className="text-xl mb-12">
@@ -38,7 +38,7 @@ export function LandingPage() {
 
           <div className="space-y-8">
             <div className="flex items-start">
-              <div className="bg-blue-500 p-3 rounded-full mr-4">
+              <div className="bg-primary-foreground/20 p-3 rounded-full mr-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -58,7 +58,7 @@ export function LandingPage() {
                 <h3 className="text-lg font-semibold mb-1">
                   Track Your Expenses
                 </h3>
-                <p className="text-blue-100">
+                <p className="text-primary-foreground/80">
                   Easily log and categorize your expenses to see where your
                   money is going.
                 </p>
@@ -66,7 +66,7 @@ export function LandingPage() {
             </div>
 
             <div className="flex items-start">
-              <div className="bg-blue-500 p-3 rounded-full mr-4">
+              <div className="bg-primary-foreground/20 p-3 rounded-full mr-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -84,7 +84,7 @@ export function LandingPage() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-1">Set Budgets</h3>
-                <p className="text-blue-100">
+                <p className="text-primary-foreground/80">
                   Create custom budgets for different categories and track your
                   progress.
                 </p>
@@ -92,7 +92,7 @@ export function LandingPage() {
             </div>
 
             <div className="flex items-start">
-              <div className="bg-blue-500 p-3 rounded-full mr-4">
+              <div className="bg-primary-foreground/20 p-3 rounded-full mr-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -112,7 +112,7 @@ export function LandingPage() {
                 <h3 className="text-lg font-semibold mb-1">
                   Visualize Your Finances
                 </h3>
-                <p className="text-blue-100">
+                <p className="text-primary-foreground/80">
                   Get insights with beautiful charts and reports to help you
                   make better financial decisions.
                 </p>
@@ -120,7 +120,7 @@ export function LandingPage() {
             </div>
 
             <div className="flex items-start">
-              <div className="bg-blue-500 p-3 rounded-full mr-4">
+              <div className="bg-primary-foreground/20 p-3 rounded-full mr-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -140,7 +140,7 @@ export function LandingPage() {
                 <h3 className="text-lg font-semibold mb-1">
                   Achieve Your Goals
                 </h3>
-                <p className="text-blue-100">
+                <p className="text-primary-foreground/80">
                   Set financial goals and track your progress towards achieving
                   them.
                 </p>

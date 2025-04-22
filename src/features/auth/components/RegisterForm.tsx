@@ -68,7 +68,7 @@ export function RegisterForm() {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
-          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+          <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400 mx-auto mb-2" />
           <CardTitle className="text-2xl">Registration Successful!</CardTitle>
         </CardHeader>
         <CardContent className="text-center">
