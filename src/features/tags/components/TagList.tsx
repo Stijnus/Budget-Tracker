@@ -5,7 +5,24 @@ import {
   Tag 
 } from "../../../api/supabase/tags";
 import { TagModal } from "./TagModal";
-import { Edit, Trash2, Plus, Tag as TagIcon } from "lucide-react";
+import { Edit, Trash2, Plus, Tag as TagIcon, Loader2, AlertCircle, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface TagListProps {
   showAddButton?: boolean;
@@ -121,74 +138,101 @@ export function TagList({
     }
   };
 
-  if (isLoading) {
+  if (isLoading && tags.length === 0) {
     return (
-      <div className="flex justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      <Card className={className}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xl">Tags</CardTitle>
+          {showAddButton && (
+            <Button onClick={handleAddTag} size="sm">
+              <Plus size={16} className="mr-1" /> Add Tag
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
+    return (
+      <Card className={className}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xl">Tags</CardTitle>
+          {showAddButton && (
+            <Button onClick={handleAddTag} size="sm">
+              <Plus size={16} className="mr-1" /> Add Tag
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="pt-6">
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+          <Button variant="outline" onClick={handleTagSuccess}>
+            Try Again
+          </Button>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <div className={`${className}`}>
-      {/* Search and Add Button */}
-      <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div className="relative flex-1">
-          <input
+    <Card className={className}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xl">Tags</CardTitle>
+        {showAddButton && (
+          <Button onClick={handleAddTag} size="sm">
+            <Plus size={16} className="mr-1" /> Add Tag
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="pt-6">
+        {/* Search */}
+        <div className="mb-4 relative">
+          <Input
             type="text"
             placeholder="Search tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="pl-10"
           />
-          <div className="absolute left-3 top-2.5 text-gray-400">
-            <TagIcon size={16} />
-          </div>
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
         </div>
-        
-        {showAddButton && (
-          <button
-            onClick={handleAddTag}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
-          >
-            <Plus size={16} className="mr-1" />
-            Add Tag
-          </button>
-        )}
-      </div>
 
-      {/* Tags List */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {/* Tags List */}
         {filteredTags.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
+          <div className="p-6 text-center text-muted-foreground">
             {searchQuery ? (
               <>No tags found matching "{searchQuery}"</>
             ) : (
               <>
                 No tags found. {showAddButton && (
-                  <button 
+                  <Button 
                     onClick={handleAddTag}
-                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                    variant="link"
+                    className="px-1 py-0 h-auto"
                   >
                     Create your first tag
-                  </button>
+                  </Button>
                 )} to organize your transactions!
               </>
             )}
           </div>
         ) : (
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-border">
             {filteredTags.map((tag) => (
               <li 
                 key={tag.id} 
-                className={`p-4 hover:bg-gray-50 flex items-center justify-between ${
+                className={`p-4 hover:bg-muted/50 rounded-md flex items-center justify-between ${
                   onTagSelect ? 'cursor-pointer' : ''
                 } ${
-                  selectedTags.includes(tag.id) ? 'bg-blue-50' : ''
+                  selectedTags.includes(tag.id) ? 'bg-accent' : ''
                 }`}
                 onClick={onTagSelect ? () => handleTagClick(tag) : undefined}
               >
@@ -197,70 +241,68 @@ export function TagList({
                     className="w-4 h-4 rounded-full mr-3"
                     style={{ backgroundColor: tag.color }}
                   ></div>
-                  <span className="font-medium text-gray-700">{tag.name}</span>
+                  <span className="font-medium">{tag.name}</span>
                 </div>
                 
                 {!onTagSelect && (
-                  <div className="flex space-x-2">
-                    <button
+                  <div className="flex space-x-1">
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditTag(tag);
                       }}
-                      className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
-                      aria-label="Edit"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
                     >
                       <Edit size={16} />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteClick(tag.id);
                       }}
-                      className="p-1 text-gray-500 hover:text-red-600 transition-colors"
-                      aria-label="Delete"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive/90"
                     >
                       <Trash2 size={16} />
-                    </button>
+                    </Button>
                   </div>
                 )}
               </li>
             ))}
           </ul>
         )}
-      </div>
+        
+        {/* Tag Modal */}
+        <TagModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          tag={selectedTag}
+          onSuccess={handleTagSuccess}
+        />
 
-      {/* Tag Modal */}
-      <TagModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        tag={selectedTag}
-        onSuccess={handleTagSuccess}
-      />
-
-      {/* Delete Confirmation Modal */}
-      {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Confirm Deletion</h3>
-            <p className="text-gray-700 mb-6">Are you sure you want to delete this tag? This action cannot be undone.</p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={handleDeleteCancel}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
+        {/* Delete Confirmation Modal */}
+        <Dialog open={isDeleteConfirmOpen} onOpenChange={(open) => !open && handleDeleteCancel()}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Deletion</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this tag? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={handleDeleteCancel}>
                 Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-              >
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteConfirm}>
                 Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
   );
 }

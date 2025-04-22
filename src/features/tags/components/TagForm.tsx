@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "../../../state/useAuth";
-import { X } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 import {
   createTag,
   updateTag,
@@ -96,59 +101,49 @@ export function TagForm({ tag, onClose, onSuccess }: TagFormProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-auto">
+    <div className="p-6 max-w-md w-full mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">
+        <h2 className="text-xl font-semibold">
           {tag ? "Edit Tag" : "Create Tag"}
         </h2>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-gray-700"
-          aria-label="Close"
-        >
-          <X size={20} />
-        </button>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
-          {error}
-        </div>
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Tag Name */}
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Tag Name
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="name">Tag Name</Label>
+          <Input
             type="text"
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             placeholder="e.g., Vacation, Business, Personal"
             required
           />
         </div>
 
         {/* Color Selection */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tag Color
-          </label>
+        <div className="space-y-2">
+          <Label>Tag Color</Label>
           <div className="grid grid-cols-6 gap-2">
             {TAG_COLORS.map((colorOption) => (
-              <button
+              <Button
                 key={colorOption}
                 type="button"
-                className={`w-8 h-8 rounded-full ${
-                  color === colorOption ? "ring-2 ring-offset-2 ring-blue-500" : ""
-                }`}
+                variant="outline"
+                className={cn(
+                  "w-8 h-8 p-0",
+                  color === colorOption
+                    ? "ring-2 ring-primary ring-offset-2"
+                    : ""
+                )}
                 style={{ backgroundColor: colorOption }}
                 onClick={() => setColor(colorOption)}
                 aria-label={`Select color ${colorOption}`}
@@ -158,41 +153,25 @@ export function TagForm({ tag, onClose, onSuccess }: TagFormProps) {
         </div>
 
         {/* Preview */}
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Preview
-          </label>
-          <div className="flex items-center space-x-2">
+        <div className="space-y-2">
+          <Label>Preview</Label>
+          <div className="flex items-center space-x-2 p-2 border rounded-md">
             <div
               className="w-4 h-4 rounded-full"
               style={{ backgroundColor: color }}
             ></div>
-            <span className="text-sm font-medium">
-              {name || "Tag Name"}
-            </span>
+            <span className="text-sm font-medium">{name || "Tag Name"}</span>
           </div>
         </div>
 
         {/* Submit Button */}
         <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading
-              ? "Saving..."
-              : tag
-              ? "Update Tag"
-              : "Create Tag"}
-          </button>
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Saving..." : tag ? "Update Tag" : "Create Tag"}
+          </Button>
         </div>
       </form>
     </div>

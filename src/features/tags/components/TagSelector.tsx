@@ -7,7 +7,16 @@ import {
   Tag 
 } from "../../../api/supabase/tags";
 import { TagModal } from "./TagModal";
-import { Plus, X } from "lucide-react";
+import { Plus, X, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface TagSelectorProps {
   transactionId?: string;
@@ -27,7 +36,7 @@ export function TagSelector({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Fetch all available tags
   useEffect(() => {
@@ -125,9 +134,6 @@ export function TagSelector({
       if (onTagsChange) {
         onTagsChange(newSelectedTagIds);
       }
-      
-      // Close dropdown after selection
-      setIsDropdownOpen(false);
     } catch (err) {
       console.error("Error updating tags:", err);
       setError("Failed to update tags");
@@ -151,90 +157,106 @@ export function TagSelector({
 
   return (
     <div className="relative">
-      {/* Selected Tags Display */}
-      <div 
-        className="min-h-[38px] p-1.5 border border-gray-300 rounded-md flex flex-wrap gap-1 cursor-pointer"
-        onClick={() => !readOnly && setIsDropdownOpen(!isDropdownOpen)}
-      >
-        {selectedTags.length === 0 ? (
-          <span className="text-gray-500 text-sm px-1.5">
-            {readOnly ? "No tags" : "Select tags..."}
-          </span>
-        ) : (
-          <>
-            {selectedTags.map(tag => (
-              <div 
-                key={tag.id}
-                className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1"
-              >
-                <div 
-                  className="w-2 h-2 rounded-full mr-1.5"
-                  style={{ backgroundColor: tag.color }}
-                ></div>
-                <span className="text-xs font-medium text-gray-700">{tag.name}</span>
-                {!readOnly && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTagSelect(tag.id);
-                    }}
-                    className="ml-1 text-gray-400 hover:text-gray-600"
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </>
-        )}
-      </div>
-
-      {/* Dropdown for selecting tags */}
-      {isDropdownOpen && !readOnly && (
-        <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
-          {isLoading ? (
-            <div className="p-2 text-center text-gray-500">Loading tags...</div>
-          ) : error ? (
-            <div className="p-2 text-center text-red-500">{error}</div>
-          ) : (
-            <>
-              <ul className="py-1">
-                {tags.map(tag => (
-                  <li 
+      <Popover open={isOpen && !readOnly} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button 
+            variant="outline" 
+            role="combobox" 
+            aria-expanded={isOpen}
+            className={cn(
+              "w-full justify-between h-auto min-h-10 py-2",
+              readOnly && "cursor-default hover:bg-background"
+            )}
+            onClick={() => !readOnly && setIsOpen(!isOpen)}
+          >
+            <div className="flex flex-wrap gap-1 mr-2">
+              {selectedTags.length === 0 ? (
+                <span className="text-muted-foreground">
+                  {readOnly ? "No tags" : "Select tags..."}
+                </span>
+              ) : (
+                selectedTags.map(tag => (
+                  <Badge 
                     key={tag.id}
-                    className={`px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center ${
-                      selectedTagIds.includes(tag.id) ? 'bg-blue-50' : ''
-                    }`}
-                    onClick={() => handleTagSelect(tag.id)}
+                    variant="outline"
+                    className="flex items-center gap-1 px-2 py-1"
+                    style={{ backgroundColor: `${tag.color}20` }}
                   >
                     <div 
-                      className="w-3 h-3 rounded-full mr-2"
+                      className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: tag.color }}
                     ></div>
-                    <span className="text-sm">{tag.name}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              {/* Create new tag button */}
-              <div className="border-t border-gray-200 p-2">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsModalOpen(true);
-                  }}
-                  className="w-full text-left text-sm text-blue-600 hover:text-blue-800 flex items-center px-2 py-1"
-                >
-                  <Plus size={14} className="mr-1" />
-                  Create new tag
-                </button>
+                    <span>{tag.name}</span>
+                    {!readOnly && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-4 w-4 p-0 ml-1 hover:bg-transparent"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTagSelect(tag.id);
+                        }}
+                      >
+                        <X size={10} />
+                      </Button>
+                    )}
+                  </Badge>
+                ))
+              )}
+            </div>
+            {!readOnly && <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-full p-0" align="start">
+          {isLoading ? (
+            <div className="p-2 text-center text-muted-foreground">Loading tags...</div>
+          ) : error ? (
+            <div className="p-2 text-center text-destructive">{error}</div>
+          ) : (
+            <>
+              <div className="max-h-60 overflow-y-auto">
+                {tags.length === 0 ? (
+                  <div className="p-2 text-center text-muted-foreground">No tags found</div>
+                ) : (
+                  <div className="py-1">
+                    {tags.map(tag => (
+                      <Button
+                        key={tag.id}
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-start px-3 py-2 text-left font-normal",
+                          selectedTagIds.includes(tag.id) && "bg-accent"
+                        )}
+                        onClick={() => handleTagSelect(tag.id)}
+                      >
+                        <div 
+                          className="w-3 h-3 rounded-full mr-2"
+                          style={{ backgroundColor: tag.color }}
+                        ></div>
+                        <span>{tag.name}</span>
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
+              
+              <Separator />
+              
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-3 py-2 text-primary"
+                onClick={() => {
+                  setIsModalOpen(true);
+                  setIsOpen(false);
+                }}
+              >
+                <Plus size={14} className="mr-2" />
+                Create new tag
+              </Button>
             </>
           )}
-        </div>
-      )}
+        </PopoverContent>
+      </Popover>
 
       {/* Tag Creation Modal */}
       <TagModal
