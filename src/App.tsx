@@ -16,8 +16,10 @@ import { ExpensesPage } from "./pages/ExpensesPage";
 import { IncomePage } from "./pages/IncomePage";
 import { BudgetsPage } from "./pages/BudgetsPage";
 import { TagsPage } from "./pages/TagsPage";
+import { TagPage } from "./pages/TagPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { BillsPage } from "./pages/BillsPage";
+import { BillPage } from "./pages/BillPage";
 import { GoalsPage } from "./pages/GoalsPage";
 import { GoalPage } from "./pages/GoalPage";
 import { BudgetPage } from "./pages/BudgetPage";
@@ -61,6 +63,13 @@ function App() {
             <Router>
               <KeyboardShortcutsProvider>
                 <Routes>
+                  {/*
+                  PAGE NAMING CONVENTION:
+                  - List/Index Pages (Plural): Pages that show a list of items use plural names (e.g., GoalsPage, BudgetsPage)
+                  - Detail/Form Pages (Singular): Pages for creating or editing a single item use singular names (e.g., GoalPage, BudgetPage)
+                  - Other Pages: Pages that don't follow the list/detail pattern have descriptive names (e.g., DashboardPage, SettingsPage)
+                  */}
+
                   {/* Public routes */}
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<LandingPage />} />
@@ -69,6 +78,7 @@ function App() {
                   <Route path="/reset-password" element={<LandingPage />} />
 
                   {/* Protected routes */}
+                  {/* Dashboard route */}
                   <Route
                     path="/dashboard"
                     element={
@@ -79,6 +89,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  {/* Settings route */}
                   <Route
                     path="/settings"
                     element={
@@ -89,6 +100,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  {/* Categories routes */}
                   <Route
                     path="/categories"
                     element={
@@ -119,6 +131,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  {/* Transactions routes */}
                   <Route
                     path="/transactions"
                     element={
@@ -149,6 +162,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  {/* Expenses routes */}
                   <Route
                     path="/expenses"
                     element={
@@ -169,6 +183,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  {/* Income routes */}
                   <Route
                     path="/income"
                     element={
@@ -179,6 +194,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  {/* Budgets routes */}
                   <Route
                     path="/budgets"
                     element={
@@ -189,6 +205,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  {/* Tags routes */}
                   <Route
                     path="/tags"
                     element={
@@ -200,6 +217,17 @@ function App() {
                     }
                   />
                   <Route
+                    path="/tags/:tagId"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <TagPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* Analytics routes */}
+                  <Route
                     path="/analytics"
                     element={
                       <ProtectedRoute>
@@ -209,6 +237,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  {/* Bills routes */}
                   <Route
                     path="/bills"
                     element={
@@ -219,6 +248,17 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  <Route
+                    path="/bills/:billId"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <BillPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* Goals routes */}
                   <Route
                     path="/goals"
                     element={
@@ -250,7 +290,7 @@ function App() {
                     }
                   />
 
-                  {/* Redirect /home to /dashboard */}
+                  {/* Redirects */}
                   <Route
                     path="/home"
                     element={<Navigate to="/dashboard" replace />}
