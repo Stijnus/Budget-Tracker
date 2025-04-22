@@ -38,6 +38,8 @@ interface CategoryListProps {
 
 export function CategoryList({
   onEdit,
+  // onAdd is defined in props but not used in this component
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAdd,
   type = "expense",
 }: CategoryListProps) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+// No useState needed in this component
 import { AppLayout } from "../shared/components/layout";
 import {
   ProfileForm,
@@ -19,15 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Define the tabs
-type SettingsTab =
-  | "profile"
-  | "password"
-  | "preferences"
-  | "notifications"
-  | "currency"
-  | "theme"
-  | "account";
+// Tab values are used directly in the component
 
 export function SettingsPage() {
   // We'll use the Tabs component's built-in state management

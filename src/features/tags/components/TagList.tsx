@@ -230,7 +230,7 @@ export function TagList({
                 <div className="flex items-center">
                   <div
                     className="w-4 h-4 rounded-full mr-3"
-                    style={{ backgroundColor: tag.color }}
+                    style={{ backgroundColor: tag.color || undefined }}
                   ></div>
                   <span className="font-medium">{tag.name}</span>
                 </div>
