@@ -1,8 +1,23 @@
 {
   "name": "budget-tracker",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "A personal finance application for tracking expenses, income, and budget management",
+  "author": "Stijnus",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Stijnus/Budget-Tracker.git"
+  },
+  "keywords": [
+    "budget",
+    "finance",
+    "expense-tracker",
+    "react",
+    "typescript",
+    "supabase"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,7 +27,11 @@
     "types:generate": "supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > src/lib/database.types.ts",
     "type-check": "tsc --noEmit",
     "prepare": "husky",
-    "pre-commit": "./scripts/check-typescript.sh"
+    "pre-commit": "./scripts/check-typescript.sh",
+    "start": "vite preview",
+    "clean": "rm -rf node_modules dist .turbo",
+    "update-deps": "npm update",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -46,7 +65,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "react": "^18.3.1",
-    "react-day-picker": "8.10.1",
+    "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.56.0",
     "react-router-dom": "^7.5.1",
@@ -57,27 +76,27 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.1",
+    "@eslint/js": "^9.25.1",
     "@shadcn/ui": "^0.0.4",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
     "@types/uuid": "^10.0.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.18",
-    "eslint": "^9.9.1",
+    "eslint": "^9.25.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
-    "eslint-plugin-react-refresh": "^0.4.11",
-    "globals": "^15.9.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^15.15.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
-    "lucide-react": "^0.488.0",
+    "lucide-react": "^0.503.0",
     "postcss": "^8.4.35",
-    "supabase": "^1.187.3",
-    "tailwindcss": "^3.4.13",
+    "supabase": "^1.226.4",
+    "tailwindcss": "^3.4.17",
     "tsc-files": "^1.1.4",
     "tsx": "^4.19.3",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^8.3.0",
-    "vite": "^5.4.2"
+    "typescript-eslint": "^8.31.0",
+    "vite": "^5.4.18"
   }
 }
