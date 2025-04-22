@@ -5,3 +5,6 @@ export * from "./ProfileForm";
 export * from "./PasswordChangeForm";
 export * from "./AccountDeletionForm";
 export * from "./UserSettingsForm";
+export * from "./NotificationSettingsForm";
+export * from "./CurrencySettingsForm";
+export * from "./ThemeSettingsForm";

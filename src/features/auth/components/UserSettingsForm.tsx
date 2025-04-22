@@ -1,6 +1,25 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { updateUserSettings } from "../../../api/supabase/auth";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 // Currency options
 const CURRENCIES = [
@@ -74,95 +93,78 @@ export function UserSettingsForm() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">
-        User Preferences
-      </h2>
+    <Card>
+      <CardHeader>
+        <CardTitle>User Preferences</CardTitle>
+        <CardDescription>Customize your application settings</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {message && (
+          <Alert
+            variant={message.type === "success" ? "default" : "destructive"}
+            className="mb-4"
+          >
+            {message.type === "success" ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : (
+              <AlertCircle className="h-4 w-4" />
+            )}
+            <AlertDescription>{message.text}</AlertDescription>
+          </Alert>
+        )}
 
-      {message && (
-        <div
-          className={`p-3 mb-4 text-sm rounded-md ${
-            message.type === "success"
-              ? "bg-green-50 text-green-600"
-              : "bg-red-50 text-red-600"
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="currency">Currency</Label>
+            <Select value={currency} onValueChange={setCurrency}>
+              <SelectTrigger id="currency">
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCIES.map((curr) => (
+                  <SelectItem key={curr.code} value={curr.code}>
+                    {curr.symbol} - {curr.name} ({curr.code})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              This will be used for displaying all monetary values
+            </p>
+          </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label
-            htmlFor="currency"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Currency
-          </label>
-          <select
-            id="currency"
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            {CURRENCIES.map((curr) => (
-              <option key={curr.code} value={curr.code}>
-                {curr.symbol} - {curr.name} ({curr.code})
-              </option>
-            ))}
-          </select>
-          <p className="mt-1 text-xs text-gray-500">
-            This will be used for displaying all monetary values
-          </p>
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="theme">Theme</Label>
+            <Select value={theme} onValueChange={setTheme}>
+              <SelectTrigger id="theme">
+                <SelectValue placeholder="Select theme" />
+              </SelectTrigger>
+              <SelectContent>
+                {THEMES.map((themeOption) => (
+                  <SelectItem key={themeOption.value} value={themeOption.value}>
+                    {themeOption.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div>
-          <label
-            htmlFor="theme"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Theme
-          </label>
-          <select
-            id="theme"
-            value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            {THEMES.map((themeOption) => (
-              <option key={themeOption.value} value={themeOption.value}>
-                {themeOption.label}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="notifications"
+              checked={notificationsEnabled}
+              onCheckedChange={setNotificationsEnabled}
+            />
+            <Label htmlFor="notifications" className="cursor-pointer">
+              Enable notifications
+            </Label>
+          </div>
 
-        <div className="flex items-center">
-          <input
-            id="notifications"
-            type="checkbox"
-            checked={notificationsEnabled}
-            onChange={(e) => setNotificationsEnabled(e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          />
-          <label
-            htmlFor="notifications"
-            className="ml-2 block text-sm text-gray-700"
-          >
-            Enable notifications
-          </label>
-        </div>
-
-        <div className="pt-4">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Saving..." : "Save Preferences"}
-          </button>
-        </div>
-      </form>
-    </div>
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
