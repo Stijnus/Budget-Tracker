@@ -1,6 +1,24 @@
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   createCategory,
   updateCategory,
@@ -97,116 +115,87 @@ export function CategoryForm({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-800">
+    <Dialog open={true} onOpenChange={() => onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
             {category ? "Edit Category" : "Add Category"}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X size={20} />
-          </button>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         {error && (
-          <div className="p-4 mx-6 mt-4 bg-red-50 text-red-600 rounded-md text-sm">
-            {error}
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Category Name
-            </label>
-            <input
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Category Name</Label>
+            <Input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="e.g., Groceries, Rent, Salary"
               required
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="type"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Category Type
-            </label>
-            <select
-              id="type"
+          <div className="space-y-2">
+            <Label htmlFor="type">Category Type</Label>
+            <Select
               value={type}
-              onChange={(e) =>
-                setType(e.target.value as "expense" | "income" | "both")
+              onValueChange={(value) =>
+                setType(value as "expense" | "income" | "both")
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="expense">Expense</option>
-              <option value="income">Income</option>
-              <option value="both">Both</option>
-            </select>
+              <SelectTrigger id="type">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="expense">Expense</SelectItem>
+                <SelectItem value="income">Income</SelectItem>
+                <SelectItem value="both">Both</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category Color
-            </label>
+          <div className="space-y-2">
+            <Label>Category Color</Label>
             <CategoryColorPicker color={color} onChange={setColor} />
           </div>
 
-          <div>
-            <label
-              htmlFor="icon"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Icon (Optional)
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="icon">Icon (Optional)</Label>
+            <Input
               id="icon"
               type="text"
               value={icon}
               onChange={(e) => setIcon(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Icon name or URL"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               You can use an icon name from Lucide icons or a URL to a custom
               icon.
             </p>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
+          <DialogFooter className="mt-4">
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            </Button>
+            <Button type="submit" disabled={isLoading}>
               {isLoading
                 ? "Saving..."
                 : category
                 ? "Update Category"
                 : "Add Category"}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
