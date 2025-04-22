@@ -1,6 +1,15 @@
-import { Bell, LogOut, Settings as SettingsIcon } from "lucide-react";
+import {
+  Bell,
+  LogOut,
+  Settings as SettingsIcon,
+  HelpCircle,
+  Search,
+  User,
+} from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
 import { Link } from "react-router-dom";
+import { QuickAddMenu } from "../QuickAddMenu";
+import { ThemeToggle } from "../ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -28,8 +37,49 @@ export function Navbar() {
           <h1 className="text-xl font-semibold">Dashboard</h1>
         </div>
 
-        {/* Right side - User menu and notifications */}
+        {/* Right side - Actions and user menu */}
         <div className="flex items-center space-x-2">
+          {/* Search */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hidden md:flex"
+                >
+                  <Search size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Search</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Quick Add Menu */}
+          <QuickAddMenu />
+
+          {/* Help */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hidden md:flex"
+                >
+                  <HelpCircle size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Help</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
           {/* Notifications */}
           <TooltipProvider>
             <Tooltip>

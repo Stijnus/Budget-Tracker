@@ -1,5 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Github, Twitter, Facebook, Instagram, HelpCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,6 +17,8 @@ export function Footer() {
         <div className="text-sm text-muted-foreground">
           &copy; {currentYear} Budget Tracker. All rights reserved.
         </div>
+
+        {/* Links */}
         <div className="mt-2 md:mt-0 flex items-center space-x-4">
           <Button
             variant="link"
@@ -35,6 +44,94 @@ export function Footer() {
             Contact
           </Button>
         </div>
+      </div>
+
+      {/* Social Media Icons */}
+      <div className="flex justify-center mt-4 space-x-4">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                <Github size={18} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>GitHub</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                <Twitter size={18} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Twitter</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                <Facebook size={18} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Facebook</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                <Instagram size={18} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Instagram</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                <HelpCircle size={18} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Help & Support</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </footer>
   );

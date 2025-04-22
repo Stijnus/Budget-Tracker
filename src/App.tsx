@@ -25,6 +25,7 @@ import { ErrorBoundary } from "./shared/components/ErrorBoundary";
 import { ToastProvider } from "./shared/components/Toast";
 import { WelcomeModal } from "./shared/components/WelcomeModal";
 import { KeyboardShortcutsProvider } from "./shared/components/KeyboardShortcutsProvider";
+import { ThemeProvider } from "./state/useTheme";
 
 function App() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
@@ -50,163 +51,165 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <ToastProvider>
-          <Router>
-            <KeyboardShortcutsProvider>
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<LandingPage />} />
-                <Route path="/register" element={<LandingPage />} />
-                <Route path="/forgot-password" element={<LandingPage />} />
-                <Route path="/reset-password" element={<LandingPage />} />
+      <ThemeProvider defaultTheme="light">
+        <AuthProvider>
+          <ToastProvider>
+            <Router>
+              <KeyboardShortcutsProvider>
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<LandingPage />} />
+                  <Route path="/register" element={<LandingPage />} />
+                  <Route path="/forgot-password" element={<LandingPage />} />
+                  <Route path="/reset-password" element={<LandingPage />} />
 
-                {/* Protected routes */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <DashboardPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <SettingsPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/categories"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <CategoriesPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/transactions"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <TransactionsPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/expenses"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <ExpensesPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/income"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <IncomePage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/budgets"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <BudgetsPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/tags"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <TagsPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/analytics"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <AnalyticsPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/bills"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <BillsPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/goals"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <GoalsPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/goals/:goalId"
-                  element={
-                    <ProtectedRoute>
-                      <ErrorBoundary>
-                        <GoalsPage />
-                      </ErrorBoundary>
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Protected routes */}
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <DashboardPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <SettingsPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/categories"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <CategoriesPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/transactions"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <TransactionsPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/expenses"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <ExpensesPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/income"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <IncomePage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/budgets"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <BudgetsPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/tags"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <TagsPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/analytics"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <AnalyticsPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/bills"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <BillsPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/goals"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <GoalsPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/goals/:goalId"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <GoalsPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* Redirect /home to /dashboard */}
-                <Route
-                  path="/home"
-                  element={<Navigate to="/dashboard" replace />}
+                  {/* Redirect /home to /dashboard */}
+                  <Route
+                    path="/home"
+                    element={<Navigate to="/dashboard" replace />}
+                  />
+
+                  {/* Database check route */}
+                  <Route path="/db-check" element={<DatabaseCheck />} />
+
+                  {/* 404 route */}
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+
+                {/* Welcome Modal for new users */}
+                <WelcomeModal
+                  isOpen={showWelcomeModal}
+                  onClose={handleWelcomeModalClose}
+                  userName={userName}
                 />
-
-                {/* Database check route */}
-                <Route path="/db-check" element={<DatabaseCheck />} />
-
-                {/* 404 route */}
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-
-              {/* Welcome Modal for new users */}
-              <WelcomeModal
-                isOpen={showWelcomeModal}
-                onClose={handleWelcomeModalClose}
-                userName={userName}
-              />
-            </KeyboardShortcutsProvider>
-          </Router>
-        </ToastProvider>
-      </AuthProvider>
+              </KeyboardShortcutsProvider>
+            </Router>
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
