@@ -1,32 +1,31 @@
-import { useState } from 'react';
-import { AppLayout } from '../shared/components/layout';
-import { BillList } from '../features/bills/components/BillList';
-import { BillDetails } from '../features/bills/components/BillDetails';
+import { useState } from "react";
+import { AppLayout } from "../shared/components/layout";
+import { BillList } from "../features/bills/components/BillList";
+import { BillDetails } from "../features/bills/components/BillDetails";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 export function BillsPage() {
   const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
-  
+
   return (
     <AppLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Bills & Subscriptions
-          </h2>
+          <h2 className="text-2xl font-bold">Bills & Subscriptions</h2>
         </div>
-        
+
         {selectedBillId ? (
           <div>
-            <button
+            <Button
               onClick={() => setSelectedBillId(null)}
-              className="mb-4 text-blue-600 hover:text-blue-800 flex items-center"
+              variant="ghost"
+              className="mb-4 flex items-center p-0 h-auto font-normal"
             >
-              <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="h-4 w-4 mr-1" />
               Back to Bills
-            </button>
-            
+            </Button>
+
             <BillDetails
               billId={selectedBillId}
               onClose={() => setSelectedBillId(null)}

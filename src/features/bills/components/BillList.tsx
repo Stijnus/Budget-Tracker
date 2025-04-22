@@ -6,6 +6,7 @@ import {
   Calendar,
   AlertCircle,
   CheckCircle2,
+  Loader2,
 } from "lucide-react";
 import {
   BillWithCategory,
@@ -15,6 +16,18 @@ import {
 } from "../../../api/supabase/bills";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
 import { BillModal } from "./BillModal";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface BillListProps {
   showAddButton?: boolean;
@@ -190,13 +203,18 @@ export function BillList({
   if (isLoading) {
     return (
       <div className="flex justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
   }
 
   return (
@@ -204,125 +222,131 @@ export function BillList({
       {/* Add Bill Button */}
       {showAddButton && (
         <div className="mb-4 flex justify-end">
-          <button
-            onClick={handleAddBill}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
-          >
+          <Button onClick={handleAddBill} className="flex items-center">
             <Plus size={16} className="mr-1" />
             Add Bill
-          </button>
+          </Button>
         </div>
       )}
 
       {/* Bills List */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        {bills.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            <p className="mb-4">
-              No bills found. Add your first bill to start tracking!
-            </p>
-            {showAddButton && (
-              <button
-                onClick={handleAddBill}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
-              >
-                Add Bill
-              </button>
-            )}
-          </div>
-        ) : (
-          <ul className="divide-y divide-gray-200">
-            {bills.map((bill) => (
-              <li key={bill.id} className="p-4 hover:bg-gray-50">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="text-md font-medium text-gray-900">
-                      {bill.name}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {bill.category_name
-                        ? bill.category_name
-                        : "Uncategorized"}{" "}
-                      •{getFrequencyText(bill.frequency)}
-                    </p>
+      <Card>
+        <CardContent className="p-0">
+          {bills.length === 0 ? (
+            <div className="p-6 text-center text-muted-foreground">
+              <p className="mb-4">
+                No bills found. Add your first bill to start tracking!
+              </p>
+              {showAddButton && (
+                <Button onClick={handleAddBill}>Add Bill</Button>
+              )}
+            </div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {bills.map((bill) => (
+                <li
+                  key={bill.id}
+                  className="p-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="text-md font-medium">{bill.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {bill.category_name
+                          ? bill.category_name
+                          : "Uncategorized"}{" "}
+                        •{getFrequencyText(bill.frequency)}
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        onClick={() => handleMarkAsPaid(bill.id)}
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-green-600"
+                        aria-label="Mark as Paid"
+                        title="Mark as Paid"
+                      >
+                        <CheckCircle2 size={16} />
+                      </Button>
+                      <Button
+                        onClick={() => handleEditBill(bill)}
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-primary"
+                        aria-label="Edit"
+                      >
+                        <Edit size={16} />
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteClick(bill.id)}
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        aria-label="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleMarkAsPaid(bill.id)}
-                      className="p-1 text-gray-500 hover:text-green-600 transition-colors"
-                      aria-label="Mark as Paid"
-                      title="Mark as Paid"
+
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-lg font-medium">
+                      {formatCurrency(bill.amount)}
+                    </span>
+                    <Badge
+                      variant={
+                        bill.status === "active"
+                          ? "default"
+                          : bill.status === "paused"
+                          ? "outline"
+                          : "secondary"
+                      }
                     >
-                      <CheckCircle2 size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleEditBill(bill)}
-                      className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
-                      aria-label="Edit"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(bill.id)}
-                      className="p-1 text-gray-500 hover:text-red-600 transition-colors"
-                      aria-label="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                      {bill.status.charAt(0).toUpperCase() +
+                        bill.status.slice(1)}
+                    </Badge>
                   </div>
-                </div>
 
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-lg font-medium text-gray-700">
-                    {formatCurrency(bill.amount)}
-                  </span>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
-                      bill.status
-                    )}`}
-                  >
-                    {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
-                  </span>
-                </div>
-
-                <div className="flex items-center text-sm text-gray-500">
-                  <Calendar size={14} className="mr-1" />
-                  <span>
-                    Next due:{" "}
-                    {bill.next_due_date
-                      ? formatDate(bill.next_due_date, "medium")
-                      : "Not set"}
-                  </span>
-                </div>
-
-                {/* Alert if due soon or overdue */}
-                {bill.next_due_date && isOverdue(bill.next_due_date) && (
-                  <div className="mt-2 flex items-center text-xs text-red-600">
-                    <AlertCircle size={14} className="mr-1" />
-                    Overdue
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Calendar size={14} className="mr-1" />
+                    <span>
+                      Next due:{" "}
+                      {bill.next_due_date
+                        ? formatDate(bill.next_due_date, "medium")
+                        : "Not set"}
+                    </span>
                   </div>
-                )}
 
-                {bill.next_due_date &&
-                  !isOverdue(bill.next_due_date) &&
-                  isDueSoon(bill.next_due_date) && (
-                    <div className="mt-2 flex items-center text-xs text-yellow-600">
+                  {/* Alert if due soon or overdue */}
+                  {bill.next_due_date && isOverdue(bill.next_due_date) && (
+                    <div className="mt-2 flex items-center text-xs text-destructive">
                       <AlertCircle size={14} className="mr-1" />
-                      Due soon
+                      Overdue
                     </div>
                   )}
 
-                {/* Payment method if available */}
-                {bill.payment_method && (
-                  <div className="mt-1 text-xs text-gray-500">
-                    Payment method: {bill.payment_method}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                  {bill.next_due_date &&
+                    !isOverdue(bill.next_due_date) &&
+                    isDueSoon(bill.next_due_date) && (
+                      <div className="mt-2 flex items-center text-xs text-yellow-600">
+                        <AlertCircle size={14} className="mr-1" />
+                        Due soon
+                      </div>
+                    )}
+
+                  {/* Payment method if available */}
+                  {bill.payment_method && (
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      Payment method: {bill.payment_method}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Bill Modal */}
       <BillModal
@@ -333,33 +357,25 @@ export function BillList({
       />
 
       {/* Delete Confirmation Modal */}
-      {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Confirm Deletion
-            </h3>
-            <p className="text-gray-700 mb-6">
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
               Are you sure you want to delete this bill? This action cannot be
               undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={handleDeleteCancel}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleDeleteCancel}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
