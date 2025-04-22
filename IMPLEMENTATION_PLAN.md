@@ -334,11 +334,11 @@ This section tracks the progress of integrating shadcn/ui components throughout 
 
 #### Analytics Components
 
-- [ ] AnalyticsPage
-- [ ] ExpenseBreakdownChart
-- [ ] IncomeBreakdownChart
-- [ ] SpendingTrendsChart
-- [ ] SavingsRateChart
+- [x] AnalyticsPage
+- [x] ExpenseBreakdownChart
+- [x] IncomeBreakdownChart
+- [x] SpendingTrendsChart
+- [x] SavingsRateChart
 
 #### Bill Management
 
