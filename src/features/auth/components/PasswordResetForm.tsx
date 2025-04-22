@@ -1,9 +1,22 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { resetPassword } from '../../../api/supabase/auth';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { resetPassword } from "../../../api/supabase/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 
 export function PasswordResetForm() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -15,14 +28,14 @@ export function PasswordResetForm() {
 
     try {
       const { error } = await resetPassword(email);
-      
+
       if (error) {
         setError(error.message);
       } else {
         setSuccess(true);
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      setError("An unexpected error occurred. Please try again.");
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -31,72 +44,68 @@ export function PasswordResetForm() {
 
   if (success) {
     return (
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Check your email</h1>
-          <p className="mt-4 text-gray-600">
-            We've sent a password reset link to {email}. Please check your inbox and follow the instructions to reset your password.
-          </p>
-          <Link
-            to="/login"
-            className="mt-6 inline-block text-sm font-medium text-blue-600 hover:text-blue-500"
-          >
-            Return to login
-          </Link>
-        </div>
-      </div>
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Check your email</CardTitle>
+          <CardDescription className="text-base mt-4">
+            We've sent a password reset link to {email}. Please check your inbox
+            and follow the instructions to reset your password.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter className="flex justify-center">
+          <Button asChild variant="link">
+            <Link to="/login">Return to login</Link>
+          </Button>
+        </CardFooter>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Reset your password</h1>
-        <p className="mt-2 text-gray-600">Enter your email to receive a password reset link</p>
-      </div>
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">Reset your password</CardTitle>
+        <CardDescription className="text-base">
+          Enter your email to receive a password reset link
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      {error && (
-        <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
-          {error}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Sending..." : "Send reset link"}
+          </Button>
+        </form>
+      </CardContent>
+      <CardFooter className="flex justify-center">
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground">
+            Remember your password?{" "}
+            <Button asChild variant="link" className="p-0 h-auto font-normal">
+              <Link to="/login">Sign in</Link>
+            </Button>
+          </p>
         </div>
-      )}
-
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email address
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? 'Sending...' : 'Send reset link'}
-          </button>
-        </div>
-      </form>
-
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-600">
-          Remember your password?{' '}
-          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            Sign in
-          </Link>
-        </p>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }

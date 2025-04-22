@@ -2,6 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../state/useAuth";
 import { supabase } from "../../../api/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function AccountDeletionForm() {
   const { user, logout } = useAuth();
@@ -54,49 +66,47 @@ export function AccountDeletionForm() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-red-200">
-      <h2 className="text-xl font-semibold text-red-600 mb-2">
-        Delete Account
-      </h2>
-      <p className="text-gray-600 mb-6">
-        This action is permanent and cannot be undone. All your data will be
-        permanently deleted.
-      </p>
+    <Card className="border-destructive/20">
+      <CardHeader>
+        <CardTitle className="text-destructive">Delete Account</CardTitle>
+        <CardDescription>
+          This action is permanent and cannot be undone. All your data will be
+          permanently deleted.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      {error && (
-        <div className="p-3 mb-4 text-sm bg-red-50 text-red-600 rounded-md">
-          {error}
-        </div>
-      )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="confirmText" className="text-destructive/90">
+              To confirm, type "DELETE MY ACCOUNT" below
+            </Label>
+            <Input
+              id="confirmText"
+              type="text"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              required
+              className="border-destructive/30 focus-visible:ring-destructive/30"
+            />
+          </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="confirmText"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            To confirm, type "DELETE MY ACCOUNT" below
-          </label>
-          <input
-            id="confirmText"
-            type="text"
-            value={confirmText}
-            onChange={(e) => setConfirmText(e.target.value)}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500"
-          />
-        </div>
-
-        <div className="pt-4">
-          <button
+          <Button
             type="submit"
+            variant="destructive"
+            className="w-full mt-4"
             disabled={isLoading || confirmText !== "DELETE MY ACCOUNT"}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Deleting..." : "Permanently Delete My Account"}
-          </button>
-        </div>
-      </form>
-    </div>
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
