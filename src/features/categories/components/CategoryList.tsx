@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Edit,
   Trash2,
-  Plus,
   AlertCircle,
   Loader2,
   Palette,
@@ -12,7 +11,7 @@ import {
 import { getCategories, deleteCategory, Category } from "../../../api/supabase";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -33,7 +32,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface CategoryListProps {
   onEdit: (category: Category) => void;
-  onAdd: () => void;
+  onAdd: (() => void) | (() => Promise<void>);
   type?: "expense" | "income" | "both";
 }
 

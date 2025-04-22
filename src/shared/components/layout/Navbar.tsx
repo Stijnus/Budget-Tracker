@@ -4,7 +4,6 @@ import {
   Settings as SettingsIcon,
   HelpCircle,
   Search,
-  User,
 } from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
 import { Link } from "react-router-dom";

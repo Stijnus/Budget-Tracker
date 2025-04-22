@@ -16,9 +16,24 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Theme options
 const THEMES = [
-  { value: "light", label: "Light", icon: Sun, description: "Light mode with bright background and dark text" },
-  { value: "dark", label: "Dark", icon: Moon, description: "Dark mode with dark background and light text" },
-  { value: "system", label: "System", icon: Laptop, description: "Follow your system's theme settings" },
+  {
+    value: "light",
+    label: "Light",
+    icon: Sun,
+    description: "Light mode with bright background and dark text",
+  },
+  {
+    value: "dark",
+    label: "Dark",
+    icon: Moon,
+    description: "Dark mode with dark background and light text",
+  },
+  {
+    value: "system",
+    label: "System",
+    icon: Laptop,
+    description: "Follow your system's theme settings",
+  },
 ];
 
 export function ThemeSettingsForm() {
@@ -53,10 +68,15 @@ export function ThemeSettingsForm() {
       if (error) {
         setMessage({ text: error.message, type: "error" });
       } else {
-        setMessage({ text: "Theme settings updated successfully", type: "success" });
+        setMessage({
+          text: "Theme settings updated successfully",
+          type: "success",
+        });
         // Refresh user data to update the UI
-        await refreshUserData();
-        
+        if (refreshUserData) {
+          await refreshUserData();
+        }
+
         // In a real app, we would apply the theme here
         // document.documentElement.classList.toggle('dark', theme === 'dark');
       }
@@ -72,7 +92,9 @@ export function ThemeSettingsForm() {
     <Card>
       <CardHeader>
         <CardTitle>Theme Settings</CardTitle>
-        <CardDescription>Customize the appearance of the application</CardDescription>
+        <CardDescription>
+          Customize the appearance of the application
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {message && (
@@ -92,8 +114,8 @@ export function ThemeSettingsForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-3">
             <Label>Select Theme</Label>
-            <RadioGroup 
-              value={theme} 
+            <RadioGroup
+              value={theme}
               onValueChange={setTheme}
               className="grid grid-cols-1 md:grid-cols-3 gap-4"
             >

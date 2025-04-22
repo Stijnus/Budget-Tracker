@@ -30,7 +30,7 @@ type SettingsTab =
   | "account";
 
 export function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
+  // We'll use the Tabs component's built-in state management
 
   return (
     <AppLayout>
@@ -40,7 +40,7 @@ export function SettingsPage() {
         <Tabs
           defaultValue="profile"
           className="w-full"
-          onValueChange={(value) => setActiveTab(value as SettingsTab)}
+          // Tab changes are handled internally by the Tabs component
         >
           <div className="flex flex-col md:flex-row gap-6">
             {/* Sidebar */}

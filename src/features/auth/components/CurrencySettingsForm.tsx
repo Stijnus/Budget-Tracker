@@ -35,7 +35,12 @@ const CURRENCIES = [
   { code: "GBP", symbol: "£", name: "British Pound", format: "£1,234.56" },
   { code: "JPY", symbol: "¥", name: "Japanese Yen", format: "¥1,235" },
   { code: "CAD", symbol: "C$", name: "Canadian Dollar", format: "C$1,234.56" },
-  { code: "AUD", symbol: "A$", name: "Australian Dollar", format: "A$1,234.56" },
+  {
+    code: "AUD",
+    symbol: "A$",
+    name: "Australian Dollar",
+    format: "A$1,234.56",
+  },
   { code: "CHF", symbol: "Fr", name: "Swiss Franc", format: "Fr 1'234.56" },
   { code: "CNY", symbol: "¥", name: "Chinese Yuan", format: "¥1,234.56" },
   { code: "INR", symbol: "₹", name: "Indian Rupee", format: "₹1,234.56" },
@@ -74,9 +79,14 @@ export function CurrencySettingsForm() {
       if (error) {
         setMessage({ text: error.message, type: "error" });
       } else {
-        setMessage({ text: "Currency settings updated successfully", type: "success" });
+        setMessage({
+          text: "Currency settings updated successfully",
+          type: "success",
+        });
         // Refresh user data to update the UI
-        await refreshUserData();
+        if (refreshUserData) {
+          await refreshUserData();
+        }
       }
     } catch (err) {
       setMessage({ text: "An unexpected error occurred", type: "error" });
@@ -86,13 +96,16 @@ export function CurrencySettingsForm() {
     }
   };
 
-  const selectedCurrency = CURRENCIES.find(c => c.code === currency) || CURRENCIES[0];
+  const selectedCurrency =
+    CURRENCIES.find((c) => c.code === currency) || CURRENCIES[0];
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Currency Settings</CardTitle>
-        <CardDescription>Choose your preferred currency for the application</CardDescription>
+        <CardDescription>
+          Choose your preferred currency for the application
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {message && (
@@ -125,7 +138,8 @@ export function CurrencySettingsForm() {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              This will be used for displaying all monetary values throughout the application
+              This will be used for displaying all monetary values throughout
+              the application
             </p>
           </div>
 
@@ -134,15 +148,21 @@ export function CurrencySettingsForm() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Symbol:</span>
-                <span className="text-sm font-medium">{selectedCurrency.symbol}</span>
+                <span className="text-sm font-medium">
+                  {selectedCurrency.symbol}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Code:</span>
-                <span className="text-sm font-medium">{selectedCurrency.code}</span>
+                <span className="text-sm font-medium">
+                  {selectedCurrency.code}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Format:</span>
-                <span className="text-sm font-medium">{selectedCurrency.format}</span>
+                <span className="text-sm font-medium">
+                  {selectedCurrency.format}
+                </span>
               </div>
             </div>
           </div>

@@ -1,20 +1,11 @@
 import { useState, useEffect } from "react";
-import { 
-  getTags, 
-  deleteTag,
-  Tag 
-} from "../../../api/supabase/tags";
+import { getTags, deleteTag, Tag } from "../../../api/supabase/tags";
 import { TagModal } from "./TagModal";
-import { Edit, Trash2, Plus, Tag as TagIcon, Loader2, AlertCircle, Search } from "lucide-react";
+import { Edit, Trash2, Plus, Loader2, AlertCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -31,11 +22,11 @@ interface TagListProps {
   className?: string;
 }
 
-export function TagList({ 
+export function TagList({
   showAddButton = false,
   onTagSelect,
   selectedTags = [],
-  className = "" 
+  className = "",
 }: TagListProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,13 +43,13 @@ export function TagList({
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const { data, error } = await getTags();
-        
+
         if (error) {
           throw error;
         }
-        
+
         setTags(data || []);
       } catch (err) {
         console.error("Error fetching tags:", err);
@@ -72,7 +63,7 @@ export function TagList({
   }, []);
 
   // Filter tags based on search query
-  const filteredTags = tags.filter(tag => 
+  const filteredTags = tags.filter((tag) =>
     tag.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -101,12 +92,12 @@ export function TagList({
       if (error) throw error;
 
       // Remove from local state
-      setTags(tags.filter(t => t.id !== tagToDelete));
+      setTags(tags.filter((t) => t.id !== tagToDelete));
       setIsDeleteConfirmOpen(false);
       setTagToDelete(null);
     } catch (err) {
-      console.error('Error deleting tag:', err);
-      setError('Failed to delete tag');
+      console.error("Error deleting tag:", err);
+      setError("Failed to delete tag");
     }
   };
 
@@ -212,38 +203,38 @@ export function TagList({
               <>No tags found matching "{searchQuery}"</>
             ) : (
               <>
-                No tags found. {showAddButton && (
-                  <Button 
+                No tags found.{" "}
+                {showAddButton && (
+                  <Button
                     onClick={handleAddTag}
                     variant="link"
                     className="px-1 py-0 h-auto"
                   >
                     Create your first tag
                   </Button>
-                )} to organize your transactions!
+                )}{" "}
+                to organize your transactions!
               </>
             )}
           </div>
         ) : (
           <ul className="divide-y divide-border">
             {filteredTags.map((tag) => (
-              <li 
-                key={tag.id} 
+              <li
+                key={tag.id}
                 className={`p-4 hover:bg-muted/50 rounded-md flex items-center justify-between ${
-                  onTagSelect ? 'cursor-pointer' : ''
-                } ${
-                  selectedTags.includes(tag.id) ? 'bg-accent' : ''
-                }`}
+                  onTagSelect ? "cursor-pointer" : ""
+                } ${selectedTags.includes(tag.id) ? "bg-accent" : ""}`}
                 onClick={onTagSelect ? () => handleTagClick(tag) : undefined}
               >
                 <div className="flex items-center">
-                  <div 
+                  <div
                     className="w-4 h-4 rounded-full mr-3"
                     style={{ backgroundColor: tag.color }}
                   ></div>
                   <span className="font-medium">{tag.name}</span>
                 </div>
-                
+
                 {!onTagSelect && (
                   <div className="flex space-x-1">
                     <Button
@@ -274,7 +265,7 @@ export function TagList({
             ))}
           </ul>
         )}
-        
+
         {/* Tag Modal */}
         <TagModal
           isOpen={isModalOpen}
@@ -284,12 +275,16 @@ export function TagList({
         />
 
         {/* Delete Confirmation Modal */}
-        <Dialog open={isDeleteConfirmOpen} onOpenChange={(open) => !open && handleDeleteCancel()}>
+        <Dialog
+          open={isDeleteConfirmOpen}
+          onOpenChange={(open) => !open && handleDeleteCancel()}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Confirm Deletion</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete this tag? This action cannot be undone.
+                Are you sure you want to delete this tag? This action cannot be
+                undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

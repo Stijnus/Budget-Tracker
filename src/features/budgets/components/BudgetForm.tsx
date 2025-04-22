@@ -41,13 +41,14 @@ export function BudgetForm({ budget, onClose, onSuccess }: BudgetFormProps) {
   const [amount, setAmount] = useState(budget?.amount?.toString() || "");
   const [categoryId, setCategoryId] = useState(budget?.category_id || "");
   const [period, setPeriod] = useState<"monthly" | "yearly" | "custom">(
-    budget?.period || "monthly"
+    (budget?.period as "monthly" | "yearly") || "monthly"
   );
   const [startDate, setStartDate] = useState(
     budget?.start_date || new Date().toISOString().split("T")[0]
   );
   const [endDate, setEndDate] = useState(budget?.end_date || "");
-  const [description, setDescription] = useState(budget?.description || "");
+  // Description is not in the database schema, but we'll keep it for future use
+  const [description, setDescription] = useState("");
 
   // Fetch categories on mount
   useEffect(() => {
@@ -125,11 +126,11 @@ export function BudgetForm({ budget, onClose, onSuccess }: BudgetFormProps) {
         user_id: user.id,
         name,
         amount: parseFloat(amount),
-        category_id: categoryId || null,
-        period,
+        category_id: categoryId || "",
+        period: period === "custom" ? "monthly" : period,
         start_date: startDate,
         end_date: calculatedEndDate || null,
-        description: description || null,
+        // description field is not in the schema yet
       };
 
       let result;

@@ -17,6 +17,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export function ProfileForm() {
   const { user, userProfile, refreshUserData } = useAuth();
+  // Use default values if userProfile is undefined
+  const profile = userProfile || {};
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +54,9 @@ export function ProfileForm() {
       } else {
         setMessage({ text: "Profile updated successfully", type: "success" });
         // Refresh user data to update the UI
-        await refreshUserData();
+        if (refreshUserData) {
+          await refreshUserData();
+        }
       }
     } catch (err) {
       setMessage({ text: "An unexpected error occurred", type: "error" });

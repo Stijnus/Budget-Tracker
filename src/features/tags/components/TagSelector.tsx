@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { 
-  getTags, 
+import {
+  getTags,
   getTagsForTransaction,
   addTagToTransaction,
   removeTagFromTransaction,
-  Tag 
+  Tag,
 } from "../../../api/supabase/tags";
 import { TagModal } from "./TagModal";
 import { Plus, X, ChevronDown } from "lucide-react";
@@ -25,14 +25,16 @@ interface TagSelectorProps {
   readOnly?: boolean;
 }
 
-export function TagSelector({ 
+export function TagSelector({
   transactionId,
   onTagsChange,
   selectedTagIds: externalSelectedTagIds,
-  readOnly = false
+  readOnly = false,
 }: TagSelectorProps) {
   const [tags, setTags] = useState<Tag[]>([]);
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(externalSelectedTagIds || []);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
+    externalSelectedTagIds || []
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,13 +45,13 @@ export function TagSelector({
     async function fetchTags() {
       try {
         setIsLoading(true);
-        
+
         const { data, error } = await getTags();
-        
+
         if (error) {
           throw error;
         }
-        
+
         setTags(data || []);
       } catch (err) {
         console.error("Error fetching tags:", err);
@@ -69,17 +71,18 @@ export function TagSelector({
     async function fetchTransactionTags() {
       try {
         setIsLoading(true);
-        
+
+        if (!transactionId) return;
         const { data, error } = await getTagsForTransaction(transactionId);
-        
+
         if (error) {
           throw error;
         }
-        
+
         if (data) {
-          const tagIds = data.map(item => item.tag_id);
+          const tagIds = data.map((item) => item.tag_id);
           setSelectedTagIds(tagIds);
-          
+
           // Call the onTagsChange callback if provided
           if (onTagsChange) {
             onTagsChange(tagIds);
@@ -106,30 +109,33 @@ export function TagSelector({
   // Handle tag selection
   const handleTagSelect = async (tagId: string) => {
     if (readOnly) return;
-    
+
     try {
       let newSelectedTagIds;
-      
+
       if (selectedTagIds.includes(tagId)) {
         // Remove tag
-        newSelectedTagIds = selectedTagIds.filter(id => id !== tagId);
-        
+        newSelectedTagIds = selectedTagIds.filter((id) => id !== tagId);
+
         if (transactionId) {
-          const { error } = await removeTagFromTransaction(transactionId, tagId);
+          const { error } = await removeTagFromTransaction(
+            transactionId,
+            tagId
+          );
           if (error) throw error;
         }
       } else {
         // Add tag
         newSelectedTagIds = [...selectedTagIds, tagId];
-        
+
         if (transactionId) {
           const { error } = await addTagToTransaction(transactionId, tagId);
           if (error) throw error;
         }
       }
-      
+
       setSelectedTagIds(newSelectedTagIds);
-      
+
       // Call the onTagsChange callback if provided
       if (onTagsChange) {
         onTagsChange(newSelectedTagIds);
@@ -153,15 +159,15 @@ export function TagSelector({
   };
 
   // Get selected tags objects
-  const selectedTags = tags.filter(tag => selectedTagIds.includes(tag.id));
+  const selectedTags = tags.filter((tag) => selectedTagIds.includes(tag.id));
 
   return (
     <div className="relative">
       <Popover open={isOpen && !readOnly} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            role="combobox" 
+          <Button
+            variant="outline"
+            role="combobox"
             aria-expanded={isOpen}
             className={cn(
               "w-full justify-between h-auto min-h-10 py-2",
@@ -175,14 +181,14 @@ export function TagSelector({
                   {readOnly ? "No tags" : "Select tags..."}
                 </span>
               ) : (
-                selectedTags.map(tag => (
-                  <Badge 
+                selectedTags.map((tag) => (
+                  <Badge
                     key={tag.id}
                     variant="outline"
                     className="flex items-center gap-1 px-2 py-1"
                     style={{ backgroundColor: `${tag.color}20` }}
                   >
-                    <div 
+                    <div
                       className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: tag.color }}
                     ></div>
@@ -204,22 +210,28 @@ export function TagSelector({
                 ))
               )}
             </div>
-            {!readOnly && <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />}
+            {!readOnly && (
+              <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0" align="start">
           {isLoading ? (
-            <div className="p-2 text-center text-muted-foreground">Loading tags...</div>
+            <div className="p-2 text-center text-muted-foreground">
+              Loading tags...
+            </div>
           ) : error ? (
             <div className="p-2 text-center text-destructive">{error}</div>
           ) : (
             <>
               <div className="max-h-60 overflow-y-auto">
                 {tags.length === 0 ? (
-                  <div className="p-2 text-center text-muted-foreground">No tags found</div>
+                  <div className="p-2 text-center text-muted-foreground">
+                    No tags found
+                  </div>
                 ) : (
                   <div className="py-1">
-                    {tags.map(tag => (
+                    {tags.map((tag) => (
                       <Button
                         key={tag.id}
                         variant="ghost"
@@ -229,7 +241,7 @@ export function TagSelector({
                         )}
                         onClick={() => handleTagSelect(tag.id)}
                       >
-                        <div 
+                        <div
                           className="w-3 h-3 rounded-full mr-2"
                           style={{ backgroundColor: tag.color }}
                         ></div>
@@ -239,9 +251,9 @@ export function TagSelector({
                   </div>
                 )}
               </div>
-              
+
               <Separator />
-              
+
               <Button
                 variant="ghost"
                 className="w-full justify-start px-3 py-2 text-primary"

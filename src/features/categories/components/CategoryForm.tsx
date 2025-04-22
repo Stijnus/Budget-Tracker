@@ -4,7 +4,7 @@ import {
   Tag,
   ArrowUpDown,
   Palette,
-  Icons,
+  Icon,
   ShoppingBag,
   Home,
   Car,
@@ -55,7 +55,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   createCategory,
@@ -251,7 +250,7 @@ export function CategoryForm({
 
         <div className="space-y-2">
           <Label htmlFor="icon" className="flex items-center gap-1">
-            <Icons size={14} />
+            <Icon size={14} />
             <span>Icon</span>
           </Label>
           <div className="grid grid-cols-2 gap-2">

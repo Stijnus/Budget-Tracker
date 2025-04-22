@@ -4,6 +4,9 @@ import { User, AuthError } from "@supabase/supabase-js";
 export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  userProfile?: any; // User profile data
+  userSettings?: any; // User settings data
+  refreshUserData?: () => Promise<void>; // Function to refresh user data
   login: (
     email: string,
     password: string

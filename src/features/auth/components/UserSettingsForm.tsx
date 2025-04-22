@@ -82,7 +82,9 @@ export function UserSettingsForm() {
       } else {
         setMessage({ text: "Settings updated successfully", type: "success" });
         // Refresh user data to update the UI
-        await refreshUserData();
+        if (refreshUserData) {
+          await refreshUserData();
+        }
       }
     } catch (err) {
       setMessage({ text: "An unexpected error occurred", type: "error" });

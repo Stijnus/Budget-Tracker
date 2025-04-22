@@ -25,15 +25,17 @@ interface BudgetListProps {
   className?: string;
 }
 
-export function BudgetList({ 
+export function BudgetList({
   showAddButton = false,
-  className = "" 
+  className = "",
 }: BudgetListProps) {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedBudget, setSelectedBudget] = useState<Budget | undefined>(undefined);
+  const [selectedBudget, setSelectedBudget] = useState<Budget | undefined>(
+    undefined
+  );
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null);
 
@@ -43,13 +45,13 @@ export function BudgetList({
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const { data, error } = await getBudgets();
-        
+
         if (error) {
           throw error;
         }
-        
+
         setBudgets(data || []);
       } catch (err) {
         console.error("Error fetching budgets:", err);
@@ -87,12 +89,12 @@ export function BudgetList({
       if (error) throw error;
 
       // Remove from local state
-      setBudgets(budgets.filter(b => b.id !== budgetToDelete));
+      setBudgets(budgets.filter((b) => b.id !== budgetToDelete));
       setIsDeleteConfirmOpen(false);
       setBudgetToDelete(null);
     } catch (err) {
-      console.error('Error deleting budget:', err);
-      setError('Failed to delete budget');
+      console.error("Error deleting budget:", err);
+      setError("Failed to delete budget");
     }
   };
 
@@ -117,19 +119,7 @@ export function BudgetList({
     fetchBudgets();
   };
 
-  // Calculate budget progress
-  const calculateProgress = (budget: Budget) => {
-    // For now, we'll just return 0 since we don't have spent data
-    return 0;
-  };
-
-  // Determine progress color
-  const getProgressColor = (budget: Budget) => {
-    const progress = calculateProgress(budget);
-    if (progress >= 100) return "bg-destructive";
-    if (progress >= 75) return "bg-warning";
-    return "bg-primary";
-  };
+  // Progress calculation will be implemented in a future update
 
   if (isLoading) {
     return (
@@ -168,30 +158,35 @@ export function BudgetList({
         <CardContent>
           {budgets.length === 0 ? (
             <div className="p-6 text-center text-muted-foreground">
-              No budgets found. {showAddButton && (
-                <Button 
+              No budgets found.{" "}
+              {showAddButton && (
+                <Button
                   onClick={handleAddBudget}
                   variant="link"
                   className="px-1 py-0 h-auto"
                 >
                   Create your first budget
                 </Button>
-              )} to start tracking your spending!
+              )}{" "}
+              to start tracking your spending!
             </div>
           ) : (
             <ul className="divide-y divide-border">
               {budgets.map((budget) => (
-                <li 
-                  key={budget.id} 
+                <li
+                  key={budget.id}
                   className="p-4 hover:bg-muted/50 rounded-md"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="text-md font-medium">{budget.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {budget.category_id ? "Category" : "All Categories"} • 
-                        {budget.period === "monthly" ? " Monthly" : 
-                         budget.period === "yearly" ? " Yearly" : " Custom"}
+                        {budget.category_id ? "Category" : "All Categories"} •
+                        {budget.period === "monthly"
+                          ? " Monthly"
+                          : budget.period === "yearly"
+                          ? " Yearly"
+                          : " Custom"}
                       </p>
                     </div>
                     <div className="flex space-x-1">
@@ -215,21 +210,21 @@ export function BudgetList({
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium">
                       {formatCurrency(0)} of {formatCurrency(budget.amount)}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {formatDate(budget.start_date, "short")} - {budget.end_date ? formatDate(budget.end_date, "short") : "Ongoing"}
+                      {formatDate(budget.start_date, "short")} -{" "}
+                      {budget.end_date
+                        ? formatDate(budget.end_date, "short")
+                        : "Ongoing"}
                     </span>
                   </div>
-                  
+
                   {/* Progress bar */}
-                  <Progress 
-                    value={0} 
-                    className="h-2"
-                  />
+                  <Progress value={0} className="h-2" />
                 </li>
               ))}
             </ul>
@@ -246,12 +241,16 @@ export function BudgetList({
       />
 
       {/* Delete Confirmation Modal */}
-      <Dialog open={isDeleteConfirmOpen} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <Dialog
+        open={isDeleteConfirmOpen}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this budget? This action cannot be undone.
+              Are you sure you want to delete this budget? This action cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

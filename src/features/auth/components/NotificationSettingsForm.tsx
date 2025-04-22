@@ -16,17 +16,39 @@ import {
 
 // Notification types
 const NOTIFICATION_TYPES = [
-  { id: "bill_due", name: "Bill Due Reminders", description: "Get notified when bills are due" },
-  { id: "budget_alert", name: "Budget Alerts", description: "Get notified when you're close to exceeding your budget" },
-  { id: "goal_progress", name: "Goal Progress", description: "Get notified about your savings goal progress" },
-  { id: "transaction_alert", name: "Transaction Alerts", description: "Get notified about new transactions" },
-  { id: "weekly_summary", name: "Weekly Summary", description: "Get a weekly summary of your finances" },
+  {
+    id: "bill_due",
+    name: "Bill Due Reminders",
+    description: "Get notified when bills are due",
+  },
+  {
+    id: "budget_alert",
+    name: "Budget Alerts",
+    description: "Get notified when you're close to exceeding your budget",
+  },
+  {
+    id: "goal_progress",
+    name: "Goal Progress",
+    description: "Get notified about your savings goal progress",
+  },
+  {
+    id: "transaction_alert",
+    name: "Transaction Alerts",
+    description: "Get notified about new transactions",
+  },
+  {
+    id: "weekly_summary",
+    name: "Weekly Summary",
+    description: "Get a weekly summary of your finances",
+  },
 ];
 
 export function NotificationSettingsForm() {
   const { user, userSettings, refreshUserData } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [notificationPreferences, setNotificationPreferences] = useState<Record<string, boolean>>({
+  const [notificationPreferences, setNotificationPreferences] = useState<
+    Record<string, boolean>
+  >({
     bill_due: true,
     budget_alert: true,
     goal_progress: true,
@@ -43,7 +65,7 @@ export function NotificationSettingsForm() {
   useEffect(() => {
     if (userSettings) {
       setNotificationsEnabled(userSettings.notification_enabled);
-      
+
       // In a real app, we would load notification preferences from the database
       // For now, we'll just use the default values
     }
@@ -67,9 +89,14 @@ export function NotificationSettingsForm() {
       if (error) {
         setMessage({ text: error.message, type: "error" });
       } else {
-        setMessage({ text: "Notification settings updated successfully", type: "success" });
+        setMessage({
+          text: "Notification settings updated successfully",
+          type: "success",
+        });
         // Refresh user data to update the UI
-        await refreshUserData();
+        if (refreshUserData) {
+          await refreshUserData();
+        }
       }
     } catch (err) {
       setMessage({ text: "An unexpected error occurred", type: "error" });
@@ -80,9 +107,9 @@ export function NotificationSettingsForm() {
   };
 
   const toggleNotificationType = (id: string) => {
-    setNotificationPreferences(prev => ({
+    setNotificationPreferences((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
   };
 
@@ -114,7 +141,10 @@ export function NotificationSettingsForm() {
               checked={notificationsEnabled}
               onCheckedChange={setNotificationsEnabled}
             />
-            <Label htmlFor="notifications-master" className="cursor-pointer font-medium">
+            <Label
+              htmlFor="notifications-master"
+              className="cursor-pointer font-medium"
+            >
               Enable all notifications
             </Label>
           </div>
@@ -122,7 +152,7 @@ export function NotificationSettingsForm() {
           {notificationsEnabled && (
             <div className="space-y-4 mt-4 border-t pt-4">
               <h3 className="text-sm font-medium">Notification Types</h3>
-              
+
               <div className="space-y-4">
                 {NOTIFICATION_TYPES.map((type) => (
                   <div key={type.id} className="flex items-start space-x-3">
@@ -133,8 +163,8 @@ export function NotificationSettingsForm() {
                       className="mt-0.5"
                     />
                     <div className="space-y-1">
-                      <Label 
-                        htmlFor={`notification-${type.id}`} 
+                      <Label
+                        htmlFor={`notification-${type.id}`}
                         className="cursor-pointer font-medium"
                       >
                         {type.name}

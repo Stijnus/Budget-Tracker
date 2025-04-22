@@ -38,27 +38,33 @@ export function SavingsRateChart({
         setIsLoading(true);
         setError(null);
 
-        const { data, error } = await getIncomeVsExpenses(startDate, endDate, "month");
+        const { data, error } = await getIncomeVsExpenses(
+          startDate,
+          endDate,
+          "month"
+        );
 
         if (error) {
           throw error;
         }
 
         // Calculate savings rate for each month
-        const savingsRateData = data.map((item) => {
-          const income = item.income || 0;
-          const expenses = item.expenses || 0;
-          const savings = income - expenses;
-          const savingsRate = income > 0 ? (savings / income) * 100 : 0;
+        const savingsRateData = Array.isArray(data)
+          ? data.map((item) => {
+              const income = item.income || 0;
+              const expenses = item.expenses || 0;
+              const savings = income - expenses;
+              const savingsRate = income > 0 ? (savings / income) * 100 : 0;
 
-          return {
-            name: item.name,
-            savingsRate: parseFloat(savingsRate.toFixed(1)),
-            income,
-            expenses,
-            savings,
-          };
-        });
+              return {
+                name: item.name,
+                savingsRate: parseFloat(savingsRate.toFixed(1)),
+                income,
+                expenses,
+                savings,
+              };
+            })
+          : [];
 
         setData(savingsRateData);
       } catch (err) {
@@ -137,8 +143,13 @@ export function SavingsRateChart({
   }
 
   // Calculate average savings rate
-  const totalSavingsRate = data.reduce((sum, item) => sum + item.savingsRate, 0);
-  const averageSavingsRate = parseFloat((totalSavingsRate / data.length).toFixed(1));
+  const totalSavingsRate = data.reduce(
+    (sum, item) => sum + item.savingsRate,
+    0
+  );
+  const averageSavingsRate = parseFloat(
+    (totalSavingsRate / data.length).toFixed(1)
+  );
 
   return (
     <Card className={className}>
@@ -147,8 +158,8 @@ export function SavingsRateChart({
       </CardHeader>
       <CardContent>
         <div className="flex justify-between items-center mb-4">
-          <Badge 
-            variant="outline" 
+          <Badge
+            variant="outline"
             className={`px-2 py-1 ${getSavingsRateColor(averageSavingsRate)}`}
           >
             Average Savings Rate: {averageSavingsRate}%
@@ -174,14 +185,24 @@ export function SavingsRateChart({
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis 
-                domain={[-10, 50]} 
+              <YAxis
+                domain={[-10, 50]}
                 tickFormatter={(value) => `${value}%`}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <ReferenceLine y={20} stroke="green" strokeDasharray="3 3" label="Good" />
-              <ReferenceLine y={0} stroke="red" strokeDasharray="3 3" label="Minimum" />
+              <ReferenceLine
+                y={20}
+                stroke="green"
+                strokeDasharray="3 3"
+                label="Good"
+              />
+              <ReferenceLine
+                y={0}
+                stroke="red"
+                strokeDasharray="3 3"
+                label="Minimum"
+              />
               <Line
                 type="monotone"
                 dataKey="savingsRate"
