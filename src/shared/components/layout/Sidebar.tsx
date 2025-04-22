@@ -88,13 +88,18 @@ export function Sidebar() {
             navItems={navItems}
             pathname={location.pathname}
             onClose={() => setIsOpen(false)}
+            t={t}
           />
         </SheetContent>
       </Sheet>
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:block fixed inset-y-0 left-0 z-40 w-64 border-r bg-background shadow-sm">
-        <DesktopSidebar navItems={navItems} pathname={location.pathname} />
+        <DesktopSidebar
+          navItems={navItems}
+          pathname={location.pathname}
+          t={t}
+        />
       </aside>
     </>
   );
@@ -108,9 +113,10 @@ interface SidebarProps {
   }[];
   pathname: string;
   onClose?: () => void;
+  t: (key: string) => string;
 }
 
-function MobileSidebar({ navItems, pathname, onClose }: SidebarProps) {
+function MobileSidebar({ navItems, pathname, onClose, t }: SidebarProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -159,7 +165,7 @@ function MobileSidebar({ navItems, pathname, onClose }: SidebarProps) {
   );
 }
 
-function DesktopSidebar({ navItems, pathname }: SidebarProps) {
+function DesktopSidebar({ navItems, pathname, t }: SidebarProps) {
   return (
     <div className="flex flex-col h-full w-full">
       {/* Logo */}
