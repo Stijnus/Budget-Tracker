@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Apply theme if available
       if (settingsData?.theme) {
-        setTheme(settingsData.theme);
+        setTheme(settingsData.theme as "light" | "dark" | "system");
       }
 
       // Store user settings in localStorage for formatters to use
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserProfile(null);
         setUserSettings(null);
         // Reset theme to default
-        setTheme("light");
+        setTheme("light" as "light" | "dark" | "system");
         // Clear user settings from localStorage
         localStorage.removeItem("userSettings");
       } else if (event === "USER_UPDATED" && session) {

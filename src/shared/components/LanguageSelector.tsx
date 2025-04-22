@@ -25,8 +25,7 @@ export function LanguageSelector() {
     nativeName: details.nativeName,
   }));
 
-  // Find current language
-  const currentLanguage = languageOptions.find(lang => lang.code === language) || languageOptions[0];
+  // We don't need to find the current language here as we're using it directly in the map function
 
   return (
     <DropdownMenu>
@@ -54,7 +53,9 @@ export function LanguageSelector() {
           <DropdownMenuItem
             key={lang.code}
             onClick={() => changeLanguage(lang.code)}
-            className={`cursor-pointer ${lang.code === language ? 'bg-accent' : ''}`}
+            className={`cursor-pointer ${
+              lang.code === language ? "bg-accent" : ""
+            }`}
           >
             <span className="mr-2">{lang.flag}</span>
             <span>{lang.nativeName}</span>
