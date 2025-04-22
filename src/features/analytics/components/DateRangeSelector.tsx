@@ -1,4 +1,9 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface DateRangeSelectorProps {
   startDate: string;
@@ -73,93 +78,87 @@ export function DateRangeSelector({
   };
 
   return (
-    <div className={`bg-white p-4 rounded-lg shadow ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Date Range</h3>
-
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          onClick={() => handleRangeSelect("this-month")}
-          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
-        >
-          This Month
-        </button>
-        <button
-          onClick={() => handleRangeSelect("last-month")}
-          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
-        >
-          Last Month
-        </button>
-        <button
-          onClick={() => handleRangeSelect("this-quarter")}
-          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
-        >
-          This Quarter
-        </button>
-        <button
-          onClick={() => handleRangeSelect("this-year")}
-          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
-        >
-          This Year
-        </button>
-        <button
-          onClick={() => handleRangeSelect("last-year")}
-          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
-        >
-          Last Year
-        </button>
-        <button
-          onClick={() => handleRangeSelect("custom")}
-          className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md"
-        >
-          Custom
-        </button>
-      </div>
-
-      {customRange && (
-        <div className="flex flex-col sm:flex-row gap-4 items-end">
-          <div className="flex-1">
-            <label
-              htmlFor="start-date"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Start Date
-            </label>
-            <input
-              type="date"
-              id="start-date"
-              value={customStartDate}
-              onChange={(e) => setCustomStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-          <div className="flex-1">
-            <label
-              htmlFor="end-date"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              End Date
-            </label>
-            <input
-              type="date"
-              id="end-date"
-              value={customEndDate}
-              onChange={(e) => setCustomEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-          <button
-            onClick={handleCustomDateChange}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+    <Card className={className}>
+      <CardHeader className="pb-3">
+        <CardTitle>Date Range</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap gap-2 mb-4">
+          <Button
+            onClick={() => handleRangeSelect("this-month")}
+            variant="outline"
+            size="sm"
           >
-            Apply
-          </button>
+            This Month
+          </Button>
+          <Button
+            onClick={() => handleRangeSelect("last-month")}
+            variant="outline"
+            size="sm"
+          >
+            Last Month
+          </Button>
+          <Button
+            onClick={() => handleRangeSelect("this-quarter")}
+            variant="outline"
+            size="sm"
+          >
+            This Quarter
+          </Button>
+          <Button
+            onClick={() => handleRangeSelect("this-year")}
+            variant="outline"
+            size="sm"
+          >
+            This Year
+          </Button>
+          <Button
+            onClick={() => handleRangeSelect("last-year")}
+            variant="outline"
+            size="sm"
+          >
+            Last Year
+          </Button>
+          <Button
+            onClick={() => handleRangeSelect("custom")}
+            variant="outline"
+            size="sm"
+          >
+            Custom
+          </Button>
         </div>
-      )}
 
-      <div className="mt-2 text-sm text-gray-500">
-        Current range: {new Date(startDate).toLocaleDateString()} -{" "}
-        {new Date(endDate).toLocaleDateString()}
-      </div>
-    </div>
+        {customRange && (
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="start-date">Start Date</Label>
+              <Input
+                type="date"
+                id="start-date"
+                value={customStartDate}
+                onChange={(e) => setCustomStartDate(e.target.value)}
+              />
+            </div>
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="end-date">End Date</Label>
+              <Input
+                type="date"
+                id="end-date"
+                value={customEndDate}
+                onChange={(e) => setCustomEndDate(e.target.value)}
+              />
+            </div>
+            <Button onClick={handleCustomDateChange}>Apply</Button>
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center justify-center">
+          <Badge variant="outline" className="text-sm px-3 py-1">
+            {new Date(startDate).toLocaleDateString()} -{" "}
+            {new Date(endDate).toLocaleDateString()}
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

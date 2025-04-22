@@ -12,6 +12,10 @@ import {
 } from "recharts";
 import { getIncomeVsExpenses } from "../../../api/supabase/analytics";
 import { formatCurrency } from "../../../utils/formatters";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface IncomeExpenseChartProps {
   startDate: string;
@@ -91,20 +95,32 @@ export function IncomeExpenseChart({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
   }
 
   if (data.length === 0) {
     return (
-      <div className="p-4 text-center text-gray-500 h-64 flex items-center justify-center">
-        <p>No transaction data available for the selected period.</p>
-      </div>
+      <Card className={className}>
+        <CardHeader>
+          <CardTitle className="text-lg">Income vs Expenses</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center text-muted-foreground h-64 flex items-center justify-center">
+            <p>No transaction data available for the selected period.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -114,60 +130,74 @@ export function IncomeExpenseChart({
     incomeValue > 0 ? Math.round((netSavings / incomeValue) * 100) : 0;
 
   return (
-    <div className={`bg-white p-4 rounded-lg shadow ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">
-        Income vs Expenses
-      </h3>
-
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-sm text-gray-500">
-          Net:{" "}
-          <span className={netSavings >= 0 ? "text-green-600" : "text-red-600"}>
-            {formatCurrency(netSavings)}
-          </span>
-        </div>
-        <div className="text-sm text-gray-500">
-          Savings Rate:{" "}
-          <span
-            className={
-              savingsRate >= 20
-                ? "text-green-600"
-                : savingsRate >= 0
-                ? "text-yellow-600"
-                : "text-red-600"
-            }
-          >
-            {savingsRate}%
-          </span>
-        </div>
-      </div>
-
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis
-              tickFormatter={(value) =>
-                formatCurrency(value, { compact: true })
+    <Card className={className}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg">Income vs Expenses</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex justify-between items-center mb-4">
+          <Badge variant="outline" className="px-2 py-1">
+            Net:{" "}
+            <span
+              className={
+                netSavings >= 0 ? "text-green-600" : "text-destructive"
               }
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Bar
-              dataKey="value"
-              name="Amount"
-              fill="#8884d8"
-              radius={[4, 4, 0, 0]}
-            />
-            {/* Add a reference line for net savings */}
-            <ReferenceLine y={0} stroke="#000" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+            >
+              {formatCurrency(netSavings)}
+            </span>
+          </Badge>
+          <Badge
+            variant="outline"
+            className={`px-2 py-1 ${
+              savingsRate >= 20
+                ? "border-green-600"
+                : savingsRate >= 0
+                ? "border-yellow-600"
+                : "border-destructive"
+            }`}
+          >
+            Savings Rate:{" "}
+            <span
+              className={
+                savingsRate >= 20
+                  ? "text-green-600"
+                  : savingsRate >= 0
+                  ? "text-yellow-600"
+                  : "text-destructive"
+              }
+            >
+              {savingsRate}%
+            </span>
+          </Badge>
+        </div>
+
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis
+                tickFormatter={(value) =>
+                  formatCurrency(value, { compact: true })
+                }
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              <Bar
+                dataKey="value"
+                name="Amount"
+                fill="#8884d8"
+                radius={[4, 4, 0, 0]}
+              />
+              {/* Add a reference line for net savings */}
+              <ReferenceLine y={0} stroke="#000" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

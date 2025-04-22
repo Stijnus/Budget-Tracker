@@ -11,6 +11,9 @@ import {
 } from "recharts";
 import { getSpendingTrend } from "../../../api/supabase/analytics";
 import { formatCurrency } from "../../../utils/formatters";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 interface SpendingTrendChartProps {
   startDate: string;
@@ -122,62 +125,79 @@ export function SpendingTrendChart({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
   }
 
   if (data.length === 0) {
     return (
-      <div className="p-4 text-center text-gray-500 h-64 flex items-center justify-center">
-        <p>No transaction data available for the selected period.</p>
-      </div>
+      <Card className={className}>
+        <CardHeader>
+          <CardTitle className="text-lg">
+            Spending Trend ({groupBy === "month" ? "Monthly" : "Daily"})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 text-center text-muted-foreground h-64 flex items-center justify-center">
+            <p>No transaction data available for the selected period.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className={`bg-white p-4 rounded-lg shadow ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        Spending Trend ({groupBy === "month" ? "Monthly" : "Daily"})
-      </h3>
-
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="displayDate" tick={{ fontSize: 12 }} />
-            <YAxis
-              tickFormatter={(value) =>
-                formatCurrency(value, { compact: true })
-              }
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="income"
-              name="Income"
-              stroke="#10B981"
-              activeDot={{ r: 8 }}
-              strokeWidth={2}
-            />
-            <Line
-              type="monotone"
-              dataKey="expenses"
-              name="Expenses"
-              stroke="#EF4444"
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+    <Card className={className}>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg">
+          Spending Trend ({groupBy === "month" ? "Monthly" : "Daily"})
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={data}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="displayDate" tick={{ fontSize: 12 }} />
+              <YAxis
+                tickFormatter={(value) =>
+                  formatCurrency(value, { compact: true })
+                }
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="income"
+                name="Income"
+                stroke="#10B981"
+                activeDot={{ r: 8 }}
+                strokeWidth={2}
+              />
+              <Line
+                type="monotone"
+                dataKey="expenses"
+                name="Expenses"
+                stroke="#EF4444"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
