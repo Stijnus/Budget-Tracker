@@ -5,7 +5,7 @@ import { useLanguage, LANGUAGES } from "../../../providers/LanguageProvider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle, Globe } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,7 +21,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Language options are imported from LanguageProvider
+// Convert the LANGUAGES object to an array for easier use in the component
+const LANGUAGE_OPTIONS = Object.entries(LANGUAGES).map(([code, details]) => ({
+  code,
+  name: code.toUpperCase(),
+  flag: details.flag,
+  native: details.nativeName,
+}));
 
 export function LanguageSettingsForm() {
   const { user, userSettings, refreshUserData } = useAuth();
@@ -77,7 +83,7 @@ export function LanguageSettingsForm() {
   };
 
   const selectedLanguage =
-    LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
+    LANGUAGE_OPTIONS.find((l) => l.code === language) || LANGUAGE_OPTIONS[0];
 
   return (
     <Card>
@@ -110,7 +116,7 @@ export function LanguageSettingsForm() {
                 <SelectValue placeholder="Select language" />
               </SelectTrigger>
               <SelectContent>
-                {LANGUAGES.map((lang) => (
+                {LANGUAGE_OPTIONS.map((lang) => (
                   <SelectItem key={lang.code} value={lang.code}>
                     <div className="flex items-center">
                       <span className="mr-2">{lang.flag}</span>
