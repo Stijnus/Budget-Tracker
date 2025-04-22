@@ -177,18 +177,22 @@ export function TransactionList({
   if (isLoading) {
     return (
       <div className="flex justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
+    return (
+      <div className="p-4 text-destructive bg-destructive/10 dark:bg-destructive/20 rounded-md">
+        {error}
+      </div>
+    );
   }
 
   if (transactions.length === 0 && !showAddButton) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-4 text-center text-muted-foreground">
         <p className="mb-4">
           No transactions found. Add your first transaction to get started!
         </p>
@@ -222,7 +226,7 @@ export function TransactionList({
       {/* Transactions List */}
       <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
         {transactions.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
+          <div className="p-6 text-center text-muted-foreground">
             <p className="mb-4">
               No transactions found. Add your first transaction to get started!
             </p>
@@ -237,11 +241,11 @@ export function TransactionList({
             )}
           </div>
         ) : (
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-border">
             {transactions.map((transaction) => (
               <li
                 key={transaction.id}
-                className="py-4 px-4 flex items-center hover:bg-gray-50"
+                className="py-4 px-4 flex items-center hover:bg-accent/50"
               >
                 <div
                   className="w-2 h-10 rounded-full mr-4"
@@ -257,10 +261,10 @@ export function TransactionList({
                       : handleEditTransaction(transaction)
                   }
                 >
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {transaction.description || "Unnamed transaction"}
                   </p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm text-muted-foreground truncate">
                     {formatDate(transaction.date, "short")} •{" "}
                     {transaction.category_name || "Uncategorized"}
                   </p>
@@ -268,8 +272,8 @@ export function TransactionList({
                 <div
                   className={`text-sm font-medium mr-4 ${
                     transaction.type === "income"
-                      ? "text-green-600"
-                      : "text-red-600"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-destructive"
                   }`}
                 >
                   {transaction.type === "income" ? "+" : "-"}

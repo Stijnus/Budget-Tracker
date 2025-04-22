@@ -68,19 +68,21 @@ export function SpendingSummary() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-red-50 border-0">
+            <Card className="bg-destructive/10 border-0 dark:bg-destructive/20">
               <CardContent className="p-6">
-                <p className="text-sm text-red-700 mb-1">Expenses</p>
-                <p className="text-2xl font-bold text-red-700">
+                <p className="text-sm text-destructive mb-1">Expenses</p>
+                <p className="text-2xl font-bold text-destructive">
                   {formatCurrency(0)}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-green-50 border-0">
+            <Card className="bg-green-500/10 border-0 dark:bg-green-500/20">
               <CardContent className="p-6">
-                <p className="text-sm text-green-700 mb-1">Savings</p>
-                <p className="text-2xl font-bold text-green-700">
+                <p className="text-sm text-green-600 dark:text-green-400 mb-1">
+                  Savings
+                </p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {formatCurrency(0)}
                 </p>
               </CardContent>
@@ -104,19 +106,21 @@ export function SpendingSummary() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-blue-50 border-0">
+          <Card className="bg-blue-500/10 border-0 dark:bg-blue-500/20">
             <CardContent className="p-4">
-              <p className="text-sm text-blue-700 mb-1">Income</p>
-              <p className="text-2xl font-bold text-blue-700">
+              <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">
+                Income
+              </p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {formatCurrency(totalIncome)}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-red-50 border-0">
+          <Card className="bg-destructive/10 border-0 dark:bg-destructive/20">
             <CardContent className="p-4">
-              <p className="text-sm text-red-700 mb-1">Expenses</p>
-              <p className="text-2xl font-bold text-red-700">
+              <p className="text-sm text-destructive mb-1">Expenses</p>
+              <p className="text-2xl font-bold text-destructive">
                 {formatCurrency(totalExpenses)}
               </p>
             </CardContent>
@@ -124,20 +128,26 @@ export function SpendingSummary() {
 
           <Card
             className={`${
-              netSavings >= 0 ? "bg-green-50" : "bg-yellow-50"
+              netSavings >= 0
+                ? "bg-green-500/10 dark:bg-green-500/20"
+                : "bg-yellow-500/10 dark:bg-yellow-500/20"
             } border-0`}
           >
             <CardContent className="p-4">
               <p
                 className={`text-sm ${
-                  netSavings >= 0 ? "text-green-700" : "text-yellow-700"
+                  netSavings >= 0
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-yellow-600 dark:text-yellow-400"
                 } mb-1`}
               >
                 {netSavings >= 0 ? "Savings" : "Deficit"}
               </p>
               <p
                 className={`text-2xl font-bold ${
-                  netSavings >= 0 ? "text-green-700" : "text-yellow-700"
+                  netSavings >= 0
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-yellow-600 dark:text-yellow-400"
                 }`}
               >
                 {formatCurrency(Math.abs(netSavings))}
@@ -156,10 +166,10 @@ export function SpendingSummary() {
               <div
                 className={`h-2.5 rounded-full ${
                   savingsRate >= 20
-                    ? "bg-green-600"
+                    ? "bg-green-600 dark:bg-green-500"
                     : savingsRate >= 0
-                    ? "bg-yellow-500"
-                    : "bg-red-600"
+                    ? "bg-yellow-500 dark:bg-yellow-400"
+                    : "bg-destructive"
                 }`}
                 style={{ width: `${Math.max(savingsRate, 0)}%` }}
               ></div>
