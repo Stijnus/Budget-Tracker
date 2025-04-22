@@ -28,7 +28,15 @@ export function SavingsRateChart({
   endDate,
   className = "",
 }: SavingsRateChartProps) {
-  const [data, setData] = useState<any[]>([]);
+  interface SavingsRateData {
+    name: string;
+    savingsRate: number;
+    income: number;
+    expenses: number;
+    savings: number;
+  }
+
+  const [data, setData] = useState<SavingsRateData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,13 +90,7 @@ export function SavingsRateChart({
   interface TooltipProps {
     active?: boolean;
     payload?: Array<{
-      payload: {
-        name: string;
-        savingsRate: number;
-        income: number;
-        expenses: number;
-        savings: number;
-      };
+      payload: SavingsRateData;
     }>;
     label?: string;
   }

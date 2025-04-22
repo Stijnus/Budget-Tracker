@@ -32,17 +32,12 @@ import { Badge } from "@/components/ui/badge";
 
 interface CategoryListProps {
   onEdit: (category: Category) => void;
-  onAdd: (() => void) | (() => Promise<void>);
   type?: "expense" | "income" | "both";
+  // onAdd is required by parent components but not used here
+  onAdd?: (() => void) | (() => Promise<void>);
 }
 
-export function CategoryList({
-  onEdit,
-  // onAdd is defined in props but not used in this component
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onAdd,
-  type = "expense",
-}: CategoryListProps) {
+export function CategoryList({ onEdit, type = "expense" }: CategoryListProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +74,7 @@ export function CategoryList({
   // Load categories on component mount
   useEffect(() => {
     loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle delete click
