@@ -117,7 +117,8 @@ export function TransactionList({
           );
         }
 
-        setTransactions(filteredData);
+        // Cast to TransactionType[] to ensure type compatibility
+        setTransactions(filteredData as TransactionType[]);
       } catch (err) {
         console.error("Error fetching transactions:", err);
         setError("Failed to load transactions");
@@ -166,12 +167,7 @@ export function TransactionList({
     setTransactionToDelete(null);
   };
 
-  // Handle transaction refresh after add/edit
-  const handleTransactionSuccess = () => {
-    // Refetch transactions with current filters
-    const currentFilters = { ...filters };
-    setFilters({ ...currentFilters });
-  };
+  // Note: Transaction refresh is now handled by navigation and useEffect
 
   // Handle filter changes
   const handleFilterChange = (newFilters: FilterType) => {
