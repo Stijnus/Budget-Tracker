@@ -1,4 +1,4 @@
-import { useState } from "react";
+// Categories page component
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "../shared/components/layout";
 import { CategoryList } from "../features/categories/components";
@@ -14,7 +14,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
   PieChartIcon,
-  TagsIcon,
   ArrowDownCircle,
   ArrowUpCircle,
   Plus,
