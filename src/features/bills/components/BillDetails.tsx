@@ -193,132 +193,139 @@ export function BillDetails({ billId }: BillDetailsProps) {
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-xl">{bill.name}</CardTitle>
-          <Button
-            onClick={() => setIsEditModalOpen(true)}
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-primary"
-            aria-label="Edit"
-          >
-            <Edit size={18} />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <div className="flex items-center mb-4">
-              <DollarSign size={18} className="text-muted-foreground mr-2" />
-              <div>
-                <p className="text-sm text-muted-foreground">Amount</p>
-                <p className="text-lg font-medium">
-                  {formatCurrency(bill.amount)}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center mb-4">
-              <Calendar size={18} className="text-muted-foreground mr-2" />
-              <div>
-                <p className="text-sm text-muted-foreground">Next Due Date</p>
-                <p className="font-medium">
-                  {bill.next_due_date
-                    ? formatDate(bill.next_due_date, "medium")
-                    : "Not set"}
-
-                  {bill.next_due_date && isOverdue(bill.next_due_date) && (
-                    <span className="ml-2 text-xs text-destructive font-normal">
-                      Overdue
-                    </span>
-                  )}
-
-                  {bill.next_due_date &&
-                    !isOverdue(bill.next_due_date) &&
-                    isDueSoon(bill.next_due_date) && (
-                      <span className="ml-2 text-xs text-yellow-600 font-normal">
-                        Due soon
-                      </span>
-                    )}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center mb-4">
-              <Clock size={18} className="text-muted-foreground mr-2" />
-              <div>
-                <p className="text-sm text-muted-foreground">Frequency</p>
-                <p className="font-medium">{getFrequencyText(bill.frequency)}</p>
-              </div>
-            </div>
+    <div>
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-xl">{bill.name}</CardTitle>
+            <Button
+              onClick={() => setIsEditModalOpen(true)}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-primary"
+              aria-label="Edit"
+            >
+              <Edit size={18} />
+            </Button>
           </div>
-
-          <div>
-            <div className="flex items-center mb-4">
-              <Tag size={18} className="text-muted-foreground mr-2" />
-              <div>
-                <p className="text-sm text-muted-foreground">Category</p>
-                <p className="font-medium">
-                  {bill.category_name || "Uncategorized"}
-                </p>
-              </div>
-            </div>
-
-            {bill.payment_method && (
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
               <div className="flex items-center mb-4">
-                <CreditCard size={18} className="text-muted-foreground mr-2" />
+                <DollarSign size={18} className="text-muted-foreground mr-2" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Payment Method</p>
-                  <p className="font-medium">{bill.payment_method}</p>
+                  <p className="text-sm text-muted-foreground">Amount</p>
+                  <p className="text-lg font-medium">
+                    {formatCurrency(bill.amount)}
+                  </p>
                 </div>
               </div>
-            )}
 
-            <div className="flex items-center mb-4">
-              <AlertCircle size={18} className="text-muted-foreground mr-2" />
-              <div>
-                <p className="text-sm text-muted-foreground">Status</p>
-                <p className="font-medium capitalize">{bill.status}</p>
+              <div className="flex items-center mb-4">
+                <Calendar size={18} className="text-muted-foreground mr-2" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Next Due Date</p>
+                  <p className="font-medium">
+                    {bill.next_due_date
+                      ? formatDate(bill.next_due_date, "medium")
+                      : "Not set"}
+
+                    {bill.next_due_date && isOverdue(bill.next_due_date) && (
+                      <span className="ml-2 text-xs text-destructive font-normal">
+                        Overdue
+                      </span>
+                    )}
+
+                    {bill.next_due_date &&
+                      !isOverdue(bill.next_due_date) &&
+                      isDueSoon(bill.next_due_date) && (
+                        <span className="ml-2 text-xs text-yellow-600 font-normal">
+                          Due soon
+                        </span>
+                      )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center mb-4">
+                <Clock size={18} className="text-muted-foreground mr-2" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Frequency</p>
+                  <p className="font-medium">
+                    {getFrequencyText(bill.frequency)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center mb-4">
+                <Tag size={18} className="text-muted-foreground mr-2" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Category</p>
+                  <p className="font-medium">
+                    {bill.category_name || "Uncategorized"}
+                  </p>
+                </div>
+              </div>
+
+              {bill.payment_method && (
+                <div className="flex items-center mb-4">
+                  <CreditCard
+                    size={18}
+                    className="text-muted-foreground mr-2"
+                  />
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Payment Method
+                    </p>
+                    <p className="font-medium">{bill.payment_method}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center mb-4">
+                <AlertCircle size={18} className="text-muted-foreground mr-2" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Status</p>
+                  <p className="font-medium capitalize">{bill.status}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {bill.notes && (
-          <div className="mb-6">
-            <h3 className="text-sm font-medium mb-2">Notes</h3>
-            <p className="text-muted-foreground bg-muted p-3 rounded-md">
-              {bill.notes}
-            </p>
+          {bill.notes && (
+            <div className="mb-6">
+              <h3 className="text-sm font-medium mb-2">Notes</h3>
+              <p className="text-muted-foreground bg-muted p-3 rounded-md">
+                {bill.notes}
+              </p>
+            </div>
+          )}
+
+          <div className="flex space-x-3 mb-6">
+            <Button
+              onClick={handleMarkAsPaid}
+              variant="secondary"
+              className="flex items-center"
+            >
+              <CheckCircle2 size={16} className="mr-1" />
+              Mark as Paid
+            </Button>
+
+            <Button
+              onClick={() => setIsPaymentModalOpen(true)}
+              className="flex items-center"
+            >
+              <DollarSign size={16} className="mr-1" />
+              Add Payment
+            </Button>
           </div>
-        )}
 
-        <div className="flex space-x-3 mb-6">
-          <Button
-            onClick={handleMarkAsPaid}
-            variant="secondary"
-            className="flex items-center"
-          >
-            <CheckCircle2 size={16} className="mr-1" />
-            Mark as Paid
-          </Button>
-
-          <Button
-            onClick={() => setIsPaymentModalOpen(true)}
-            className="flex items-center"
-          >
-            <DollarSign size={16} className="mr-1" />
-            Add Payment
-          </Button>
-        </div>
-
-        <PaymentHistory billId={bill.id} className="mt-6" />
-      </CardContent>
-    </Card>
+          <PaymentHistory billId={bill.id} className="mt-6" />
+        </CardContent>
+      </Card>
 
       {/* Edit Modal */}
       <BillModal
@@ -381,15 +388,18 @@ export function BillDetails({ billId }: BillDetailsProps) {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsPaymentModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsPaymentModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit">
-                Add Payment
-              </Button>
+              <Button type="submit">Add Payment</Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+    </div>
   );
 }
