@@ -354,10 +354,10 @@ This section tracks the progress of integrating shadcn/ui components throughout 
 
 #### Settings Components
 
-- [ ] SettingsPage
-- [ ] NotificationSettings
-- [ ] CurrencySettings
-- [ ] ThemeSettings
+- [x] SettingsPage
+- [x] NotificationSettings
+- [x] CurrencySettings
+- [x] ThemeSettings
 
 ## Project Completion
 
