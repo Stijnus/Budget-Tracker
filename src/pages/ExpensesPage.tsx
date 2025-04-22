@@ -1,16 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "../shared/components/layout";
 import { TransactionList } from "../features/transactions/components/TransactionList";
 import { TransactionFilters } from "../features/transactions/components/TransactionFilters";
 import { formatDate } from "../utils/formatters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowDownCircle, CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowDownCircle, CalendarIcon, Plus } from "lucide-react";
 
 export function ExpensesPage() {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState<TransactionFilters>({
     type: "expense",
   });
+
+  const handleAddExpense = () => {
+    navigate("/expenses/new");
+  };
 
   return (
     <AppLayout>
@@ -30,14 +37,25 @@ export function ExpensesPage() {
         </div>
 
         <Card>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="text-lg">Expense Transactions</CardTitle>
+            <Button
+              onClick={handleAddExpense}
+              className="flex items-center gap-1"
+            >
+              <Plus size={16} />
+              Add Expense
+            </Button>
           </CardHeader>
           <CardContent>
             <TransactionFilters filters={filters} onFilterChange={setFilters} />
 
             <div className="mt-6">
-              <TransactionList showAddButton={true} />
+              <TransactionList
+                filters={filters}
+                showFilters={false}
+                showAddButton={false}
+              />
             </div>
           </CardContent>
         </Card>

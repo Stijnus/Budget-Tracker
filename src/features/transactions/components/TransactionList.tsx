@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getRecentTransactions,
   getTransactionsByDateRange,
@@ -6,12 +7,22 @@ import {
   Transaction as TransactionType,
 } from "../../../api/supabase/transactions";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
-import { TransactionModal } from "./TransactionModal";
 import {
   TransactionFilters,
   TransactionFilters as FilterType,
 } from "./TransactionFilters";
 import { Edit, Trash2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface TransactionListProps {
   limit?: number;
@@ -19,6 +30,7 @@ interface TransactionListProps {
   showAddButton?: boolean;
   onTransactionClick?: (transaction: TransactionType) => void;
   className?: string;
+  filters?: FilterType;
 }
 
 export function TransactionList({
@@ -27,19 +39,24 @@ export function TransactionList({
   showAddButton = false,
   onTransactionClick,
   className = "",
+  filters: externalFilters,
 }: TransactionListProps = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<FilterType>({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] = useState<
-    TransactionType | undefined
-  >(undefined);
+  const [filters, setFilters] = useState<FilterType>(externalFilters || {});
+  const navigate = useNavigate();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
     null
   );
+
+  // Update internal filters when external filters change
+  useEffect(() => {
+    if (externalFilters) {
+      setFilters(externalFilters);
+    }
+  }, [externalFilters]);
 
   // Fetch transactions when filters change
   useEffect(() => {
@@ -112,15 +129,13 @@ export function TransactionList({
     fetchTransactions();
   }, [filters, limit]);
 
-  // Handle opening the add/edit modal
+  // Handle navigation to add/edit transaction page
   const handleAddTransaction = () => {
-    setSelectedTransaction(undefined);
-    setIsModalOpen(true);
+    navigate("/transactions/new");
   };
 
   const handleEditTransaction = (transaction: TransactionType) => {
-    setSelectedTransaction(transaction);
-    setIsModalOpen(true);
+    navigate(`/transactions/${transaction.id}`);
   };
 
   // Handle transaction deletion
@@ -198,30 +213,31 @@ export function TransactionList({
       {/* Add Transaction Button */}
       {showAddButton && (
         <div className="mb-4 flex justify-end">
-          <button
+          <Button
             onClick={handleAddTransaction}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-1"
           >
-            <Plus size={16} className="mr-1" />
+            <Plus size={16} />
             Add Transaction
-          </button>
+          </Button>
         </div>
       )}
 
       {/* Transactions List */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
         {transactions.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             <p className="mb-4">
               No transactions found. Add your first transaction to get started!
             </p>
             {showAddButton && (
-              <button
+              <Button
                 onClick={handleAddTransaction}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-1"
               >
+                <Plus size={16} />
                 Add Transaction
-              </button>
+              </Button>
             )}
           </div>
         ) : (
@@ -266,20 +282,24 @@ export function TransactionList({
 
                 {/* Action buttons */}
                 <div className="flex space-x-2 ml-2">
-                  <button
+                  <Button
                     onClick={() => handleEditTransaction(transaction)}
-                    className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
                     aria-label="Edit"
                   >
                     <Edit size={16} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => handleDeleteClick(transaction.id)}
-                    className="p-1 text-gray-500 hover:text-red-600 transition-colors"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:text-destructive/90"
                     aria-label="Delete"
                   >
                     <Trash2 size={16} />
-                  </button>
+                  </Button>
                 </div>
               </li>
             ))}
@@ -287,42 +307,32 @@ export function TransactionList({
         )}
       </div>
 
-      {/* Transaction Modal */}
-      <TransactionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        transaction={selectedTransaction}
-        onSuccess={handleTransactionSuccess}
-      />
-
       {/* Delete Confirmation Modal */}
-      {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Confirm Deletion
-            </h3>
-            <p className="text-gray-700 mb-6">
+      <AlertDialog
+        open={isDeleteConfirmOpen}
+        onOpenChange={setIsDeleteConfirmOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to delete this transaction? This action
               cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={handleDeleteCancel}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

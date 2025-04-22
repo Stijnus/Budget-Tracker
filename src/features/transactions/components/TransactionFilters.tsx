@@ -1,6 +1,18 @@
 import { useState, useEffect } from "react";
 import { getCategories } from "../../../api/supabase/categories";
 import { useAuth } from "../../../state/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Category {
   id: string;
@@ -53,8 +65,11 @@ export function TransactionFilters({
     onFilterChange({ ...filters, type });
   };
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onFilterChange({ ...filters, categoryId: e.target.value || undefined });
+  const handleCategoryChange = (value: string) => {
+    onFilterChange({
+      ...filters,
+      categoryId: value === "all" ? undefined : value,
+    });
   };
 
   const handleDateChange = (
@@ -81,178 +96,186 @@ export function TransactionFilters({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Filters</h3>
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-sm text-blue-600 hover:text-blue-800"
-        >
-          {isExpanded ? "Collapse" : "Expand"}
-        </button>
-      </div>
+    <Card className="mb-6">
+      <CardContent className="pt-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium">Filters</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center gap-1"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="h-4 w-4" />
+                <span>Collapse</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                <span>Expand</span>
+              </>
+            )}
+          </Button>
+        </div>
 
-      {/* Basic filters (always visible) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        {/* Transaction Type */}
-        <div>
-          <div className="flex space-x-2">
-            <button
-              type="button"
-              onClick={() => handleTypeChange("all")}
-              className={`flex-1 py-2 px-3 text-xs rounded-md ${
-                filters.type === "all" || !filters.type
-                  ? "bg-gray-200 text-gray-800 font-medium"
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTypeChange("expense")}
-              className={`flex-1 py-2 px-3 text-xs rounded-md ${
-                filters.type === "expense"
-                  ? "bg-red-100 text-red-700 font-medium"
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              Expenses
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTypeChange("income")}
-              className={`flex-1 py-2 px-3 text-xs rounded-md ${
-                filters.type === "income"
-                  ? "bg-green-100 text-green-700 font-medium"
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              Income
-            </button>
+        {/* Basic filters (always visible) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          {/* Transaction Type */}
+          <div>
+            <div className="flex space-x-2">
+              <Button
+                type="button"
+                onClick={() => handleTypeChange("all")}
+                variant={
+                  filters.type === "all" || !filters.type
+                    ? "default"
+                    : "outline"
+                }
+                size="sm"
+                className="flex-1"
+              >
+                All
+              </Button>
+              <Button
+                type="button"
+                onClick={() => handleTypeChange("expense")}
+                variant={filters.type === "expense" ? "default" : "outline"}
+                size="sm"
+                className={`flex-1 ${
+                  filters.type === "expense"
+                    ? "bg-destructive hover:bg-destructive/90"
+                    : ""
+                }`}
+              >
+                Expenses
+              </Button>
+              <Button
+                type="button"
+                onClick={() => handleTypeChange("income")}
+                variant={filters.type === "income" ? "default" : "outline"}
+                size="sm"
+                className={`flex-1 ${
+                  filters.type === "income"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : ""
+                }`}
+              >
+                Income
+              </Button>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="md:col-span-2">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search transactions..."
+                value={filters.searchQuery || ""}
+                onChange={handleSearchChange}
+                className="pl-8"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="md:col-span-2">
-          <input
-            type="text"
-            placeholder="Search transactions..."
-            value={filters.searchQuery || ""}
-            onChange={handleSearchChange}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-          />
-        </div>
-      </div>
+        {/* Advanced filters (expandable) */}
+        {isExpanded && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t">
+            {/* Category */}
+            <div className="space-y-2">
+              <Label htmlFor="category" className="text-xs">
+                Category
+              </Label>
+              <Select
+                value={filters.categoryId || "all"}
+                onValueChange={handleCategoryChange}
+              >
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-      {/* Advanced filters (expandable) */}
-      {isExpanded && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
-          {/* Category */}
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-xs font-medium text-gray-700 mb-1"
-            >
-              Category
-            </label>
-            <select
-              id="category"
-              value={filters.categoryId || ""}
-              onChange={handleCategoryChange}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs"
-            >
-              <option value="">All Categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
+            {/* Date Range */}
+            <div className="space-y-2">
+              <Label htmlFor="startDate" className="text-xs">
+                From Date
+              </Label>
+              <Input
+                type="date"
+                id="startDate"
+                value={filters.startDate || ""}
+                onChange={(e) => handleDateChange("startDate", e)}
+              />
+            </div>
 
-          {/* Date Range */}
-          <div>
-            <label
-              htmlFor="startDate"
-              className="block text-xs font-medium text-gray-700 mb-1"
-            >
-              From Date
-            </label>
-            <input
-              type="date"
-              id="startDate"
-              value={filters.startDate || ""}
-              onChange={(e) => handleDateChange("startDate", e)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs"
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="endDate" className="text-xs">
+                To Date
+              </Label>
+              <Input
+                type="date"
+                id="endDate"
+                value={filters.endDate || ""}
+                onChange={(e) => handleDateChange("endDate", e)}
+              />
+            </div>
 
-          <div>
-            <label
-              htmlFor="endDate"
-              className="block text-xs font-medium text-gray-700 mb-1"
-            >
-              To Date
-            </label>
-            <input
-              type="date"
-              id="endDate"
-              value={filters.endDate || ""}
-              onChange={(e) => handleDateChange("endDate", e)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs"
-            />
-          </div>
+            {/* Amount Range */}
+            <div className="space-y-2">
+              <Label htmlFor="minAmount" className="text-xs">
+                Min Amount
+              </Label>
+              <Input
+                type="number"
+                id="minAmount"
+                value={filters.minAmount || ""}
+                onChange={(e) => handleAmountChange("minAmount", e)}
+                min="0"
+                step="0.01"
+              />
+            </div>
 
-          {/* Amount Range */}
-          <div>
-            <label
-              htmlFor="minAmount"
-              className="block text-xs font-medium text-gray-700 mb-1"
-            >
-              Min Amount
-            </label>
-            <input
-              type="number"
-              id="minAmount"
-              value={filters.minAmount || ""}
-              onChange={(e) => handleAmountChange("minAmount", e)}
-              min="0"
-              step="0.01"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs"
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="maxAmount" className="text-xs">
+                Max Amount
+              </Label>
+              <Input
+                type="number"
+                id="maxAmount"
+                value={filters.maxAmount || ""}
+                onChange={(e) => handleAmountChange("maxAmount", e)}
+                min="0"
+                step="0.01"
+              />
+            </div>
 
-          <div>
-            <label
-              htmlFor="maxAmount"
-              className="block text-xs font-medium text-gray-700 mb-1"
-            >
-              Max Amount
-            </label>
-            <input
-              type="number"
-              id="maxAmount"
-              value={filters.maxAmount || ""}
-              onChange={(e) => handleAmountChange("maxAmount", e)}
-              min="0"
-              step="0.01"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs"
-            />
+            {/* Clear Filters */}
+            <div className="flex items-end">
+              <Button
+                type="button"
+                onClick={clearFilters}
+                variant="outline"
+                className="w-full"
+              >
+                Clear Filters
+              </Button>
+            </div>
           </div>
-
-          {/* Clear Filters */}
-          <div className="flex items-end">
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Clear Filters
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

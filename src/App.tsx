@@ -10,6 +10,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
+import { TransactionPage } from "./pages/TransactionPage";
 import { ExpensesPage } from "./pages/ExpensesPage";
 import { IncomePage } from "./pages/IncomePage";
 import { BudgetsPage } from "./pages/BudgetsPage";
@@ -106,11 +107,41 @@ function App() {
                     }
                   />
                   <Route
+                    path="/transactions/new"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <TransactionPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/transactions/:transactionId"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <TransactionPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/expenses"
                     element={
                       <ProtectedRoute>
                         <ErrorBoundary>
                           <ExpensesPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/expenses/new"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <TransactionPage />
                         </ErrorBoundary>
                       </ProtectedRoute>
                     }

@@ -29,12 +29,14 @@ interface TransactionFormProps {
   transaction?: Transaction;
   onClose: () => void;
   onSuccess: () => void;
+  defaultType?: "expense" | "income";
 }
 
 export function TransactionForm({
   transaction,
   onClose,
   onSuccess,
+  defaultType,
 }: TransactionFormProps) {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -52,11 +54,13 @@ export function TransactionForm({
     transaction?.date || new Date().toISOString().split("T")[0]
   );
   const [type, setType] = useState<"expense" | "income">(
-    transaction?.type || "expense"
+    transaction?.type || defaultType || "expense"
   );
-  const [categoryId, setCategoryId] = useState(transaction?.category_id || "");
+  const [categoryId, setCategoryId] = useState(
+    transaction?.category_id || "none"
+  );
   const [paymentMethod, setPaymentMethod] = useState(
-    transaction?.payment_method || ""
+    transaction?.payment_method || "none"
   );
   const [status, setStatus] = useState<"pending" | "completed" | "cancelled">(
     transaction?.status || "completed"
@@ -136,8 +140,8 @@ export function TransactionForm({
         description: description || null,
         date,
         type,
-        category_id: categoryId || null,
-        payment_method: paymentMethod || null,
+        category_id: categoryId === "none" ? null : categoryId,
+        payment_method: paymentMethod === "none" ? null : paymentMethod,
         status,
         notes: notes || null,
       };
@@ -266,7 +270,7 @@ export function TransactionForm({
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {filteredCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
@@ -284,7 +288,7 @@ export function TransactionForm({
                 <SelectValue placeholder="Select a payment method" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 <SelectItem value="cash">Cash</SelectItem>
                 <SelectItem value="credit_card">Credit Card</SelectItem>
                 <SelectItem value="debit_card">Debit Card</SelectItem>
