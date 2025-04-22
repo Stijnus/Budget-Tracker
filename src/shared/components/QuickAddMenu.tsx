@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Plus, ArrowDownCircle, ArrowUpCircle, Target, Calendar, Tag } from "lucide-react";
+import { useLanguage } from "../../providers/LanguageProvider";
+import {
+  Plus,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Target,
+  Calendar,
+  Tag,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 export function QuickAddMenu() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLanguage();
 
   const handleItemClick = (path: string) => {
     setIsOpen(false);
@@ -42,48 +51,48 @@ export function QuickAddMenu() {
             </DropdownMenuTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Quick Add</p>
+            <p>{t("common.quickAdd")}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Quick Add</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("common.quickAdd")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => handleItemClick("/expenses?new=true")}
           className="cursor-pointer"
         >
           <ArrowDownCircle className="mr-2 h-4 w-4 text-red-500" />
-          <span>New Expense</span>
+          <span>{t("common.newExpense")}</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => handleItemClick("/income?new=true")}
           className="cursor-pointer"
         >
           <ArrowUpCircle className="mr-2 h-4 w-4 text-green-500" />
-          <span>New Income</span>
+          <span>{t("common.newIncome")}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => handleItemClick("/budgets?new=true")}
           className="cursor-pointer"
         >
           <Calendar className="mr-2 h-4 w-4 text-blue-500" />
-          <span>New Budget</span>
+          <span>{t("common.newBudget")}</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => handleItemClick("/goals?new=true")}
           className="cursor-pointer"
         >
           <Target className="mr-2 h-4 w-4 text-purple-500" />
-          <span>New Goal</span>
+          <span>{t("common.newGoal")}</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => handleItemClick("/tags?new=true")}
           className="cursor-pointer"
         >
           <Tag className="mr-2 h-4 w-4 text-yellow-500" />
-          <span>New Tag</span>
+          <span>{t("common.newTag")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

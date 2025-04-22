@@ -4,12 +4,17 @@ import {
   Settings as SettingsIcon,
   HelpCircle,
   Search,
+  User,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
 import { useLanguage } from "../../../providers/LanguageProvider";
-import { Link } from "react-router-dom";
+import { useTheme } from "../../../providers/ThemeProvider";
+import { Link, useLocation } from "react-router-dom";
 import { QuickAddMenu } from "../QuickAddMenu";
 import { ThemeToggle } from "../ThemeToggle";
+import { LanguageSelector } from "../LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -29,13 +34,44 @@ import {
 export function Navbar() {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
+  const { theme, setTheme } = useTheme();
+  const location = useLocation();
+
+  // Get page title based on current route
+  const getPageTitle = () => {
+    const path = location.pathname;
+
+    if (path === "/dashboard") return t("nav.dashboard");
+    if (path === "/transactions") return t("nav.transactions");
+    if (path === "/expenses") return t("nav.expenses");
+    if (path === "/income") return t("nav.income");
+    if (path === "/categories") return t("nav.categories");
+    if (path === "/bills") return t("nav.bills");
+    if (path === "/budgets") return t("nav.budgets");
+    if (path === "/goals") return t("nav.goals");
+    if (path === "/analytics") return t("nav.analytics");
+    if (path === "/settings") return t("nav.settings");
+    if (path === "/tags") return t("nav.tags");
+
+    // For detail pages
+    if (path.includes("/transactions/")) return t("nav.transactions");
+    if (path.includes("/expenses/")) return t("nav.expenses");
+    if (path.includes("/income/")) return t("nav.income");
+    if (path.includes("/categories/")) return t("nav.categories");
+    if (path.includes("/bills/")) return t("nav.bills");
+    if (path.includes("/budgets/")) return t("nav.budgets");
+    if (path.includes("/goals/")) return t("nav.goals");
+    if (path.includes("/tags/")) return t("nav.tags");
+
+    return t("app.name");
+  };
 
   return (
     <header className="bg-background border-b shadow-sm h-16 sticky top-0 z-30">
       <div className="flex items-center justify-between h-full px-4 md:px-6">
         {/* Left side - Title based on current page */}
         <div>
-          <h1 className="text-xl font-semibold">Dashboard</h1>
+          <h1 className="text-xl font-semibold">{getPageTitle()}</h1>
         </div>
 
         {/* Right side - Actions and user menu */}
@@ -81,6 +117,10 @@ export function Navbar() {
 
           {/* Theme Toggle */}
           <ThemeToggle />
+
+          {/* Language Selector */}
+          <LanguageSelector />
+
           {/* Notifications */}
           <TooltipProvider>
             <Tooltip>
@@ -130,6 +170,19 @@ export function Navbar() {
                   </p>
                 </div>
                 <DropdownMenuSeparator />
+
+                {/* Profile */}
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/settings"
+                    className="flex w-full cursor-pointer items-center"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    <span>{t("settings.profile")}</span>
+                  </Link>
+                </DropdownMenuItem>
+
+                {/* Settings */}
                 <DropdownMenuItem asChild>
                   <Link
                     to="/settings"
@@ -139,10 +192,30 @@ export function Navbar() {
                     <span>{t("nav.settings")}</span>
                   </Link>
                 </DropdownMenuItem>
+
+                {/* Theme Toggle */}
+                <DropdownMenuItem
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="cursor-pointer"
+                >
+                  {theme === "dark" ? (
+                    <Sun className="mr-2 h-4 w-4" />
+                  ) : (
+                    <Moon className="mr-2 h-4 w-4" />
+                  )}
+                  <span>
+                    {theme === "dark"
+                      ? t("common.lightMode")
+                      : t("common.darkMode")}
+                  </span>
+                </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
+
+                {/* Logout */}
                 <DropdownMenuItem
                   onClick={() => logout()}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-destructive focus:text-destructive"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>{t("common.logout")}</span>
