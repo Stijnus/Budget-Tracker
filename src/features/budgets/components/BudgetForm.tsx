@@ -39,7 +39,7 @@ export function BudgetForm({ budget, onClose, onSuccess }: BudgetFormProps) {
   // Form state
   const [name, setName] = useState(budget?.name || "");
   const [amount, setAmount] = useState(budget?.amount?.toString() || "");
-  const [categoryId, setCategoryId] = useState(budget?.category_id || "");
+  const [categoryId, setCategoryId] = useState(budget?.category_id || "all");
   const [period, setPeriod] = useState<"monthly" | "yearly" | "custom">(
     (budget?.period as "monthly" | "yearly") || "monthly"
   );
@@ -126,7 +126,7 @@ export function BudgetForm({ budget, onClose, onSuccess }: BudgetFormProps) {
         user_id: user.id,
         name,
         amount: parseFloat(amount),
-        category_id: categoryId || "",
+        category_id: categoryId === "all" ? "" : categoryId,
         period: period === "custom" ? "monthly" : period,
         start_date: startDate,
         end_date: calculatedEndDate || null,
@@ -224,7 +224,7 @@ export function BudgetForm({ budget, onClose, onSuccess }: BudgetFormProps) {
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Expenses</SelectItem>
+                <SelectItem value="all">All Expenses</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
