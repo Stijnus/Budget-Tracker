@@ -8,6 +8,8 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
+  Receipt,
+  CreditCard,
 } from "lucide-react";
 import {
   BillWithCategory,
@@ -192,7 +194,7 @@ export function BillList({
         <div className="mb-4 flex justify-end">
           <Button onClick={handleAddBill} className="flex items-center">
             <Plus size={16} className="mr-1" />
-            Add Bill
+            Add Bill/Subscription
           </Button>
         </div>
       )}
@@ -206,7 +208,7 @@ export function BillList({
                 No bills found. Add your first bill to start tracking!
               </p>
               {showAddButton && (
-                <Button onClick={handleAddBill}>Add Bill</Button>
+                <Button onClick={handleAddBill}>Add Bill/Subscription</Button>
               )}
             </div>
           ) : (
@@ -218,12 +220,24 @@ export function BillList({
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h3 className="text-md font-medium">{bill.name}</h3>
+                      <div className="flex items-center gap-1">
+                        {bill.frequency === "one-time" ? (
+                          <Receipt className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <CreditCard className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <h3 className="text-md font-medium">{bill.name}</h3>
+                        <Badge variant="outline" className="ml-2 text-xs">
+                          {bill.frequency === "one-time"
+                            ? "Bill"
+                            : "Subscription"}
+                        </Badge>
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         {bill.category_name
                           ? bill.category_name
                           : "Uncategorized"}{" "}
-                        •{getFrequencyText(bill.frequency)}
+                        • {getFrequencyText(bill.frequency)}
                       </p>
                     </div>
                     <div className="flex space-x-2">

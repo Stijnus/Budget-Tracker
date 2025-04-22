@@ -52,6 +52,10 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
   const [status, setStatus] = useState<"active" | "paused" | "cancelled">(
     bill?.status || "active"
   );
+  // Determine if this is a bill or subscription based on frequency
+  const [itemType, setItemType] = useState<"bill" | "subscription">(
+    bill?.frequency === "one-time" ? "bill" : "subscription"
+  );
 
   // Fetch categories
   useEffect(() => {
@@ -133,15 +137,63 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
         </Alert>
       )}
 
-      {/* Bill Name */}
+      {/* Item Type */}
       <div className="space-y-2">
-        <Label htmlFor="name">Bill Name *</Label>
+        <Label htmlFor="itemType">Type *</Label>
+        <div className="flex space-x-4">
+          <div className="flex items-center space-x-2">
+            <input
+              type="radio"
+              id="typeBill"
+              name="itemType"
+              value="bill"
+              checked={itemType === "bill"}
+              onChange={() => {
+                setItemType("bill");
+                if (frequency !== "one-time") setFrequency("one-time");
+              }}
+              className="h-4 w-4 text-primary"
+            />
+            <Label htmlFor="typeBill" className="cursor-pointer">
+              Bill (One-time)
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="radio"
+              id="typeSubscription"
+              name="itemType"
+              value="subscription"
+              checked={itemType === "subscription"}
+              onChange={() => {
+                setItemType("subscription");
+                if (frequency === "one-time") setFrequency("monthly");
+              }}
+              className="h-4 w-4 text-primary"
+            />
+            <Label htmlFor="typeSubscription" className="cursor-pointer">
+              Subscription (Recurring)
+            </Label>
+          </div>
+        </div>
+      </div>
+
+      {/* Name */}
+      <div className="space-y-2">
+        <Label htmlFor="name">
+          {itemType === "bill" ? "Bill" : "Subscription"} Name *
+        </Label>
         <Input
           type="text"
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          placeholder={
+            itemType === "bill"
+              ? "e.g., Electricity Bill"
+              : "e.g., Netflix Subscription"
+          }
         />
       </div>
 
@@ -182,11 +234,21 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
         <Label htmlFor="frequency">Frequency *</Label>
         <Select
           value={frequency}
-          onValueChange={(value) =>
-            setFrequency(
-              value as "one-time" | "daily" | "weekly" | "monthly" | "yearly"
-            )
-          }
+          onValueChange={(value) => {
+            const newFrequency = value as
+              | "one-time"
+              | "daily"
+              | "weekly"
+              | "monthly"
+              | "yearly";
+            setFrequency(newFrequency);
+            // Update item type based on frequency
+            if (newFrequency === "one-time") {
+              setItemType("bill");
+            } else {
+              setItemType("subscription");
+            }
+          }}
         >
           <SelectTrigger id="frequency">
             <SelectValue placeholder="Select frequency" />
@@ -290,7 +352,11 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
           Cancel
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : bill ? "Update Bill" : "Add Bill"}
+          {isLoading
+            ? "Saving..."
+            : bill
+            ? `Update ${itemType === "bill" ? "Bill" : "Subscription"}`
+            : `Add ${itemType === "bill" ? "Bill" : "Subscription"}`}
         </Button>
       </div>
     </form>

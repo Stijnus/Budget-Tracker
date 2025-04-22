@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, Receipt } from "lucide-react";
+import { ChevronLeft, Receipt, CreditCard } from "lucide-react";
 import { AppLayout } from "../shared/components/layout";
 import { BillForm } from "../features/bills/components/BillForm";
 import {
@@ -94,9 +94,17 @@ export function BillPage() {
           >
             <ChevronLeft size={20} />
           </Button>
-          <Receipt className="h-6 w-6 text-primary" />
+          {bill?.frequency === "one-time" || !bill ? (
+            <Receipt className="h-6 w-6 text-primary" />
+          ) : (
+            <CreditCard className="h-6 w-6 text-primary" />
+          )}
           <h2 className="text-2xl font-bold">
-            {billId && billId !== "new" ? "Edit Bill" : "Add Bill"}
+            {billId && billId !== "new"
+              ? bill?.frequency === "one-time"
+                ? "Edit Bill"
+                : "Edit Subscription"
+              : "Add Bill or Subscription"}
           </h2>
         </div>
 

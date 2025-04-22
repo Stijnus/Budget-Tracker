@@ -12,7 +12,13 @@ export function BillsPage() {
     <AppLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Bills & Subscriptions</h2>
+          <div>
+            <h2 className="text-2xl font-bold">Bills & Subscriptions</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Manage your one-time bills and recurring subscriptions in one
+              place
+            </p>
+          </div>
         </div>
 
         {selectedBillId ? (
