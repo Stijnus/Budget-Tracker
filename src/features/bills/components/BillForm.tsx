@@ -40,7 +40,7 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
   const [frequency, setFrequency] = useState<
     "one-time" | "daily" | "weekly" | "monthly" | "yearly"
   >(bill?.frequency || "monthly");
-  const [categoryId, setCategoryId] = useState(bill?.category_id || "");
+  const [categoryId, setCategoryId] = useState(bill?.category_id || "none");
   const [paymentMethod, setPaymentMethod] = useState(
     bill?.payment_method || ""
   );
@@ -69,7 +69,8 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
         setCategories(expenseCategories);
 
         // Set default category if none selected and categories are available
-        if (!categoryId && expenseCategories.length > 0) {
+        if (categoryId === "none" && expenseCategories.length > 0 && !bill) {
+          // Only set a default category for new bills, not when editing
           setCategoryId(expenseCategories[0].id);
         }
       } catch (err) {
@@ -79,7 +80,8 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
     }
 
     fetchCategories();
-  }, [categoryId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,7 +107,7 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
         amount: parseFloat(amount),
         due_date: dueDate,
         frequency,
-        category_id: categoryId || null,
+        category_id: categoryId === "none" ? null : categoryId,
         payment_method: paymentMethod || null,
         auto_pay: autoPay,
         reminder_days: parseInt(reminderDays) || 7,
@@ -210,7 +212,7 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">None</SelectItem>
+            <SelectItem value="none">None</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.name}
