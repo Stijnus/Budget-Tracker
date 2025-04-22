@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, PiggyBank } from "lucide-react";
 import { AppLayout } from "../shared/components/layout";
 import { BudgetForm } from "../features/budgets/components/BudgetForm";
-import { getBudget } from "../api/supabase/budgets";
+import { getBudgetById } from "../api/supabase/budgets";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -22,11 +22,11 @@ export function BudgetPage() {
 
       try {
         setIsLoading(true);
-        const { data, error } = await getBudget(budgetId);
-        
+        const { data, error } = await getBudgetById(budgetId);
+
         if (error) throw error;
         if (!data) throw new Error("Budget not found");
-        
+
         setBudget(data);
       } catch (err) {
         console.error("Error fetching budget:", err);
@@ -61,9 +61,9 @@ export function BudgetPage() {
     <AppLayout>
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleClose}
             className="mr-2"
           >

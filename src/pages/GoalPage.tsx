@@ -3,7 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, Target } from "lucide-react";
 import { AppLayout } from "../shared/components/layout";
 import { GoalForm } from "../features/goals/components/GoalForm";
-import { getGoal, createGoal, updateGoal, GoalInsert } from "../api/supabase/goals";
+import {
+  getGoalById,
+  createGoal,
+  updateGoal,
+  GoalInsert,
+} from "../api/supabase/goals";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -22,11 +27,11 @@ export function GoalPage() {
 
       try {
         setIsLoading(true);
-        const { data, error } = await getGoal(goalId);
-        
+        const { data, error } = await getGoalById(goalId);
+
         if (error) throw error;
         if (!data) throw new Error("Goal not found");
-        
+
         setGoal(data);
       } catch (err) {
         console.error("Error fetching goal:", err);
@@ -78,9 +83,9 @@ export function GoalPage() {
     <AppLayout>
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleClose}
             className="mr-2"
           >
