@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Tag, ArrowUpDown, Palette, Icons } from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -132,7 +132,10 @@ export function CategoryForm({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Category Name</Label>
+            <Label htmlFor="name" className="flex items-center gap-1">
+              <Tag size={14} />
+              <span>Category Name</span>
+            </Label>
             <Input
               id="name"
               type="text"
@@ -144,7 +147,10 @@ export function CategoryForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Category Type</Label>
+            <Label htmlFor="type" className="flex items-center gap-1">
+              <ArrowUpDown size={14} />
+              <span>Category Type</span>
+            </Label>
             <Select
               value={type}
               onValueChange={(value) =>
@@ -163,19 +169,41 @@ export function CategoryForm({
           </div>
 
           <div className="space-y-2">
-            <Label>Category Color</Label>
+            <Label className="flex items-center gap-1">
+              <Palette size={14} />
+              <span>Category Color</span>
+            </Label>
             <CategoryColorPicker color={color} onChange={setColor} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="icon">Icon (Optional)</Label>
-            <Input
-              id="icon"
-              type="text"
-              value={icon}
-              onChange={(e) => setIcon(e.target.value)}
-              placeholder="Icon name or URL"
-            />
+            <Label htmlFor="icon" className="flex items-center gap-1">
+              <Icons size={14} />
+              <span>Icon (Optional)</span>
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                id="icon"
+                type="text"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+                placeholder="Icon name or URL"
+              />
+              <div className="flex items-center justify-center border rounded-md bg-muted/20 h-10">
+                {icon ? (
+                  <div className="flex items-center justify-center h-6 w-6 text-primary">
+                    {/* This is just a placeholder for the icon preview */}
+                    <span className="text-xs">
+                      {icon.substring(0, 2).toUpperCase()}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    Icon Preview
+                  </span>
+                )}
+              </div>
+            </div>
             <p className="text-xs text-muted-foreground">
               You can use an icon name from Lucide icons or a URL to a custom
               icon.

@@ -1,12 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Check, Palette } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Predefined colors
 const COLORS = [
@@ -88,47 +95,74 @@ export function CategoryColorPicker({
             <Button
               type="button"
               variant="outline"
-              className="w-10 h-10 p-0"
+              className="w-10 h-10 p-0 relative overflow-hidden"
               style={{ backgroundColor: color }}
               aria-label="Select color"
-            />
+            >
+              <Palette className="h-4 w-4 absolute text-white opacity-50" />
+            </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-2">
+            <div className="mb-2 text-xs font-medium">Select a color</div>
             <div className="grid grid-cols-5 gap-2">
               {COLORS.map((colorOption) => (
-                <Button
-                  key={colorOption}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "w-10 h-10 p-0",
-                    colorOption === color
-                      ? "ring-2 ring-primary ring-offset-2"
-                      : "hover:ring-2 hover:ring-muted"
-                  )}
-                  style={{ backgroundColor: colorOption }}
-                  onClick={() => handleColorSelect(colorOption)}
-                  aria-label={`Select color ${colorOption}`}
-                />
+                <TooltipProvider key={colorOption}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          "w-10 h-10 p-0 relative",
+                          colorOption === color
+                            ? "ring-2 ring-primary ring-offset-2"
+                            : "hover:ring-2 hover:ring-muted"
+                        )}
+                        style={{ backgroundColor: colorOption }}
+                        onClick={() => handleColorSelect(colorOption)}
+                        aria-label={`Select color ${colorOption}`}
+                      >
+                        {colorOption === color && (
+                          <Check className="h-4 w-4 absolute text-white" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <p>{colorOption}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               ))}
+            </div>
+            <div className="mt-3 pt-3 border-t">
+              <div className="text-xs font-medium mb-2">Custom color</div>
+              <div className="flex items-center space-x-2">
+                <Input
+                  type="text"
+                  value={customColor}
+                  onChange={handleCustomColorChange}
+                  className="flex-1"
+                  placeholder="#RRGGBB"
+                />
+                <Input
+                  type="color"
+                  value={customColor}
+                  onChange={handleCustomColorChange}
+                  className="w-10 h-10 p-0 cursor-pointer"
+                  aria-label="Pick custom color"
+                />
+              </div>
             </div>
           </PopoverContent>
         </Popover>
 
-        <Input
-          type="text"
-          value={customColor}
-          onChange={handleCustomColorChange}
-          className="flex-1"
-          placeholder="#RRGGBB"
-        />
-        <Input
-          type="color"
-          value={customColor}
-          onChange={handleCustomColorChange}
-          className="w-10 h-10 p-0 cursor-pointer"
-          aria-label="Pick custom color"
-        />
+        <div className="flex items-center px-3 py-2 rounded-md border bg-muted/20">
+          <div
+            className="w-4 h-4 rounded-full mr-2"
+            style={{ backgroundColor: color }}
+          ></div>
+          <span className="text-sm">{color}</span>
+        </div>
       </div>
     </div>
   );

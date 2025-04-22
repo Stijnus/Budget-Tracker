@@ -10,7 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PieChartIcon, TagsIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  PieChartIcon,
+  TagsIcon,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Plus,
+} from "lucide-react";
 
 export function CategoriesPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -45,15 +52,22 @@ export function CategoriesPage() {
     <AppLayout>
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Categories</h1>
+          <div className="flex items-center gap-2">
+            <PieChartIcon className="h-6 w-6 text-primary" />
+            <h1 className="text-2xl font-bold">Categories</h1>
+          </div>
+          <Button
+            onClick={handleAddCategory}
+            className="flex items-center gap-1"
+          >
+            <Plus size={16} />
+            Add Category
+          </Button>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <PieChartIcon className="h-5 w-5" />
-              <span>Category Management</span>
-            </CardTitle>
+            <CardTitle className="text-xl">Category Management</CardTitle>
             <CardDescription>
               Manage your expense and income categories. Categories help you
               organize your transactions and track your spending patterns.
@@ -66,11 +80,11 @@ export function CategoriesPage() {
                   value="expense"
                   className="flex items-center gap-1"
                 >
-                  <TagsIcon className="h-4 w-4" />
+                  <ArrowDownCircle className="h-4 w-4 text-destructive" />
                   <span>Expense Categories</span>
                 </TabsTrigger>
                 <TabsTrigger value="income" className="flex items-center gap-1">
-                  <TagsIcon className="h-4 w-4" />
+                  <ArrowUpCircle className="h-4 w-4 text-green-600" />
                   <span>Income Categories</span>
                 </TabsTrigger>
               </TabsList>
