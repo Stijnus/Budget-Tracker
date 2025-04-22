@@ -1,5 +1,43 @@
 import { useState, useEffect } from "react";
-import { AlertCircle, Tag, ArrowUpDown, Palette, Icons } from "lucide-react";
+import {
+  AlertCircle,
+  Tag,
+  ArrowUpDown,
+  Palette,
+  Icons,
+  ShoppingBag,
+  Home,
+  Car,
+  Utensils,
+  Coffee,
+  CreditCard,
+  Gift,
+  Briefcase,
+  Banknote,
+  Building,
+  Landmark,
+  Wallet,
+  Heart,
+  Plane,
+  Smartphone,
+  Wifi,
+  Droplet,
+  Zap,
+  Shirt,
+  Scissors,
+  Dumbbell,
+  BookOpen,
+  Gamepad2,
+  Music,
+  Film,
+  PiggyBank,
+  BarChart,
+  Percent,
+  BadgeDollarSign,
+  CircleDollarSign,
+  DollarSign,
+  Check,
+} from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,16 +70,57 @@ interface CategoryFormProps {
   category?: Category;
   onClose: () => void;
   onSuccess: () => void;
+  defaultType?: "expense" | "income" | "both";
+  inPage?: boolean;
 }
+
+// Icon map for the icon picker
+const ICON_MAP: Record<string, React.ReactNode> = {
+  ShoppingBag: <ShoppingBag size={20} />,
+  Home: <Home size={20} />,
+  Car: <Car size={20} />,
+  Utensils: <Utensils size={20} />,
+  Coffee: <Coffee size={20} />,
+  CreditCard: <CreditCard size={20} />,
+  Gift: <Gift size={20} />,
+  Briefcase: <Briefcase size={20} />,
+  Banknote: <Banknote size={20} />,
+  Building: <Building size={20} />,
+  Landmark: <Landmark size={20} />,
+  Wallet: <Wallet size={20} />,
+  Heart: <Heart size={20} />,
+  Plane: <Plane size={20} />,
+  Smartphone: <Smartphone size={20} />,
+  Wifi: <Wifi size={20} />,
+  Droplet: <Droplet size={20} />,
+  Zap: <Zap size={20} />,
+  Shirt: <Shirt size={20} />,
+  Scissors: <Scissors size={20} />,
+  Dumbbell: <Dumbbell size={20} />,
+  BookOpen: <BookOpen size={20} />,
+  Gamepad2: <Gamepad2 size={20} />,
+  Music: <Music size={20} />,
+  Film: <Film size={20} />,
+  PiggyBank: <PiggyBank size={20} />,
+  BarChart: <BarChart size={20} />,
+  Percent: <Percent size={20} />,
+  BadgeDollarSign: <BadgeDollarSign size={20} />,
+  CircleDollarSign: <CircleDollarSign size={20} />,
+  DollarSign: <DollarSign size={20} />,
+};
 
 export function CategoryForm({
   category,
   onClose,
   onSuccess,
+  defaultType,
+  inPage = false,
 }: CategoryFormProps) {
   const { user } = useAuth();
   const [name, setName] = useState("");
-  const [type, setType] = useState<"expense" | "income" | "both">("expense");
+  const [type, setType] = useState<"expense" | "income" | "both">(
+    defaultType || "expense"
+  );
   const [color, setColor] = useState("#3B82F6"); // Default blue color
   const [icon, setIcon] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +193,132 @@ export function CategoryForm({
     }
   };
 
-  return (
+  // Render the form content
+  const formContent = (
+    <>
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name" className="flex items-center gap-1">
+            <Tag size={14} />
+            <span>Category Name</span>
+          </Label>
+          <Input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g., Groceries, Rent, Salary"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="type" className="flex items-center gap-1">
+            <ArrowUpDown size={14} />
+            <span>Category Type</span>
+          </Label>
+          <Select
+            value={type}
+            onValueChange={(value) =>
+              setType(value as "expense" | "income" | "both")
+            }
+          >
+            <SelectTrigger id="type">
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="expense">Expense</SelectItem>
+              <SelectItem value="income">Income</SelectItem>
+              <SelectItem value="both">Both</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="flex items-center gap-1">
+            <Palette size={14} />
+            <span>Category Color</span>
+          </Label>
+          <CategoryColorPicker color={color} onChange={setColor} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="icon" className="flex items-center gap-1">
+            <Icons size={14} />
+            <span>Icon</span>
+          </Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Select value={icon || ""} onValueChange={setIcon}>
+              <SelectTrigger id="icon">
+                <SelectValue placeholder="Select an icon" />
+              </SelectTrigger>
+              <SelectContent className="h-[300px]">
+                <div className="grid grid-cols-4 gap-2 p-2">
+                  {Object.entries(ICON_MAP).map(([iconName, iconComponent]) => (
+                    <Button
+                      key={iconName}
+                      type="button"
+                      variant={icon === iconName ? "default" : "outline"}
+                      className="h-12 w-12 p-0 relative"
+                      onClick={() => setIcon(iconName)}
+                    >
+                      <div className="flex items-center justify-center">
+                        {iconComponent}
+                      </div>
+                      {icon === iconName && (
+                        <div className="absolute bottom-0 right-0 bg-primary rounded-full p-0.5">
+                          <Check className="h-3 w-3 text-primary-foreground" />
+                        </div>
+                      )}
+                    </Button>
+                  ))}
+                </div>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center justify-center border rounded-md bg-muted/20 h-10">
+              {icon && ICON_MAP[icon] ? (
+                <div className="flex items-center justify-center text-primary">
+                  {ICON_MAP[icon]}
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  Icon Preview
+                </span>
+              )}
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Select an icon that represents this category.
+          </p>
+        </div>
+
+        <div className="mt-4 flex justify-end space-x-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading
+              ? "Saving..."
+              : category
+              ? "Update Category"
+              : "Add Category"}
+          </Button>
+        </div>
+      </form>
+    </>
+  );
+
+  // Render as a dialog or as a page content
+  return inPage ? (
+    <div className="bg-card rounded-md border shadow p-6">{formContent}</div>
+  ) : (
     <Dialog open={true} onOpenChange={() => onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -123,106 +327,7 @@ export function CategoryForm({
           </DialogTitle>
         </DialogHeader>
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="flex items-center gap-1">
-              <Tag size={14} />
-              <span>Category Name</span>
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Groceries, Rent, Salary"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="type" className="flex items-center gap-1">
-              <ArrowUpDown size={14} />
-              <span>Category Type</span>
-            </Label>
-            <Select
-              value={type}
-              onValueChange={(value) =>
-                setType(value as "expense" | "income" | "both")
-              }
-            >
-              <SelectTrigger id="type">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="expense">Expense</SelectItem>
-                <SelectItem value="income">Income</SelectItem>
-                <SelectItem value="both">Both</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="flex items-center gap-1">
-              <Palette size={14} />
-              <span>Category Color</span>
-            </Label>
-            <CategoryColorPicker color={color} onChange={setColor} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="icon" className="flex items-center gap-1">
-              <Icons size={14} />
-              <span>Icon (Optional)</span>
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-              <Input
-                id="icon"
-                type="text"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
-                placeholder="Icon name or URL"
-              />
-              <div className="flex items-center justify-center border rounded-md bg-muted/20 h-10">
-                {icon ? (
-                  <div className="flex items-center justify-center h-6 w-6 text-primary">
-                    {/* This is just a placeholder for the icon preview */}
-                    <span className="text-xs">
-                      {icon.substring(0, 2).toUpperCase()}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-muted-foreground">
-                    Icon Preview
-                  </span>
-                )}
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              You can use an icon name from Lucide icons or a URL to a custom
-              icon.
-            </p>
-          </div>
-
-          <DialogFooter className="mt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading
-                ? "Saving..."
-                : category
-                ? "Update Category"
-                : "Add Category"}
-            </Button>
-          </DialogFooter>
-        </form>
+        {formContent}
       </DialogContent>
     </Dialog>
   );

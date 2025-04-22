@@ -9,6 +9,7 @@ import { LandingPage } from "./pages/LandingPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
+import { CategoryPage } from "./pages/CategoryPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
 import { TransactionPage } from "./pages/TransactionPage";
 import { ExpensesPage } from "./pages/ExpensesPage";
@@ -92,6 +93,26 @@ function App() {
                       <ProtectedRoute>
                         <ErrorBoundary>
                           <CategoriesPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/categories/new"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <CategoryPage />
+                        </ErrorBoundary>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/categories/:categoryId"
+                    element={
+                      <ProtectedRoute>
+                        <ErrorBoundary>
+                          <CategoryPage />
                         </ErrorBoundary>
                       </ProtectedRoute>
                     }

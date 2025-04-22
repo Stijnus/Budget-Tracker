@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "../shared/components/layout";
-import { CategoryList, CategoryForm } from "../features/categories/components";
+import { CategoryList } from "../features/categories/components";
 import { Category } from "../api/supabase";
 import {
   Card,
@@ -20,33 +21,23 @@ import {
 } from "lucide-react";
 
 export function CategoriesPage() {
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<
-    Category | undefined
-  >(undefined);
+  const navigate = useNavigate();
 
   // Handle edit category
   const handleEditCategory = (category: Category) => {
-    setSelectedCategory(category);
-    setIsFormOpen(true);
+    navigate(`/categories/${category.id}`);
   };
 
   // Handle add category
-  const handleAddCategory = () => {
-    setSelectedCategory(undefined);
-    setIsFormOpen(true);
+  const handleAddCategory = (type?: "expense" | "income" | "both") => {
+    if (type) {
+      navigate(`/categories/new?type=${type}`);
+    } else {
+      navigate("/categories/new");
+    }
   };
 
-  // Handle form close
-  const handleFormClose = () => {
-    setIsFormOpen(false);
-    setSelectedCategory(undefined);
-  };
-
-  // Handle form success
-  const handleFormSuccess = () => {
-    // The CategoryList component will reload the categories
-  };
+  // No longer need form handlers as we're using page-based navigation
 
   return (
     <AppLayout>
@@ -57,7 +48,7 @@ export function CategoriesPage() {
             <h1 className="text-2xl font-bold">Categories</h1>
           </div>
           <Button
-            onClick={handleAddCategory}
+            onClick={() => handleAddCategory()}
             className="flex items-center gap-1"
           >
             <Plus size={16} />
@@ -91,14 +82,14 @@ export function CategoriesPage() {
               <TabsContent value="expense">
                 <CategoryList
                   onEdit={handleEditCategory}
-                  onAdd={handleAddCategory}
+                  onAdd={() => handleAddCategory("expense")}
                   type="expense"
                 />
               </TabsContent>
               <TabsContent value="income">
                 <CategoryList
                   onEdit={handleEditCategory}
-                  onAdd={handleAddCategory}
+                  onAdd={() => handleAddCategory("income")}
                   type="income"
                 />
               </TabsContent>
@@ -106,13 +97,7 @@ export function CategoriesPage() {
           </CardContent>
         </Card>
 
-        {isFormOpen && (
-          <CategoryForm
-            category={selectedCategory}
-            onClose={handleFormClose}
-            onSuccess={handleFormSuccess}
-          />
-        )}
+        {/* Form is now handled in a separate page */}
       </div>
     </AppLayout>
   );
