@@ -7,7 +7,8 @@ import {
   TrendingUp,
   Edit,
   PlusCircle,
-  X,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import {
   GoalWithCategory,
@@ -18,6 +19,26 @@ import {
 import { formatCurrency, formatDate } from "../../../utils/formatters";
 import { GoalModal } from "./GoalModal";
 import { ContributionHistory } from "./ContributionHistory";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface GoalDetailsProps {
   goalId: string;
@@ -118,13 +139,13 @@ export function GoalDetails({ goalId }: GoalDetailsProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "in_progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 hover:bg-blue-100";
       case "achieved":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 hover:bg-green-100";
       case "cancelled":
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100";
     }
   };
 
@@ -145,229 +166,219 @@ export function GoalDetails({ goalId }: GoalDetailsProps) {
   if (isLoading) {
     return (
       <div className="flex justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
-    return <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>;
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
   }
 
   if (!goal || !metrics) {
-    return <div className="p-4 text-gray-500">Goal not found</div>;
+    return <div className="p-4 text-muted-foreground">Goal not found</div>;
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <div className="flex justify-between items-start mb-6">
-        <h2 className="text-xl font-bold text-gray-800">{goal.name}</h2>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setIsEditModalOpen(true)}
-            className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
-            aria-label="Edit"
-          >
-            <Edit size={18} />
-          </button>
-        </div>
-      </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xl">{goal.name}</CardTitle>
+        <Button
+          onClick={() => setIsEditModalOpen(true)}
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+        >
+          <Edit size={18} />
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {/* Progress bar */}
+        <Progress
+          value={metrics.percentComplete}
+          className="h-4 mb-4"
+        />
 
-      {/* Progress bar */}
-      <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-        <div
-          className="bg-blue-600 h-4 rounded-full"
-          style={{ width: `${metrics.percentComplete}%` }}
-        ></div>
-      </div>
-
-      <div className="flex justify-between text-sm text-gray-700 mb-6">
-        <span>
-          {formatCurrency(goal.current_amount)} of{" "}
-          {formatCurrency(goal.target_amount)}
-        </span>
-        <span className="font-medium">{metrics.percentComplete}% complete</span>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-          <div className="flex items-center mb-4">
-            <Target size={18} className="text-gray-500 mr-2" />
-            <div>
-              <p className="text-sm text-gray-500">Target Amount</p>
-              <p className="text-lg font-medium">
-                {formatCurrency(goal.target_amount)}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center mb-4">
-            <Calendar size={18} className="text-gray-500 mr-2" />
-            <div>
-              <p className="text-sm text-gray-500">Start Date</p>
-              <p className="font-medium">
-                {formatDate(goal.start_date, "medium")}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center mb-4">
-            <Calendar size={18} className="text-gray-500 mr-2" />
-            <div>
-              <p className="text-sm text-gray-500">Target Date</p>
-              <p className="font-medium">
-                {goal.target_date
-                  ? formatDate(goal.target_date, "medium")
-                  : "No target date"}
-
-                {goal.target_date && metrics.isOverdue && (
-                  <span className="ml-2 text-xs text-red-600 font-normal">
-                    Overdue
-                  </span>
-                )}
-              </p>
-            </div>
-          </div>
+        <div className="flex justify-between text-sm mb-6">
+          <span>
+            {formatCurrency(goal.current_amount)} of{" "}
+            {formatCurrency(goal.target_amount)}
+          </span>
+          <span className="font-medium">{metrics.percentComplete}% complete</span>
         </div>
 
-        <div>
-          <div className="flex items-center mb-4">
-            <Tag size={18} className="text-gray-500 mr-2" />
-            <div>
-              <p className="text-sm text-gray-500">Category</p>
-              <p className="font-medium">
-                {goal.category_name || "Uncategorized"}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center mb-4">
-            <DollarSign size={18} className="text-gray-500 mr-2" />
-            <div>
-              <p className="text-sm text-gray-500">Amount Remaining</p>
-              <p className="font-medium">
-                {formatCurrency(metrics.amountRemaining)}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center mb-4">
-            <div className="w-[18px] h-[18px] flex items-center justify-center text-gray-500 mr-2">
-              <span className="text-sm font-bold">%</span>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Status</p>
-              <p
-                className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                  goal.status
-                )}`}
-              >
-                {getStatusText(goal.status)}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Daily/Monthly targets */}
-      {goal.status === "in_progress" && goal.target_date && (
-        <div className="bg-blue-50 p-4 rounded-md mb-6">
-          <h3 className="text-sm font-medium text-blue-800 mb-2">
-            Saving Targets
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center">
-              <TrendingUp size={16} className="text-blue-600 mr-2" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <div className="flex items-center mb-4">
+              <Target size={18} className="text-muted-foreground mr-2" />
               <div>
-                <p className="text-xs text-blue-600">Daily Target</p>
-                <p className="text-sm font-medium text-blue-800">
-                  {formatCurrency(metrics.dailyTarget)}
+                <p className="text-sm text-muted-foreground">Target Amount</p>
+                <p className="text-lg font-medium">
+                  {formatCurrency(goal.target_amount)}
                 </p>
               </div>
             </div>
-            <div className="flex items-center">
-              <TrendingUp size={16} className="text-blue-600 mr-2" />
+
+            <div className="flex items-center mb-4">
+              <Calendar size={18} className="text-muted-foreground mr-2" />
               <div>
-                <p className="text-xs text-blue-600">Monthly Target</p>
-                <p className="text-sm font-medium text-blue-800">
-                  {formatCurrency(metrics.monthlyTarget)}
+                <p className="text-sm text-muted-foreground">Start Date</p>
+                <p className="font-medium">
+                  {formatDate(goal.start_date, "medium")}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center mb-4">
+              <Calendar size={18} className="text-muted-foreground mr-2" />
+              <div>
+                <p className="text-sm text-muted-foreground">Target Date</p>
+                <p className="font-medium">
+                  {goal.target_date
+                    ? formatDate(goal.target_date, "medium")
+                    : "No target date"}
+
+                  {goal.target_date && metrics.isOverdue && (
+                    <Badge variant="destructive" className="ml-2 text-xs font-normal">
+                      Overdue
+                    </Badge>
+                  )}
                 </p>
               </div>
             </div>
           </div>
-          {metrics.timeRemainingDays > 0 && (
-            <p className="text-xs text-blue-600 mt-2">
-              {metrics.timeRemainingDays} days remaining to reach your goal
+
+          <div>
+            <div className="flex items-center mb-4">
+              <Tag size={18} className="text-muted-foreground mr-2" />
+              <div>
+                <p className="text-sm text-muted-foreground">Category</p>
+                <p className="font-medium">
+                  {goal.category_name || "Uncategorized"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center mb-4">
+              <DollarSign size={18} className="text-muted-foreground mr-2" />
+              <div>
+                <p className="text-sm text-muted-foreground">Amount Remaining</p>
+                <p className="font-medium">
+                  {formatCurrency(metrics.amountRemaining)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center mb-4">
+              <div className="w-[18px] h-[18px] flex items-center justify-center text-muted-foreground mr-2">
+                <span className="text-sm font-bold">%</span>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Status</p>
+                <Badge
+                  variant="outline"
+                  className={getStatusColor(goal.status)}
+                >
+                  {getStatusText(goal.status)}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Daily/Monthly targets */}
+        {goal.status === "in_progress" && goal.target_date && (
+          <Card className="bg-primary/5 mb-6">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Saving Targets</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center">
+                  <TrendingUp size={16} className="text-primary mr-2" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Daily Target</p>
+                    <p className="text-sm font-medium">
+                      {formatCurrency(metrics.dailyTarget)}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <TrendingUp size={16} className="text-primary mr-2" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Monthly Target</p>
+                    <p className="text-sm font-medium">
+                      {formatCurrency(metrics.monthlyTarget)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {metrics.timeRemainingDays > 0 && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  {metrics.timeRemainingDays} days remaining to reach your goal
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {goal.notes && (
+          <div className="mb-6">
+            <h3 className="text-sm font-medium mb-2">Notes</h3>
+            <p className="text-muted-foreground bg-muted p-3 rounded-md">
+              {goal.notes}
             </p>
-          )}
-        </div>
-      )}
+          </div>
+        )}
 
-      {goal.notes && (
-        <div className="mb-6">
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Notes</h3>
-          <p className="text-gray-600 bg-gray-50 p-3 rounded-md">
-            {goal.notes}
-          </p>
-        </div>
-      )}
+        {goal.status === "in_progress" && (
+          <div className="flex space-x-3 mb-6">
+            <Button
+              onClick={() => setIsContributeModalOpen(true)}
+              className="flex items-center"
+            >
+              <PlusCircle size={16} className="mr-1" />
+              Add Contribution
+            </Button>
+          </div>
+        )}
 
-      {goal.status === "in_progress" && (
-        <div className="flex space-x-3 mb-6">
-          <button
-            onClick={() => setIsContributeModalOpen(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
-          >
-            <PlusCircle size={16} className="mr-1" />
-            Add Contribution
-          </button>
-        </div>
-      )}
+        <ContributionHistory goalId={goal.id} className="mt-6" />
 
-      <ContributionHistory goalId={goal.id} className="mt-6" />
+        {/* Edit Modal */}
+        <GoalModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          goal={goal}
+          onSuccess={handleGoalUpdate}
+        />
 
-      {/* Edit Modal */}
-      <GoalModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        goal={goal}
-        onSuccess={handleGoalUpdate}
-      />
-
-      {/* Add Contribution Modal */}
-      {isContributeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                Add Contribution
-              </h3>
-              <button
-                onClick={() => setIsContributeModalOpen(false)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <X size={20} />
-              </button>
-            </div>
+        {/* Add Contribution Modal */}
+        <Dialog 
+          open={isContributeModalOpen} 
+          onOpenChange={(open) => !open && setIsContributeModalOpen(false)}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Contribution</DialogTitle>
+            </DialogHeader>
 
             <form onSubmit={handleAddContribution} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="contributionAmount"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Amount *
-                </label>
+              <div className="space-y-2">
+                <Label htmlFor="contributionAmount">Amount *</Label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    $
-                  </span>
-                  <input
+                  <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
                     type="number"
                     id="contributionAmount"
                     value={contributionAmount}
                     onChange={(e) => setContributionAmount(e.target.value)}
-                    className="w-full pl-7 px-3 py-2 border border-gray-300 rounded-md"
+                    className="pl-8"
                     step="0.01"
                     min="0"
                     required
@@ -375,41 +386,32 @@ export function GoalDetails({ goalId }: GoalDetailsProps) {
                 </div>
               </div>
 
-              <div>
-                <label
-                  htmlFor="contributionNotes"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Notes
-                </label>
-                <textarea
+              <div className="space-y-2">
+                <Label htmlFor="contributionNotes">Notes</Label>
+                <Textarea
                   id="contributionNotes"
                   value={contributionNotes}
                   onChange={(e) => setContributionNotes(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   rows={2}
                 />
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
+              <DialogFooter>
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setIsContributeModalOpen(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                 >
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
+                </Button>
+                <Button type="submit">
                   Add Contribution
-                </button>
-              </div>
+                </Button>
+              </DialogFooter>
             </form>
-          </div>
-        </div>
-      )}
-    </div>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
   );
 }

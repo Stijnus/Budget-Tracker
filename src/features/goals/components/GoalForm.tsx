@@ -2,6 +2,19 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { GoalWithCategory, GoalInsert } from "../../../api/supabase/goals";
 import { getCategories } from "../../../api/supabase/categories";
+import { AlertCircle, DollarSign } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface GoalFormProps {
   goal?: GoalWithCategory;
@@ -31,9 +44,9 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
   const [targetDate, setTargetDate] = useState(goal?.target_date || "");
   const [categoryId, setCategoryId] = useState(goal?.category_id || "");
   const [notes, setNotes] = useState(goal?.notes || "");
-  const [status, setStatus] = useState<"in_progress" | "achieved" | "cancelled">(
-    goal?.status || "in_progress"
-  );
+  const [status, setStatus] = useState<
+    "in_progress" | "achieved" | "cancelled"
+  >(goal?.status || "in_progress");
 
   // Fetch categories
   useEffect(() => {
@@ -100,45 +113,35 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 text-red-700 rounded-md">{error}</div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
 
       {/* Goal Name */}
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Goal Name *
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="name">Goal Name *</Label>
+        <Input
           type="text"
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           required
         />
       </div>
 
       {/* Target Amount */}
-      <div>
-        <label
-          htmlFor="targetAmount"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Target Amount *
-        </label>
+      <div className="space-y-2">
+        <Label htmlFor="targetAmount">Target Amount *</Label>
         <div className="relative">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-            $
-          </span>
-          <input
+          <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
             type="number"
             id="targetAmount"
             value={targetAmount}
             onChange={(e) => setTargetAmount(e.target.value)}
-            className="w-full pl-7 px-3 py-2 border border-gray-300 rounded-md"
+            className="pl-8"
             step="0.01"
             min="0"
             required
@@ -147,23 +150,16 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
       </div>
 
       {/* Current Amount */}
-      <div>
-        <label
-          htmlFor="currentAmount"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Current Amount
-        </label>
+      <div className="space-y-2">
+        <Label htmlFor="currentAmount">Current Amount</Label>
         <div className="relative">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-            $
-          </span>
-          <input
+          <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
             type="number"
             id="currentAmount"
             value={currentAmount}
             onChange={(e) => setCurrentAmount(e.target.value)}
-            className="w-full pl-7 px-3 py-2 border border-gray-300 rounded-md"
+            className="pl-8"
             step="0.01"
             min="0"
           />
@@ -171,118 +167,85 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
       </div>
 
       {/* Start Date */}
-      <div>
-        <label
-          htmlFor="startDate"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Start Date *
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="startDate">Start Date *</Label>
+        <Input
           type="date"
           id="startDate"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           required
         />
       </div>
 
       {/* Target Date */}
-      <div>
-        <label
-          htmlFor="targetDate"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Target Date
-        </label>
-        <input
+      <div className="space-y-2">
+        <Label htmlFor="targetDate">Target Date</Label>
+        <Input
           type="date"
           id="targetDate"
           value={targetDate}
           onChange={(e) => setTargetDate(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
         />
       </div>
 
       {/* Category */}
-      <div>
-        <label
-          htmlFor="category"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Category
-        </label>
-        <select
-          id="category"
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-        >
-          <option value="">Select a category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+      <div className="space-y-2">
+        <Label htmlFor="category">Category</Label>
+        <Select value={categoryId} onValueChange={setCategoryId}>
+          <SelectTrigger id="category">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">None</SelectItem>
+            {categories.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Status */}
-      <div>
-        <label
-          htmlFor="status"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Status
-        </label>
-        <select
-          id="status"
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select
           value={status}
-          onChange={(e) =>
-            setStatus(e.target.value as "in_progress" | "achieved" | "cancelled")
+          onValueChange={(value) =>
+            setStatus(value as "in_progress" | "achieved" | "cancelled")
           }
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
         >
-          <option value="in_progress">In Progress</option>
-          <option value="achieved">Achieved</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="achieved">Achieved</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Notes */}
-      <div>
-        <label
-          htmlFor="notes"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Notes
-        </label>
-        <textarea
+      <div className="space-y-2">
+        <Label htmlFor="notes">Notes</Label>
+        <Textarea
           id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
           rows={3}
         />
       </div>
 
       {/* Form Actions */}
       <div className="flex justify-end space-x-3 pt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-        >
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400"
-        >
+        </Button>
+        <Button type="submit" disabled={isLoading}>
           {isLoading ? "Saving..." : goal ? "Update Goal" : "Add Goal"}
-        </button>
+        </Button>
       </div>
     </form>
   );

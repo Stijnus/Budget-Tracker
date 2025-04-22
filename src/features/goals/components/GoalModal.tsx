@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import {
   GoalWithCategory,
   GoalInsert,
@@ -7,6 +7,13 @@ import {
   updateGoal,
 } from "../../../api/supabase/goals";
 import { GoalForm } from "./GoalForm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface GoalModalProps {
   isOpen: boolean;
@@ -48,28 +55,21 @@ export function GoalModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium text-gray-900">
-            {goal ? "Edit Goal" : "Add New Goal"}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500"
-          >
-            <X size={20} />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{goal ? "Edit Goal" : "Add New Goal"}</DialogTitle>
+        </DialogHeader>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
         <GoalForm goal={goal} onSubmit={handleSubmit} onCancel={onClose} />
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

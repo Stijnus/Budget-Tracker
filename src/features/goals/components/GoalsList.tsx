@@ -7,6 +7,8 @@ import {
   Calendar,
   DollarSign,
   TrendingUp,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import {
   GoalWithCategory,
@@ -16,6 +18,24 @@ import {
 } from "../../../api/supabase/goals";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
 import { GoalModal } from "./GoalModal";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface GoalsListProps {
   showAddButton?: boolean;
@@ -120,13 +140,13 @@ export function GoalsList({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "in_progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 hover:bg-blue-100";
       case "achieved":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 hover:bg-green-100";
       case "cancelled":
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100";
     }
   };
 
@@ -147,14 +167,17 @@ export function GoalsList({
   if (isLoading) {
     return (
       <div className="flex justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 text-red-500 bg-red-50 rounded-md">{error}</div>
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
     );
   }
 
@@ -163,134 +186,132 @@ export function GoalsList({
       {/* Add Goal Button */}
       {showAddButton && (
         <div className="mb-4 flex justify-end">
-          <button
-            onClick={handleAddGoal}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
-          >
+          <Button onClick={handleAddGoal} size="sm">
             <Plus size={16} className="mr-1" />
             Add Goal
-          </button>
+          </Button>
         </div>
       )}
 
       {/* Goals List */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        {goals.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            <p className="mb-4">
-              No financial goals found. Add your first goal to start tracking!
-            </p>
-            {showAddButton && (
-              <button
-                onClick={handleAddGoal}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
-              >
-                Add Goal
-              </button>
-            )}
-          </div>
-        ) : (
-          <ul className="divide-y divide-gray-200">
-            {goals.map((goal) => {
-              const metrics = calculateGoalMetrics(goal);
-              return (
-                <li key={goal.id} className="p-4 hover:bg-gray-50">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="text-md font-medium text-gray-900">
-                        {goal.name}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {goal.category_name
-                          ? goal.category_name
-                          : "Uncategorized"}
-                      </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Financial Goals</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {goals.length === 0 ? (
+            <div className="p-6 text-center text-muted-foreground">
+              <p className="mb-4">
+                No financial goals found. Add your first goal to start tracking!
+              </p>
+              {showAddButton && (
+                <Button onClick={handleAddGoal}>
+                  Add Goal
+                </Button>
+              )}
+            </div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {goals.map((goal) => {
+                const metrics = calculateGoalMetrics(goal);
+                return (
+                  <li key={goal.id} className="p-4 hover:bg-muted/50 rounded-md">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="text-md font-medium">
+                          {goal.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {goal.category_name
+                            ? goal.category_name
+                            : "Uncategorized"}
+                        </p>
+                      </div>
+                      <div className="flex space-x-1">
+                        <Button
+                          onClick={() => handleEditGoal(goal)}
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                        >
+                          <Edit size={16} />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteClick(goal.id)}
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive/90"
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEditGoal(goal)}
-                        className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
-                        aria-label="Edit"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(goal.id)}
-                        className="p-1 text-gray-500 hover:text-red-600 transition-colors"
-                        aria-label="Delete"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
 
-                  <div className="flex justify-between items-center mb-1">
-                    <div className="flex items-center">
-                      <Target size={16} className="text-gray-500 mr-1" />
-                      <span className="text-gray-700">
-                        {formatCurrency(goal.target_amount)}
-                      </span>
-                    </div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
-                        goal.status
-                      )}`}
-                    >
-                      {getStatusText(goal.status)}
-                    </span>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                    <div
-                      className="bg-blue-600 h-2.5 rounded-full"
-                      style={{ width: `${metrics.percentComplete}%` }}
-                    ></div>
-                  </div>
-
-                  <div className="flex justify-between text-xs text-gray-500 mb-2">
-                    <span>
-                      {formatCurrency(goal.current_amount)} of{" "}
-                      {formatCurrency(goal.target_amount)}
-                    </span>
-                    <span>{metrics.percentComplete}% complete</span>
-                  </div>
-
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Calendar size={14} className="mr-1" />
-                    <span>
-                      {goal.target_date
-                        ? `Target: ${formatDate(goal.target_date, "medium")}`
-                        : "No target date"}
-                    </span>
-                  </div>
-
-                  {/* Show remaining amount and daily target if applicable */}
-                  {goal.status === "in_progress" && (
-                    <div className="mt-2 flex flex-col text-xs text-gray-500">
+                    <div className="flex justify-between items-center mb-1">
                       <div className="flex items-center">
-                        <DollarSign size={14} className="mr-1" />
+                        <Target size={16} className="text-muted-foreground mr-1" />
                         <span>
-                          {formatCurrency(metrics.amountRemaining)} remaining
+                          {formatCurrency(goal.target_amount)}
                         </span>
                       </div>
-                      {goal.target_date && metrics.dailyTarget > 0 && (
-                        <div className="flex items-center mt-1">
-                          <TrendingUp size={14} className="mr-1" />
+                      <Badge
+                        variant="outline"
+                        className={getStatusColor(goal.status)}
+                      >
+                        {getStatusText(goal.status)}
+                      </Badge>
+                    </div>
+
+                    {/* Progress bar */}
+                    <Progress
+                      value={metrics.percentComplete}
+                      className="h-2 mb-2"
+                    />
+
+                    <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                      <span>
+                        {formatCurrency(goal.current_amount)} of{" "}
+                        {formatCurrency(goal.target_amount)}
+                      </span>
+                      <span>{metrics.percentComplete}% complete</span>
+                    </div>
+
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Calendar size={14} className="mr-1" />
+                      <span>
+                        {goal.target_date
+                          ? `Target: ${formatDate(goal.target_date, "medium")}`
+                          : "No target date"}
+                      </span>
+                    </div>
+
+                    {/* Show remaining amount and daily target if applicable */}
+                    {goal.status === "in_progress" && (
+                      <div className="mt-2 flex flex-col text-xs text-muted-foreground">
+                        <div className="flex items-center">
+                          <DollarSign size={14} className="mr-1" />
                           <span>
-                            Save {formatCurrency(metrics.dailyTarget)} daily to
-                            reach goal
+                            {formatCurrency(metrics.amountRemaining)} remaining
                           </span>
                         </div>
-                      )}
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
+                        {goal.target_date && metrics.dailyTarget > 0 && (
+                          <div className="flex items-center mt-1">
+                            <TrendingUp size={14} className="mr-1" />
+                            <span>
+                              Save {formatCurrency(metrics.dailyTarget)} daily to
+                              reach goal
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Goal Modal */}
       <GoalModal
@@ -301,33 +322,24 @@ export function GoalsList({
       />
 
       {/* Delete Confirmation Modal */}
-      {isDeleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Confirm Deletion
-            </h3>
-            <p className="text-gray-700 mb-6">
-              Are you sure you want to delete this goal? This action cannot be
-              undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={handleDeleteCancel}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={(open) => !open && handleDeleteCancel()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this goal? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleDeleteCancel}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
