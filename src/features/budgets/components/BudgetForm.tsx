@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
-import { X, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   createBudget,
   updateBudget,
@@ -158,155 +157,139 @@ export function BudgetForm({ budget, onClose, onSuccess }: BudgetFormProps) {
   };
 
   return (
-    <Card className="max-w-md w-full mx-auto">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl">
-          {budget ? "Edit Budget" : "Create Budget"}
-        </CardTitle>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </CardHeader>
+    <div className="bg-card rounded-md border shadow p-6">
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
-      <CardContent>
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Budget Name */}
+        <div className="space-y-2">
+          <Label htmlFor="name">Budget Name</Label>
+          <Input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g., Monthly Groceries"
+            required
+          />
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Budget Name */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Budget Name</Label>
+        {/* Amount */}
+        <div className="space-y-2">
+          <Label htmlFor="amount">Budget Amount</Label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+              $
+            </span>
             <Input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Monthly Groceries"
+              type="number"
+              id="amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              step="0.01"
+              min="0"
+              required
+              className="pl-8"
+              placeholder="0.00"
+            />
+          </div>
+        </div>
+
+        {/* Category */}
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <Select value={categoryId} onValueChange={setCategoryId}>
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Expenses</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Period */}
+        <div className="space-y-2">
+          <Label htmlFor="period">Budget Period</Label>
+          <Select
+            value={period}
+            onValueChange={(value) =>
+              setPeriod(value as "monthly" | "yearly" | "custom")
+            }
+          >
+            <SelectTrigger id="period">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="monthly">Monthly</SelectItem>
+              <SelectItem value="yearly">Yearly</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Date Range */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="startDate">Start Date</Label>
+            <Input
+              type="date"
+              id="startDate"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
               required
             />
           </div>
-
-          {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Budget Amount</Label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                $
-              </span>
-              <Input
-                type="number"
-                id="amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                step="0.01"
-                min="0"
-                required
-                className="pl-8"
-                placeholder="0.00"
-              />
-            </div>
-          </div>
-
-          {/* Category */}
-          <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Expenses</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Period */}
-          <div className="space-y-2">
-            <Label htmlFor="period">Budget Period</Label>
-            <Select
-              value={period}
-              onValueChange={(value) =>
-                setPeriod(value as "monthly" | "yearly" | "custom")
-              }
-            >
-              <SelectTrigger id="period">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Date Range */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate">Start Date</Label>
-              <Input
-                type="date"
-                id="startDate"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate">
-                End Date {period !== "custom" && "(Optional)"}
-              </Label>
-              <Input
-                type="date"
-                id="endDate"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required={period === "custom"}
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              placeholder="Add notes or details about this budget..."
+            <Label htmlFor="endDate">
+              End Date {period !== "custom" && "(Optional)"}
+            </Label>
+            <Input
+              type="date"
+              id="endDate"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              required={period === "custom"}
             />
           </div>
+        </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button type="button" onClick={onClose} variant="outline">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading
-                ? "Saving..."
-                : budget
-                ? "Update Budget"
-                : "Create Budget"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        {/* Description */}
+        <div className="space-y-2">
+          <Label htmlFor="description">Description (Optional)</Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            placeholder="Add notes or details about this budget..."
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-end space-x-3 pt-4">
+          <Button type="button" onClick={onClose} variant="outline">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading
+              ? "Saving..."
+              : budget
+              ? "Update Budget"
+              : "Create Budget"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

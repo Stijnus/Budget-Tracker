@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getBudgets,
   deleteBudget,
   Budget,
 } from "../../../api/supabase/budgets";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
-import { BudgetModal } from "./BudgetModal";
 import { Edit, Trash2, Plus, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -29,13 +29,10 @@ export function BudgetList({
   showAddButton = false,
   className = "",
 }: BudgetListProps) {
+  const navigate = useNavigate();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedBudget, setSelectedBudget] = useState<Budget | undefined>(
-    undefined
-  );
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null);
 
@@ -64,15 +61,13 @@ export function BudgetList({
     fetchBudgets();
   }, []);
 
-  // Handle opening the add/edit modal
+  // Navigate to add/edit pages
   const handleAddBudget = () => {
-    setSelectedBudget(undefined);
-    setIsModalOpen(true);
+    navigate("/budgets/new");
   };
 
   const handleEditBudget = (budget: Budget) => {
-    setSelectedBudget(budget);
-    setIsModalOpen(true);
+    navigate(`/budgets/${budget.id}`);
   };
 
   // Handle budget deletion
@@ -88,8 +83,8 @@ export function BudgetList({
       const { error } = await deleteBudget(budgetToDelete);
       if (error) throw error;
 
-      // Remove from local state
-      setBudgets(budgets.filter((b) => b.id !== budgetToDelete));
+      // Refresh budgets after deletion
+      await refreshBudgets();
       setIsDeleteConfirmOpen(false);
       setBudgetToDelete(null);
     } catch (err) {
@@ -103,20 +98,15 @@ export function BudgetList({
     setBudgetToDelete(null);
   };
 
-  // Handle budget refresh after add/edit
-  const handleBudgetSuccess = () => {
-    // Refetch budgets
-    async function fetchBudgets() {
-      try {
-        const { data, error } = await getBudgets();
-        if (error) throw error;
-        setBudgets(data || []);
-      } catch (err) {
-        console.error("Error fetching budgets:", err);
-      }
+  // Refresh budgets after delete
+  const refreshBudgets = async () => {
+    try {
+      const { data, error } = await getBudgets();
+      if (error) throw error;
+      setBudgets(data || []);
+    } catch (err) {
+      console.error("Error fetching budgets:", err);
     }
-
-    fetchBudgets();
   };
 
   // Progress calculation will be implemented in a future update
@@ -232,13 +222,7 @@ export function BudgetList({
         </CardContent>
       </Card>
 
-      {/* Budget Modal */}
-      <BudgetModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        budget={selectedBudget}
-        onSuccess={handleBudgetSuccess}
-      />
+      {/* No modal needed - using page-based navigation */}
 
       {/* Delete Confirmation Modal */}
       <Dialog

@@ -111,142 +111,143 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="bg-card rounded-md border shadow p-6">
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mb-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-
-      {/* Goal Name */}
-      <div className="space-y-2">
-        <Label htmlFor="name">Goal Name *</Label>
-        <Input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </div>
-
-      {/* Target Amount */}
-      <div className="space-y-2">
-        <Label htmlFor="targetAmount">Target Amount *</Label>
-        <div className="relative">
-          <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Goal Name */}
+        <div className="space-y-2">
+          <Label htmlFor="name">Goal Name *</Label>
           <Input
-            type="number"
-            id="targetAmount"
-            value={targetAmount}
-            onChange={(e) => setTargetAmount(e.target.value)}
-            className="pl-8"
-            step="0.01"
-            min="0"
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
           />
         </div>
-      </div>
 
-      {/* Current Amount */}
-      <div className="space-y-2">
-        <Label htmlFor="currentAmount">Current Amount</Label>
-        <div className="relative">
-          <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        {/* Target Amount */}
+        <div className="space-y-2">
+          <Label htmlFor="targetAmount">Target Amount *</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="number"
+              id="targetAmount"
+              value={targetAmount}
+              onChange={(e) => setTargetAmount(e.target.value)}
+              className="pl-8"
+              step="0.01"
+              min="0"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Current Amount */}
+        <div className="space-y-2">
+          <Label htmlFor="currentAmount">Current Amount</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="number"
+              id="currentAmount"
+              value={currentAmount}
+              onChange={(e) => setCurrentAmount(e.target.value)}
+              className="pl-8"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+
+        {/* Start Date */}
+        <div className="space-y-2">
+          <Label htmlFor="startDate">Start Date *</Label>
           <Input
-            type="number"
-            id="currentAmount"
-            value={currentAmount}
-            onChange={(e) => setCurrentAmount(e.target.value)}
-            className="pl-8"
-            step="0.01"
-            min="0"
+            type="date"
+            id="startDate"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            required
           />
         </div>
-      </div>
 
-      {/* Start Date */}
-      <div className="space-y-2">
-        <Label htmlFor="startDate">Start Date *</Label>
-        <Input
-          type="date"
-          id="startDate"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          required
-        />
-      </div>
+        {/* Target Date */}
+        <div className="space-y-2">
+          <Label htmlFor="targetDate">Target Date</Label>
+          <Input
+            type="date"
+            id="targetDate"
+            value={targetDate}
+            onChange={(e) => setTargetDate(e.target.value)}
+          />
+        </div>
 
-      {/* Target Date */}
-      <div className="space-y-2">
-        <Label htmlFor="targetDate">Target Date</Label>
-        <Input
-          type="date"
-          id="targetDate"
-          value={targetDate}
-          onChange={(e) => setTargetDate(e.target.value)}
-        />
-      </div>
+        {/* Category */}
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <Select value={categoryId} onValueChange={setCategoryId}>
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      {/* Category */}
-      <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
-        <Select value={categoryId} onValueChange={setCategoryId}>
-          <SelectTrigger id="category">
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">None</SelectItem>
-            {categories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+        {/* Status */}
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <Select
+            value={status}
+            onValueChange={(value) =>
+              setStatus(value as "in_progress" | "achieved" | "cancelled")
+            }
+          >
+            <SelectTrigger id="status">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="achieved">Achieved</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-      {/* Status */}
-      <div className="space-y-2">
-        <Label htmlFor="status">Status</Label>
-        <Select
-          value={status}
-          onValueChange={(value) =>
-            setStatus(value as "in_progress" | "achieved" | "cancelled")
-          }
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="in_progress">In Progress</SelectItem>
-            <SelectItem value="achieved">Achieved</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        {/* Notes */}
+        <div className="space-y-2">
+          <Label htmlFor="notes">Notes</Label>
+          <Textarea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+          />
+        </div>
 
-      {/* Notes */}
-      <div className="space-y-2">
-        <Label htmlFor="notes">Notes</Label>
-        <Textarea
-          id="notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={3}
-        />
-      </div>
-
-      {/* Form Actions */}
-      <div className="flex justify-end space-x-3 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : goal ? "Update Goal" : "Add Goal"}
-        </Button>
-      </div>
-    </form>
+        {/* Form Actions */}
+        <div className="flex justify-end space-x-3 pt-4">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Saving..." : goal ? "Update Goal" : "Add Goal"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

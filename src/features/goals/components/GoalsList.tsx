@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Edit,
   Trash2,
@@ -17,17 +18,11 @@ import {
   calculateGoalMetrics,
 } from "../../../api/supabase/goals";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
-import { GoalModal } from "./GoalModal";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -46,13 +41,11 @@ export function GoalsList({
   showAddButton = false,
   className = "",
 }: GoalsListProps) {
+  const navigate = useNavigate();
   const [goals, setGoals] = useState<GoalWithCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedGoal, setSelectedGoal] = useState<GoalWithCategory | undefined>(
-    undefined
-  );
+  // Using page-based navigation instead of modals
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
 
@@ -81,15 +74,13 @@ export function GoalsList({
     fetchGoals();
   }, []);
 
-  // Handle opening the add/edit modal
+  // Navigate to add/edit pages
   const handleAddGoal = () => {
-    setSelectedGoal(undefined);
-    setIsModalOpen(true);
+    navigate("/goals/new");
   };
 
   const handleEditGoal = (goal: GoalWithCategory) => {
-    setSelectedGoal(goal);
-    setIsModalOpen(true);
+    navigate(`/goals/${goal.id}`);
   };
 
   // Handle goal deletion
@@ -105,8 +96,8 @@ export function GoalsList({
       const { error } = await deleteGoal(goalToDelete);
       if (error) throw error;
 
-      // Remove from local state
-      setGoals(goals.filter((g) => g.id !== goalToDelete));
+      // Refresh goals after deletion
+      await refreshGoals();
       setIsDeleteConfirmOpen(false);
       setGoalToDelete(null);
     } catch (err) {
@@ -120,20 +111,15 @@ export function GoalsList({
     setGoalToDelete(null);
   };
 
-  // Handle goal refresh after add/edit
-  const handleGoalSuccess = () => {
-    // Refetch goals
-    async function fetchGoals() {
-      try {
-        const { data, error } = await getGoals();
-        if (error) throw error;
-        setGoals(data || []);
-      } catch (err) {
-        console.error("Error fetching goals:", err);
-      }
+  // Refresh goals after delete
+  const refreshGoals = async () => {
+    try {
+      const { data, error } = await getGoals();
+      if (error) throw error;
+      setGoals(data || []);
+    } catch (err) {
+      console.error("Error fetching goals:", err);
     }
-
-    fetchGoals();
   };
 
   // Get status badge color
@@ -205,9 +191,7 @@ export function GoalsList({
                 No financial goals found. Add your first goal to start tracking!
               </p>
               {showAddButton && (
-                <Button onClick={handleAddGoal}>
-                  Add Goal
-                </Button>
+                <Button onClick={handleAddGoal}>Add Goal</Button>
               )}
             </div>
           ) : (
@@ -215,12 +199,13 @@ export function GoalsList({
               {goals.map((goal) => {
                 const metrics = calculateGoalMetrics(goal);
                 return (
-                  <li key={goal.id} className="p-4 hover:bg-muted/50 rounded-md">
+                  <li
+                    key={goal.id}
+                    className="p-4 hover:bg-muted/50 rounded-md"
+                  >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h3 className="text-md font-medium">
-                          {goal.name}
-                        </h3>
+                        <h3 className="text-md font-medium">{goal.name}</h3>
                         <p className="text-sm text-muted-foreground">
                           {goal.category_name
                             ? goal.category_name
@@ -249,10 +234,11 @@ export function GoalsList({
 
                     <div className="flex justify-between items-center mb-1">
                       <div className="flex items-center">
-                        <Target size={16} className="text-muted-foreground mr-1" />
-                        <span>
-                          {formatCurrency(goal.target_amount)}
-                        </span>
+                        <Target
+                          size={16}
+                          className="text-muted-foreground mr-1"
+                        />
+                        <span>{formatCurrency(goal.target_amount)}</span>
                       </div>
                       <Badge
                         variant="outline"
@@ -298,8 +284,8 @@ export function GoalsList({
                           <div className="flex items-center mt-1">
                             <TrendingUp size={14} className="mr-1" />
                             <span>
-                              Save {formatCurrency(metrics.dailyTarget)} daily to
-                              reach goal
+                              Save {formatCurrency(metrics.dailyTarget)} daily
+                              to reach goal
                             </span>
                           </div>
                         )}
@@ -313,21 +299,19 @@ export function GoalsList({
         </CardContent>
       </Card>
 
-      {/* Goal Modal */}
-      <GoalModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        goal={selectedGoal}
-        onSuccess={handleGoalSuccess}
-      />
+      {/* No modal needed - using page-based navigation */}
 
       {/* Delete Confirmation Modal */}
-      <Dialog open={isDeleteConfirmOpen} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <Dialog
+        open={isDeleteConfirmOpen}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this goal? This action cannot be undone.
+              Are you sure you want to delete this goal? This action cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
