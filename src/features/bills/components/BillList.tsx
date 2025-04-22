@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Edit,
   Trash2,
@@ -15,7 +16,6 @@ import {
   markBillAsPaid,
 } from "../../../api/supabase/bills";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
-import { BillModal } from "./BillModal";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -38,13 +38,10 @@ export function BillList({
   showAddButton = false,
   className = "",
 }: BillListProps) {
+  const navigate = useNavigate();
   const [bills, setBills] = useState<BillWithCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedBill, setSelectedBill] = useState<
-    BillWithCategory | undefined
-  >(undefined);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [billToDelete, setBillToDelete] = useState<string | null>(null);
 
@@ -73,15 +70,13 @@ export function BillList({
     fetchBills();
   }, []);
 
-  // Handle opening the add/edit modal
+  // Navigate to add/edit pages
   const handleAddBill = () => {
-    setSelectedBill(undefined);
-    setIsModalOpen(true);
+    navigate("/bills/new");
   };
 
   const handleEditBill = (bill: BillWithCategory) => {
-    setSelectedBill(bill);
-    setIsModalOpen(true);
+    navigate(`/bills/${bill.id}`);
   };
 
   // Handle bill deletion
@@ -97,8 +92,8 @@ export function BillList({
       const { error } = await deleteBill(billToDelete);
       if (error) throw error;
 
-      // Remove from local state
-      setBills(bills.filter((b) => b.id !== billToDelete));
+      // Refresh bills after deletion
+      await refreshBills();
       setIsDeleteConfirmOpen(false);
       setBillToDelete(null);
     } catch (err) {
@@ -118,38 +113,23 @@ export function BillList({
       const { error } = await markBillAsPaid(id);
       if (error) throw error;
 
-      // Update the bill in local state
-      setBills(
-        bills.map((bill) =>
-          bill.id === id
-            ? {
-                ...bill,
-                payment_status: "paid",
-                last_paid_date: new Date().toISOString().split("T")[0],
-              }
-            : bill
-        )
-      );
+      // Refresh bills after marking as paid
+      await refreshBills();
     } catch (err) {
       console.error("Error marking bill as paid:", err);
       setError("Failed to mark bill as paid");
     }
   };
 
-  // Handle bill refresh after add/edit
-  const handleBillSuccess = () => {
-    // Refetch bills
-    async function fetchBills() {
-      try {
-        const { data, error } = await getBills();
-        if (error) throw error;
-        setBills(data || []);
-      } catch (err) {
-        console.error("Error fetching bills:", err);
-      }
+  // Refresh bills
+  const refreshBills = async () => {
+    try {
+      const { data, error } = await getBills();
+      if (error) throw error;
+      setBills(data || []);
+    } catch (err) {
+      console.error("Error fetching bills:", err);
     }
-
-    fetchBills();
   };
 
   // Status colors are now handled by the Badge component variants
@@ -336,13 +316,7 @@ export function BillList({
         </CardContent>
       </Card>
 
-      {/* Bill Modal */}
-      <BillModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        bill={selectedBill}
-        onSuccess={handleBillSuccess}
-      />
+      {/* No modal needed - using page-based navigation */}
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
