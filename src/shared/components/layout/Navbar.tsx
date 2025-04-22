@@ -6,6 +6,7 @@ import {
   Search,
 } from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
+import { useLanguage } from "../../../providers/LanguageProvider";
 import { Link } from "react-router-dom";
 import { QuickAddMenu } from "../QuickAddMenu";
 import { ThemeToggle } from "../ThemeToggle";
@@ -27,6 +28,7 @@ import {
 
 export function Navbar() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <header className="bg-background border-b shadow-sm h-16 sticky top-0 z-30">
@@ -51,7 +53,7 @@ export function Navbar() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Search</p>
+                <p>{t("common.search")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -72,7 +74,7 @@ export function Navbar() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Help</p>
+                <p>{t("common.help")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -92,7 +94,7 @@ export function Navbar() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Notifications</p>
+                <p>{t("common.notifications")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -134,7 +136,7 @@ export function Navbar() {
                     className="flex w-full cursor-pointer items-center"
                   >
                     <SettingsIcon className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <span>{t("nav.settings")}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -143,13 +145,13 @@ export function Navbar() {
                   className="cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
+                  <span>{t("common.logout")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Button asChild variant="outline" size="sm">
-              <Link to="/login">Login</Link>
+              <Link to="/login">{t("common.login")}</Link>
             </Button>
           )}
         </div>

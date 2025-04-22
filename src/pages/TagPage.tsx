@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, Tag as TagIcon } from "lucide-react";
 import { AppLayout } from "../shared/components/layout";
 import { TagForm } from "../features/tags/components/TagForm";
-import { getTagById } from "../api/supabase/tags";
+import { getTagById, type Tag } from "../api/supabase/tags";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -11,7 +11,7 @@ import { AlertCircle } from "lucide-react";
 export function TagPage() {
   const { tagId } = useParams<{ tagId: string }>();
   const navigate = useNavigate();
-  const [tag, setTag] = useState<any | null>(null);
+  const [tag, setTag] = useState<Tag | null>(null);
   const [isLoading, setIsLoading] = useState(tagId && tagId !== "new");
   const [error, setError] = useState<string | null>(null);
 

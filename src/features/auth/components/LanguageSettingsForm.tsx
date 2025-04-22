@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { updateUserSettings } from "../../../api/supabase/auth";
+import { useLanguage, LANGUAGES } from "../../../providers/LanguageProvider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -20,17 +21,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Language options
-const LANGUAGES = [
-  { code: "en", name: "English", flag: "🇬🇧", native: "English" },
-  { code: "nl", name: "Dutch", flag: "🇳🇱", native: "Nederlands" },
-  { code: "fr", name: "French", flag: "🇫🇷", native: "Français" },
-  { code: "de", name: "German", flag: "🇩🇪", native: "Deutsch" },
-];
+// Language options are imported from LanguageProvider
 
 export function LanguageSettingsForm() {
   const { user, userSettings, refreshUserData } = useAuth();
-  const [language, setLanguage] = useState("en");
+  const { language: currentLanguage, changeLanguage } = useLanguage();
+  const [language, setLanguage] = useState(currentLanguage || "en");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
@@ -68,6 +64,9 @@ export function LanguageSettingsForm() {
         if (refreshUserData) {
           await refreshUserData();
         }
+
+        // Apply the language immediately
+        await changeLanguage(language);
       }
     } catch (err) {
       setMessage({ text: "An unexpected error occurred", type: "error" });
@@ -77,7 +76,8 @@ export function LanguageSettingsForm() {
     }
   };
 
-  const selectedLanguage = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
+  const selectedLanguage =
+    LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
   return (
     <Card>

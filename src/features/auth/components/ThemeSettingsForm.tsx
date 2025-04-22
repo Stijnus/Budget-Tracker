@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { updateUserSettings } from "../../../api/supabase/auth";
+import { useTheme } from "../../../providers/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -38,7 +39,10 @@ const THEMES = [
 
 export function ThemeSettingsForm() {
   const { user, userSettings, refreshUserData } = useAuth();
-  const [theme, setTheme] = useState("light");
+  const { theme: currentTheme, setTheme: setAppTheme } = useTheme();
+  const [theme, setTheme] = useState<"light" | "dark" | "system">(
+    (currentTheme as "light" | "dark" | "system") || "light"
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
@@ -77,8 +81,8 @@ export function ThemeSettingsForm() {
           await refreshUserData();
         }
 
-        // In a real app, we would apply the theme here
-        // document.documentElement.classList.toggle('dark', theme === 'dark');
+        // Apply the theme immediately
+        setAppTheme(theme as "light" | "dark" | "system");
       }
     } catch (err) {
       setMessage({ text: "An unexpected error occurred", type: "error" });
@@ -116,7 +120,9 @@ export function ThemeSettingsForm() {
             <Label>Select Theme</Label>
             <RadioGroup
               value={theme}
-              onValueChange={setTheme}
+              onValueChange={(value) =>
+                setTheme(value as "light" | "dark" | "system")
+              }
               className="grid grid-cols-1 md:grid-cols-3 gap-4"
             >
               {THEMES.map((themeOption) => {

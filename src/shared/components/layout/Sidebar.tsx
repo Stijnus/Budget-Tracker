@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLanguage } from "../../../providers/LanguageProvider";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import {
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { t } = useLanguage();
 
   // No longer needed with Sheet component
   // const toggleSidebar = () => {
@@ -29,27 +31,43 @@ export function Sidebar() {
 
   const navItems = [
     {
-      name: "Dashboard",
+      name: t("nav.dashboard"),
       path: "/dashboard",
       icon: <LayoutDashboard size={20} />,
     },
     {
-      name: "Expenses",
+      name: t("nav.expenses"),
       path: "/expenses",
       icon: <ArrowDownCircle size={20} />,
     },
-    { name: "Income", path: "/income", icon: <ArrowUpCircle size={20} /> },
-    { name: "Categories", path: "/categories", icon: <PieChart size={20} /> },
-    { name: "Budgets", path: "/budgets", icon: <Calendar size={20} /> },
-    { name: "Tags", path: "/tags", icon: <Tag size={20} /> },
-    { name: "Goals", path: "/goals", icon: <Target size={20} /> },
-    { name: "Analytics", path: "/analytics", icon: <BarChart3 size={20} /> },
     {
-      name: "Bills & Subscriptions",
+      name: t("nav.income"),
+      path: "/income",
+      icon: <ArrowUpCircle size={20} />,
+    },
+    {
+      name: t("nav.categories"),
+      path: "/categories",
+      icon: <PieChart size={20} />,
+    },
+    { name: t("nav.budgets"), path: "/budgets", icon: <Calendar size={20} /> },
+    { name: t("nav.tags"), path: "/tags", icon: <Tag size={20} /> },
+    { name: t("nav.goals"), path: "/goals", icon: <Target size={20} /> },
+    {
+      name: t("nav.analytics"),
+      path: "/analytics",
+      icon: <BarChart3 size={20} />,
+    },
+    {
+      name: t("nav.bills"),
       path: "/bills",
       icon: <Clock size={20} />,
     },
-    { name: "Settings", path: "/settings", icon: <Settings size={20} /> },
+    {
+      name: t("nav.settings"),
+      path: "/settings",
+      icon: <Settings size={20} />,
+    },
   ];
 
   return (
@@ -97,7 +115,7 @@ function MobileSidebar({ navItems, pathname, onClose }: SidebarProps) {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center justify-center h-16 border-b">
-        <h1 className="text-xl font-bold">Budget Tracker</h1>
+        <h1 className="text-xl font-bold">{t("app.name")}</h1>
       </div>
 
       {/* Navigation */}
@@ -146,7 +164,7 @@ function DesktopSidebar({ navItems, pathname }: SidebarProps) {
     <div className="flex flex-col h-full w-full">
       {/* Logo */}
       <div className="flex items-center justify-center h-16 border-b">
-        <h1 className="text-xl font-bold">Budget Tracker</h1>
+        <h1 className="text-xl font-bold">{t("app.name")}</h1>
       </div>
 
       {/* Navigation */}
