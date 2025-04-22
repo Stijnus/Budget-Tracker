@@ -151,6 +151,7 @@ export async function updateUserSettings(
   settings: {
     currency?: string;
     theme?: string;
+    language?: string;
     notification_enabled?: boolean;
   }
 ) {

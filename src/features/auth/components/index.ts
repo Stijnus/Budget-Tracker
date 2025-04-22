@@ -8,3 +8,4 @@ export * from "./UserSettingsForm";
 export * from "./NotificationSettingsForm";
 export * from "./CurrencySettingsForm";
 export * from "./ThemeSettingsForm";
+export * from "./LanguageSettingsForm";

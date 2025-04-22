@@ -2,17 +2,59 @@ import { useEffect, useState, ReactNode } from "react";
 import { AuthContext } from "./authContext";
 import { User, AuthError } from "@supabase/supabase-js";
 import * as authApi from "../api/supabase/auth";
+import { useTheme } from "../hooks/useTheme";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userSettings, setUserSettings] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { setTheme } = useTheme();
+
+  // Function to fetch user profile and settings
+  const fetchUserData = async (userId: string) => {
+    try {
+      // Fetch user profile
+      const { data: profileData } = await authApi.getUserProfile(userId);
+      setUserProfile(profileData);
+
+      // Fetch user settings
+      const { data: settingsData } = await authApi.getUserSettings(userId);
+      setUserSettings(settingsData);
+
+      // Apply theme if available
+      if (settingsData?.theme) {
+        setTheme(settingsData.theme);
+      }
+
+      // Store user settings in localStorage for formatters to use
+      if (settingsData) {
+        localStorage.setItem("userSettings", JSON.stringify(settingsData));
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  // Function to refresh user data
+  const refreshUserData = async () => {
+    if (user) {
+      await fetchUserData(user.id);
+    }
+  };
 
   useEffect(() => {
     // Check for existing session on mount
     const checkSession = async () => {
       try {
         const { data } = await authApi.getSession();
-        setUser(data.session?.user || null);
+        const currentUser = data.session?.user || null;
+        setUser(currentUser);
+
+        // If user exists, fetch their data
+        if (currentUser) {
+          await fetchUserData(currentUser.id);
+        }
       } catch (error) {
         console.error("Error checking session:", error);
       } finally {
@@ -27,13 +69,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === "SIGNED_IN" && session) {
         // Type assertion to handle the session object
         const authSession = session as unknown as { user: User };
-        setUser(authSession.user || null);
+        const newUser = authSession.user || null;
+        setUser(newUser);
+
+        // Fetch user data when signed in
+        if (newUser) {
+          fetchUserData(newUser.id);
+        }
       } else if (event === "SIGNED_OUT") {
         setUser(null);
+        setUserProfile(null);
+        setUserSettings(null);
+        // Reset theme to default
+        setTheme("light");
+        // Clear user settings from localStorage
+        localStorage.removeItem("userSettings");
       } else if (event === "USER_UPDATED" && session) {
         // Type assertion to handle the session object
         const authSession = session as unknown as { user: User };
-        setUser(authSession.user || null);
+        const updatedUser = authSession.user || null;
+        setUser(updatedUser);
+
+        // Refresh user data when updated
+        if (updatedUser) {
+          fetchUserData(updatedUser.id);
+        }
       }
     });
 
@@ -108,12 +168,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = {
     user,
+    userProfile,
+    userSettings,
     isLoading,
     login,
     register,
     logout,
     resetPassword,
     updatePassword,
+    refreshUserData,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

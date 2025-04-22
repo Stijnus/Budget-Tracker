@@ -8,6 +8,7 @@ import {
   NotificationSettingsForm,
   CurrencySettingsForm,
   ThemeSettingsForm,
+  LanguageSettingsForm,
 } from "../features/auth/components";
 import { cn } from "@/lib/utils";
 import {
@@ -95,6 +96,15 @@ export function SettingsPage() {
                       Theme
                     </TabsTrigger>
                     <TabsTrigger
+                      value="language"
+                      className={cn(
+                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
+                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
+                      )}
+                    >
+                      Language
+                    </TabsTrigger>
+                    <TabsTrigger
                       value="account"
                       className={cn(
                         "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
@@ -127,6 +137,9 @@ export function SettingsPage() {
               </TabsContent>
               <TabsContent value="theme" className="m-0">
                 <ThemeSettingsForm />
+              </TabsContent>
+              <TabsContent value="language" className="m-0">
+                <LanguageSettingsForm />
               </TabsContent>
               <TabsContent value="account" className="m-0">
                 <div className="space-y-6">
