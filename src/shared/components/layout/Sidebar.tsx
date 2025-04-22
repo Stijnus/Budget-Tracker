@@ -75,7 +75,7 @@ export function Sidebar() {
       </Sheet>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-64 border-r bg-background shadow-sm">
+      <aside className="hidden md:block fixed inset-y-0 left-0 z-40 w-64 border-r bg-background shadow-sm">
         <DesktopSidebar navItems={navItems} pathname={location.pathname} />
       </aside>
     </>

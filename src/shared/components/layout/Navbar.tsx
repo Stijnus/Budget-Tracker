@@ -30,8 +30,8 @@ export function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <header className="bg-background border-b shadow-sm">
-      <div className="flex items-center justify-between h-16 px-4 md:px-6">
+    <header className="bg-background border-b shadow-sm h-16 sticky top-0 z-30">
+      <div className="flex items-center justify-between h-full px-4 md:px-6">
         {/* Left side - Title based on current page */}
         <div>
           <h1 className="text-xl font-semibold">Dashboard</h1>

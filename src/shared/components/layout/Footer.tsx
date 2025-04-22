@@ -12,7 +12,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-background border-t py-4 px-6">
+    <footer className="bg-background border-t py-4 px-6 mt-auto">
       <div className="flex flex-col md:flex-row justify-between items-center">
         <div className="text-sm text-muted-foreground">
           &copy; {currentYear} Budget Tracker. All rights reserved.
