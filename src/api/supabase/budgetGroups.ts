@@ -30,16 +30,7 @@ export type GroupActivityLog =
  */
 export async function getBudgetGroups() {
   try {
-    // First check if the budget_groups table exists
-    const { count, error: countError } = await supabase
-      .from("budget_groups")
-      .select("*", { count: "exact", head: true });
-
-    // If there's an error, the table might not exist
-    if (countError) {
-      console.error("Error checking budget_groups table:", countError);
-      return { data: [], error: countError };
-    }
+    console.log("Fetching budget groups...");
 
     // Get all groups the user is a member of
     const { data, error } = await supabase
@@ -67,6 +58,8 @@ export async function getBudgetGroups() {
       return { data: [], error };
     }
 
+    console.log("Raw group members data:", data);
+
     // Transform the data to extract the group objects
     const transformedData =
       data?.map((item) => ({
@@ -74,10 +67,11 @@ export async function getBudgetGroups() {
         role: item.role,
       })) || [];
 
+    console.log("Transformed groups data:", transformedData);
     return { data: transformedData, error: null };
   } catch (err) {
     console.error("Unexpected error in getBudgetGroups:", err);
-    return { data: [], error: err as any };
+    return { data: [], error: err as Error };
   }
 }
 
@@ -93,18 +87,9 @@ export async function getBudgetGroup(id: string) {
  */
 export async function createBudgetGroup(group: BudgetGroupInsert) {
   try {
-    // First check if the budget_groups table exists
-    const { count, error: countError } = await supabase
-      .from("budget_groups")
-      .select("*", { count: "exact", head: true });
+    console.log("Creating budget group with data:", group);
 
-    // If there's an error, the table might not exist
-    if (countError) {
-      console.error("Error checking budget_groups table:", countError);
-      return { data: null, error: countError };
-    }
-
-    // Start a transaction
+    // Create the group
     const { data: newGroup, error } = await supabase
       .from("budget_groups")
       .insert(group)
@@ -116,19 +101,53 @@ export async function createBudgetGroup(group: BudgetGroupInsert) {
       return { data: null, error };
     }
 
-    // Add the creator as the owner
-    const { error: memberError } = await supabase.from("group_members").insert({
-      group_id: newGroup.id,
-      user_id: group.created_by,
-      role: "owner",
-    });
+    console.log("Budget group created successfully:", newGroup);
 
-    if (memberError) {
-      console.error("Error adding group member:", memberError);
+    // Add the creator as the owner
+    // Use a workaround for the RLS policy issue
+    try {
+      console.log("Adding group member with workaround...");
+
+      // First try the direct approach
+      const { error: memberError } = await supabase
+        .from("group_members")
+        .insert({
+          group_id: newGroup.id,
+          user_id: group.created_by,
+          role: "owner",
+        });
+
+      if (memberError) {
+        console.error(
+          "Error adding group member with direct approach:",
+          memberError
+        );
+        console.log("Trying alternative approach...");
+
+        // If that fails, try a different approach with a custom RPC function
+        // This is a fallback in case the RLS policy fix hasn't been applied
+        const { error: rpcError } = await supabase.rpc("add_group_owner", {
+          p_group_id: newGroup.id,
+          p_user_id: group.created_by,
+        });
+
+        if (rpcError) {
+          console.error("Error adding group member with RPC:", rpcError);
+          // If both approaches fail, delete the group
+          console.log("Deleting group due to member error:", newGroup.id);
+          await supabase.from("budget_groups").delete().eq("id", newGroup.id);
+          return { data: null, error: rpcError };
+        }
+      }
+    } catch (memberErr) {
+      console.error("Exception adding group member:", memberErr);
       // If there was an error adding the member, delete the group
+      console.log("Deleting group due to member error:", newGroup.id);
       await supabase.from("budget_groups").delete().eq("id", newGroup.id);
-      return { data: null, error: memberError };
+      return { data: null, error: memberErr as Error };
     }
+
+    console.log("Group member added successfully");
 
     try {
       // Add an activity log entry
@@ -136,8 +155,11 @@ export async function createBudgetGroup(group: BudgetGroupInsert) {
         group_id: newGroup.id,
         user_id: group.created_by,
         action: "created_group",
+        entity_type: "group",
+        entity_id: newGroup.id,
         details: { group_name: group.name },
       });
+      console.log("Group activity logged successfully");
     } catch (logError) {
       // Don't fail if activity logging fails
       console.warn("Error logging group activity:", logError);
@@ -146,7 +168,7 @@ export async function createBudgetGroup(group: BudgetGroupInsert) {
     return { data: newGroup, error: null };
   } catch (err) {
     console.error("Exception creating budget group:", err);
-    return { data: null, error: err as any };
+    return { data: null, error: err as Error };
   }
 }
 
