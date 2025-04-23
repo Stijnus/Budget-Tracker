@@ -544,120 +544,144 @@ export function GroupDashboardPage() {
     <AppLayout>
       <div className="space-y-6">
         {/* Header with group selector and tabs */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-12 w-12 border-2 border-primary/20">
-                {group.avatar_url && (
-                  <AvatarImage src={group.avatar_url} alt={group.name} />
-                )}
-                <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                  {group.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-2">
-                  <Select
-                    value={selectedGroupId || ""}
-                    onValueChange={handleGroupChange}
-                  >
-                    <SelectTrigger className="w-[200px] border-none shadow-none p-0 h-auto text-xl font-bold focus:ring-0">
-                      <SelectValue placeholder="Select a group" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {groups.map((g) => (
-                        <SelectItem
-                          key={g.id}
-                          value={g.id}
-                          className="flex items-center gap-2"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              {g.avatar_url && (
-                                <AvatarImage src={g.avatar_url} alt={g.name} />
-                              )}
-                              <AvatarFallback>
-                                {g.name.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span>{g.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {userRole && (
-                    <Badge variant="secondary" className="ml-1">
-                      {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
-                    </Badge>
+        <Card className="p-5 bg-gradient-to-r from-slate-50 to-slate-100 border-none shadow-md mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-14 w-14 border-2 border-primary/20 shadow-md">
+                  {group.avatar_url && (
+                    <AvatarImage src={group.avatar_url} alt={group.name} />
                   )}
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                    {group.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={selectedGroupId || ""}
+                      onValueChange={handleGroupChange}
+                    >
+                      <SelectTrigger className="w-[220px] border-none shadow-none p-0 h-auto text-2xl font-bold focus:ring-0">
+                        <SelectValue placeholder="Select a group" />
+                      </SelectTrigger>
+                      <SelectContent className="border-2">
+                        {groups.map((g) => (
+                          <SelectItem
+                            key={g.id}
+                            value={g.id}
+                            className="flex items-center gap-2"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-6 w-6">
+                                {g.avatar_url && (
+                                  <AvatarImage
+                                    src={g.avatar_url}
+                                    alt={g.name}
+                                  />
+                                )}
+                                <AvatarFallback>
+                                  {g.name.substring(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span>{g.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {userRole && (
+                      <Badge
+                        variant="secondary"
+                        className="ml-1 px-3 py-1 text-sm font-medium"
+                      >
+                        {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground mt-1">
+                    {formatDate(new Date(), "long")}
+                  </p>
                 </div>
-                <p className="text-muted-foreground">
-                  {formatDate(new Date(), "long")}
-                </p>
               </div>
             </div>
-          </div>
 
-          <div className="flex gap-2">
-            <Button
-              onClick={() => navigate(`/groups/${selectedGroupId}`)}
-              variant="outline"
-              className="gap-2"
-            >
-              <Settings className="h-4 w-4" />
-              Group Settings
-            </Button>
-            <Button
-              onClick={() => navigate("/dashboard")}
-              variant="outline"
-              className="gap-2"
-            >
-              <Home className="h-4 w-4" />
-              Personal Dashboard
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => navigate(`/groups/${selectedGroupId}`)}
+                variant="outline"
+                className="gap-2 border-slate-300 hover:bg-slate-200"
+              >
+                <Settings className="h-4 w-4" />
+                Group Settings
+              </Button>
+              <Button
+                onClick={() => navigate("/dashboard")}
+                variant="outline"
+                className="gap-2 border-slate-300 hover:bg-slate-200"
+              >
+                <Home className="h-4 w-4" />
+                Personal Dashboard
+              </Button>
+            </div>
           </div>
-        </div>
+        </Card>
 
         {/* Dashboard tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 w-full sm:w-auto">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <LayoutDashboard className="h-4 w-4" />
-              <span className="hidden sm:inline">Overview</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="transactions"
-              className="flex items-center gap-2"
-            >
-              <CreditCard className="h-4 w-4" />
-              <span className="hidden sm:inline">Transactions</span>
-            </TabsTrigger>
-            <TabsTrigger value="budgets" className="flex items-center gap-2">
-              <PiggyBank className="h-4 w-4" />
-              <span className="hidden sm:inline">Budgets</span>
-            </TabsTrigger>
-            <TabsTrigger value="members" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Members</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <Card className="p-2 border-none shadow-sm bg-slate-50">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-4 w-full sm:w-auto bg-white border shadow-sm">
+              <TabsTrigger
+                value="overview"
+                className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="hidden sm:inline">Overview</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="transactions"
+                className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+              >
+                <CreditCard className="h-4 w-4" />
+                <span className="hidden sm:inline">Transactions</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="budgets"
+                className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+              >
+                <PiggyBank className="h-4 w-4" />
+                <span className="hidden sm:inline">Budgets</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="members"
+                className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+              >
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Members</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </Card>
 
         {/* Financial summary */}
         {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="overflow-hidden border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-transparent">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <ArrowUpCircle className="h-4 w-4 text-green-500" />
                   Total Income
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-2">
-                <div className="text-2xl font-bold text-green-500">
+                <div className="text-3xl font-bold text-green-600">
                   ${summary.totalIncome.toFixed(2)}
                 </div>
-                <div className="mt-2">
+                <div className="mt-3">
                   <Progress
                     value={summary.totalIncome > 0 ? 100 : 0}
                     className="h-2 bg-green-100"
@@ -670,17 +694,18 @@ export function GroupDashboardPage() {
                 Current month
               </CardFooter>
             </Card>
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden border-l-4 border-l-red-500 bg-gradient-to-br from-red-50/50 to-transparent">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <ArrowDownCircle className="h-4 w-4 text-red-500" />
                   Total Expenses
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-2">
-                <div className="text-2xl font-bold text-red-500">
+                <div className="text-3xl font-bold text-red-600">
                   ${summary.totalExpenses.toFixed(2)}
                 </div>
-                <div className="mt-2">
+                <div className="mt-3">
                   <Progress
                     value={summary.totalExpenses > 0 ? 100 : 0}
                     className="h-2 bg-red-100"
@@ -693,19 +718,32 @@ export function GroupDashboardPage() {
                 Current month
               </CardFooter>
             </Card>
-            <Card className="overflow-hidden">
+            <Card
+              className={`overflow-hidden border-l-4 ${
+                summary.balance >= 0
+                  ? "border-l-green-500 bg-gradient-to-br from-green-50/50 to-transparent"
+                  : "border-l-red-500 bg-gradient-to-br from-red-50/50 to-transparent"
+              }`}
+            >
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Balance</CardTitle>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  {summary.balance >= 0 ? (
+                    <ArrowUpCircle className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <ArrowDownCircle className="h-4 w-4 text-red-500" />
+                  )}
+                  Balance
+                </CardTitle>
               </CardHeader>
               <CardContent className="pb-2">
                 <div
-                  className={`text-2xl font-bold ${
-                    summary.balance >= 0 ? "text-green-500" : "text-red-500"
+                  className={`text-3xl font-bold ${
+                    summary.balance >= 0 ? "text-green-600" : "text-red-600"
                   }`}
                 >
                   ${summary.balance.toFixed(2)}
                 </div>
-                <div className="mt-2">
+                <div className="mt-3">
                   {summary.totalIncome > 0 && (
                     <Progress
                       value={Math.min(
@@ -727,7 +765,7 @@ export function GroupDashboardPage() {
                 </div>
                 <div>
                   {summary.totalIncome > 0 && (
-                    <span>
+                    <span className="font-medium">
                       {Math.round(
                         (summary.balance / summary.totalIncome) * 100
                       )}
@@ -747,16 +785,16 @@ export function GroupDashboardPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Recent Transactions */}
-                <Card>
+                <Card className="border-t-4 border-t-blue-500">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
-                      <Receipt className="mr-2 h-5 w-5" />
+                      <Receipt className="mr-2 h-5 w-5 text-blue-500" />
                       Recent Transactions
                     </CardTitle>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="gap-1"
+                      className="gap-1 border-blue-200 text-blue-700 hover:bg-blue-50"
                       onClick={() => setActiveTab("transactions")}
                     >
                       View All
@@ -775,16 +813,16 @@ export function GroupDashboardPage() {
                 </Card>
 
                 {/* Group Budgets */}
-                <Card>
+                <Card className="border-t-4 border-t-amber-500">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
-                      <PiggyBank className="mr-2 h-5 w-5" />
+                      <PiggyBank className="mr-2 h-5 w-5 text-amber-500" />
                       Budget Progress
                     </CardTitle>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="gap-1"
+                      className="gap-1 border-amber-200 text-amber-700 hover:bg-amber-50"
                       onClick={() => setActiveTab("budgets")}
                     >
                       View All
@@ -804,16 +842,16 @@ export function GroupDashboardPage() {
               </div>
 
               {/* Group Members */}
-              <Card>
+              <Card className="border-t-4 border-t-purple-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
-                    <Users className="mr-2 h-5 w-5" />
+                    <Users className="mr-2 h-5 w-5 text-purple-500" />
                     Group Members
                   </CardTitle>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="gap-1"
+                    className="gap-1 border-purple-200 text-purple-700 hover:bg-purple-50"
                     onClick={() => setActiveTab("members")}
                   >
                     View All
@@ -833,10 +871,10 @@ export function GroupDashboardPage() {
 
               {/* Recent Activity */}
               {activity.length > 0 && (
-                <Card>
+                <Card className="border-t-4 border-t-emerald-500">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
-                      <Activity className="mr-2 h-5 w-5" />
+                      <Activity className="mr-2 h-5 w-5 text-emerald-500" />
                       Recent Activity
                     </CardTitle>
                   </CardHeader>
@@ -854,12 +892,15 @@ export function GroupDashboardPage() {
 
           {/* Transactions Tab */}
           {activeTab === "transactions" && (
-            <Card>
+            <Card className="border-t-4 border-t-blue-500">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center">
-                  <Receipt className="mr-2 h-5 w-5" />
+                  <Receipt className="mr-2 h-5 w-5 text-blue-500" />
                   Group Transactions
                 </CardTitle>
+                <CardDescription>
+                  Manage all transactions for {group.name}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <GroupTransactions
@@ -874,12 +915,15 @@ export function GroupDashboardPage() {
 
           {/* Budgets Tab */}
           {activeTab === "budgets" && (
-            <Card>
+            <Card className="border-t-4 border-t-amber-500">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center">
-                  <PiggyBank className="mr-2 h-5 w-5" />
+                  <PiggyBank className="mr-2 h-5 w-5 text-amber-500" />
                   Group Budgets
                 </CardTitle>
+                <CardDescription>
+                  Track and manage budget allocations for {group.name}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <GroupBudgets
@@ -894,12 +938,15 @@ export function GroupDashboardPage() {
 
           {/* Members Tab */}
           {activeTab === "members" && (
-            <Card>
+            <Card className="border-t-4 border-t-purple-500">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center">
-                  <Users className="mr-2 h-5 w-5" />
+                  <Users className="mr-2 h-5 w-5 text-purple-500" />
                   Group Members
                 </CardTitle>
+                <CardDescription>
+                  Manage members and permissions for {group.name}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <GroupMembers

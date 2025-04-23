@@ -27,7 +27,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Plus, MoreHorizontal, Edit, Trash2, Calendar } from "lucide-react";
+import { Plus, MoreHorizontal, Edit, Trash2, Calendar, PiggyBank } from "lucide-react";
 import { GroupBudgetForm } from "./GroupBudgetForm";
 import {
   deleteGroupBudget,
@@ -64,6 +64,7 @@ interface GroupBudgetsProps {
   budgets: GroupBudget[];
   userRole: string;
   onChange: () => void;
+  compact?: boolean;
 }
 
 export function GroupBudgets({
@@ -71,6 +72,7 @@ export function GroupBudgets({
   budgets,
   userRole,
   onChange,
+  compact = false,
 }: GroupBudgetsProps) {
   // Translation hooks removed
   const { user } = useAuth();
@@ -172,15 +174,17 @@ export function GroupBudgets({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Budgets</h2>
-        {canCreateBudget && (
-          <Button onClick={() => handleOpenForm()}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Budget
-          </Button>
-        )}
-      </div>
+      {!compact && (
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Budgets</h2>
+          {canCreateBudget && (
+            <Button onClick={() => handleOpenForm()}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Budget
+            </Button>
+          )}
+        </div>
+      )}
 
       {error && (
         <Alert variant="destructive">
@@ -205,15 +209,24 @@ export function GroupBudgets({
       )}
 
       {budgets.length === 0 ? (
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-muted-foreground mb-4">No budgets found</p>
-            {canCreateBudget && (
-              <Button onClick={() => handleOpenForm()}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Budget
-              </Button>
-            )}
+        <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
+          <CardContent className="p-8 text-center">
+            <div className="flex flex-col items-center justify-center space-y-3 py-4">
+              <div className="rounded-full bg-amber-50 p-3">
+                <PiggyBank className="h-8 w-8 text-amber-500" />
+              </div>
+              <h3 className="text-lg font-medium">No budgets found</h3>
+              <p className="text-muted-foreground max-w-sm mx-auto mb-2">
+                Create budgets to track and manage your group's spending in
+                different categories.
+              </p>
+              {canCreateBudget && (
+                <Button onClick={() => handleOpenForm()} className="mt-2">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Budget
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       ) : (

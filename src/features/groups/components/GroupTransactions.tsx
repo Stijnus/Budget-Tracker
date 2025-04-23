@@ -35,6 +35,7 @@ import {
   Trash2,
   ArrowUpCircle,
   ArrowDownCircle,
+  Receipt,
 } from "lucide-react";
 import { GroupTransactionForm } from "./GroupTransactionForm";
 import {
@@ -163,16 +164,23 @@ export function GroupTransactions({
       <Card>
         <CardContent className="p-0">
           {transactions.length === 0 ? (
-            <div className="p-6 text-center">
-              <p className="text-muted-foreground mb-4">
-                No transactions found
-              </p>
-              {canCreateTransaction && (
-                <Button onClick={() => handleOpenForm()}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Transaction
-                </Button>
-              )}
+            <div className="p-8 text-center">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <div className="rounded-full bg-blue-50 p-3">
+                  <Receipt className="h-8 w-8 text-blue-500" />
+                </div>
+                <h3 className="text-lg font-medium">No transactions found</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto mb-2">
+                  Start tracking your group's expenses and income by adding your
+                  first transaction.
+                </p>
+                {canCreateTransaction && (
+                  <Button onClick={() => handleOpenForm()} className="mt-2">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Transaction
+                  </Button>
+                )}
+              </div>
             </div>
           ) : (
             <Table>
