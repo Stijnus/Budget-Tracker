@@ -67,6 +67,8 @@ i18n
           "common.newBudget": "New Budget",
           "common.newGoal": "New Goal",
           "common.newTag": "New Tag",
+          "common.back": "Back",
+          "common.goBack": "Go Back",
 
           // Navigation
           "nav.dashboard": "Dashboard",
@@ -304,6 +306,8 @@ i18n
           "common.newBudget": "Nieuw Budget",
           "common.newGoal": "Nieuw Doel",
           "common.newTag": "Nieuwe Tag",
+          "common.back": "Terug",
+          "common.goBack": "Ga Terug",
 
           // Navigation
           "nav.dashboard": "Dashboard",
@@ -384,6 +388,8 @@ i18n
           "common.newBudget": "Nouveau Budget",
           "common.newGoal": "Nouvel Objectif",
           "common.newTag": "Nouvelle Étiquette",
+          "common.back": "Retour",
+          "common.goBack": "Retourner",
 
           // Navigation
           "nav.dashboard": "Tableau de bord",
@@ -464,6 +470,8 @@ i18n
           "common.newBudget": "Neues Budget",
           "common.newGoal": "Neues Ziel",
           "common.newTag": "Neues Schlagwort",
+          "common.back": "Zurück",
+          "common.goBack": "Zurückgehen",
 
           // Navigation
           "nav.dashboard": "Dashboard",
