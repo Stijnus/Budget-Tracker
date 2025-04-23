@@ -1,5 +1,4 @@
 import {
-  Bell,
   LogOut,
   Settings as SettingsIcon,
   HelpCircle,
@@ -41,15 +40,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-
-// Define notification type
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-}
+import { NotificationCenter } from "../notifications/NotificationCenter";
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -59,11 +50,7 @@ export function Navbar() {
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Use a constant array with proper typing
-  const notifications: Notification[] = [];
 
   // Get page title based on current route
   const getPageTitle = () => {
@@ -121,12 +108,6 @@ export function Navbar() {
         handleKeyDown as unknown as EventListener
       );
   }, [isSearchOpen]);
-
-  // Mock fetching notifications
-  useEffect(() => {
-    // Simulate having unread notifications
-    setHasUnreadNotifications(true);
-  }, []);
 
   // Handle search query submission
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
@@ -208,70 +189,8 @@ export function Navbar() {
             {/* Language Selector */}
             <LanguageSelector />
 
-            {/* Notifications */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground relative"
-                      >
-                        <Bell size={18} />
-                        {hasUnreadNotifications && (
-                          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
-                        )}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-80">
-                      <div className="flex items-center justify-between p-2">
-                        <h3 className="font-medium">
-                          {t("common.notifications")}
-                        </h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-auto p-0 text-xs text-muted-foreground"
-                          onClick={() => setHasUnreadNotifications(false)}
-                        >
-                          {t("common.markAllAsRead")}
-                        </Button>
-                      </div>
-                      <DropdownMenuSeparator />
-                      {notifications && notifications.length > 0 ? (
-                        notifications.map((notification, index) => (
-                          <DropdownMenuItem
-                            key={index}
-                            className="p-3 cursor-pointer"
-                          >
-                            <div className="flex flex-col space-y-1">
-                              <p className="text-sm font-medium">
-                                {notification.title}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {notification.message}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {notification.time}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>
-                        ))
-                      ) : (
-                        <div className="p-4 text-center text-sm text-muted-foreground">
-                          {t("common.noNotifications")}
-                        </div>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{t("common.notifications")}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {/* Notifications - Updated to use the new component */}
+            <NotificationCenter />
 
             {/* User menu */}
             {user ? (

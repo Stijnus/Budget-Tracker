@@ -1,12 +1,8 @@
 import { createContext, useContext } from "react";
+import { SUPPORTED_LANGUAGES } from "../i18n/translations-loader";
 
-// Define the supported languages
-export const LANGUAGES = {
-  en: { nativeName: "English", flag: "🇬🇧" },
-  nl: { nativeName: "Nederlands", flag: "🇳🇱" },
-  fr: { nativeName: "Français", flag: "🇫🇷" },
-  de: { nativeName: "Deutsch", flag: "🇩🇪" },
-};
+// Re-export the supported languages
+export const LANGUAGES = SUPPORTED_LANGUAGES;
 
 // Create a context for the language provider
 export type TranslationOptions = {
@@ -17,6 +13,11 @@ export type LanguageContextType = {
   language: string;
   changeLanguage: (lang: string) => Promise<void>;
   t: (key: string, options?: TranslationOptions) => string;
+  // Add namespace support
+  i18n: {
+    language: string;
+    changeLanguage: (lang: string) => Promise<void>;
+  };
 };
 
 export const LanguageContext = createContext<LanguageContextType | undefined>(

@@ -1,0 +1,14 @@
+{
+  "nav.dashboard": "Dashboard",
+  "nav.transactions": "Transacties",
+  "nav.expenses": "Uitgaven",
+  "nav.income": "Inkomsten",
+  "nav.categories": "Categorieën",
+  "nav.bills": "Rekeningen & Abonnementen",
+  "nav.budgets": "Budgetten",
+  "nav.accounts": "Bankrekeningen",
+  "nav.groups": "Budgetgroepen",
+  "nav.goals": "Doelen",
+  "nav.analytics": "Analyses",
+  "nav.settings": "Instellingen"
+}

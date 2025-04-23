@@ -1,4 +1,4 @@
-// No useState needed in this component
+import { useState } from "react";
 import { AppLayout } from "../shared/components/layout";
 import {
   ProfileForm,
@@ -17,158 +17,276 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-// Tab values are used directly in the component
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  User,
+  Shield,
+  Settings,
+  Bell,
+  Palette,
+  Languages,
+  KeyRound,
+  CreditCard,
+  ChevronRight,
+  ArrowLeft,
+  ShieldAlert,
+  RefreshCw,
+  CheckCircle,
+} from "lucide-react";
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useTranslation } from "react-i18next";
 
 export function SettingsPage() {
-  // We'll use the Tabs component's built-in state management
+  const [activeTab, setActiveTab] = useState("profile");
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const { t } = useTranslation();
+
+  // Helper function to get the appropriate icon based on tab value
+  const getTabIcon = (value: string) => {
+    switch (value) {
+      case "profile":
+        return <User className="w-4 h-4 mr-2" />;
+      case "password":
+        return <KeyRound className="w-4 h-4 mr-2" />;
+      case "preferences":
+        return <Settings className="w-4 h-4 mr-2" />;
+      case "notifications":
+        return <Bell className="w-4 h-4 mr-2" />;
+      case "currency":
+        return <CreditCard className="w-4 h-4 mr-2" />;
+      case "theme":
+        return <Palette className="w-4 h-4 mr-2" />;
+      case "language":
+        return <Languages className="w-4 h-4 mr-2" />;
+      case "account":
+        return <Shield className="w-4 h-4 mr-2" />;
+      default:
+        return <Settings className="w-4 h-4 mr-2" />;
+    }
+  };
+
+  // Settings tab items
+  const tabItems = [
+    { value: "profile", label: t("settings.profile") },
+    { value: "password", label: t("settings.password") },
+    { value: "preferences", label: t("settings.preferences") },
+    { value: "notifications", label: t("settings.notifications") },
+    { value: "currency", label: t("settings.currency") },
+    { value: "theme", label: t("settings.theme") },
+    { value: "language", label: t("settings.language") },
+    { value: "account", label: t("settings.account") },
+  ];
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
 
   return (
     <AppLayout>
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Settings</h1>
+      <div className="container max-w-7xl py-6 px-4 md:px-6 bg-background">
+        {/* Main container */}
+        <div className="flex flex-col md:flex-row gap-6 max-w-[1400px] mx-auto">
+          {/* Left column - Settings menu */}
+          <div
+            className={cn(
+              "w-full md:w-72 lg:w-80 flex-shrink-0",
+              isMobile && activeTab !== "profile" ? "hidden" : "block"
+            )}
+          >
+            <Card className="shadow-sm border bg-card">
+              <CardHeader className="px-5 py-4">
+                <CardTitle className="text-xl font-semibold">
+                  {t("settings.title")}
+                </CardTitle>
+                <CardDescription>{t("settings.description")}</CardDescription>
+              </CardHeader>
+              <Separator />
+              <CardContent className="p-0">
+                <ScrollArea className="h-auto max-h-[calc(100vh-300px)]">
+                  <div className="flex flex-col py-2">
+                    {tabItems.map((item) => (
+                      <Button
+                        key={item.value}
+                        variant="ghost"
+                        className={cn(
+                          "justify-start rounded-none relative text-muted-foreground h-auto py-3",
+                          "border-l-2 border-transparent px-5",
+                          activeTab === item.value &&
+                            "bg-muted/50 border-l-primary text-primary font-medium"
+                        )}
+                        onClick={() => handleTabChange(item.value)}
+                      >
+                        <div className="flex items-center w-full justify-between">
+                          <div className="flex items-center">
+                            {getTabIcon(item.value)}
+                            <span>{item.label}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            {item.value === "notifications" && (
+                              <Badge
+                                variant="secondary"
+                                className="ml-auto text-xs font-normal"
+                              >
+                                New
+                              </Badge>
+                            )}
+                            <ChevronRight
+                              className={cn(
+                                "w-4 h-4 opacity-50",
+                                activeTab === item.value
+                                  ? "rotate-90 text-primary"
+                                  : ""
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+              <Separator />
+              <CardFooter className="p-4">
+                <Button variant="outline" size="sm" className="w-full text-sm">
+                  {t("common.help")}
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
 
-        <Tabs
-          defaultValue="profile"
-          className="w-full"
-          // Tab changes are handled internally by the Tabs component
-        >
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Sidebar */}
-            <div className="w-full md:w-64 shrink-0">
-              <Card>
-                <CardContent className="p-0">
-                  <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 space-y-0">
-                    <TabsTrigger
-                      value="profile"
-                      className={cn(
-                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
-                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
-                      )}
-                    >
-                      Profile Information
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="password"
-                      className={cn(
-                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
-                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
-                      )}
-                    >
-                      Password
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="preferences"
-                      className={cn(
-                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
-                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
-                      )}
-                    >
-                      Preferences
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="notifications"
-                      className={cn(
-                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
-                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
-                      )}
-                    >
-                      Notifications
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="currency"
-                      className={cn(
-                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
-                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
-                      )}
-                    >
-                      Currency
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="theme"
-                      className={cn(
-                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
-                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
-                      )}
-                    >
-                      Theme
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="language"
-                      className={cn(
-                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
-                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
-                      )}
-                    >
-                      Language
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="account"
-                      className={cn(
-                        "justify-start rounded-none border-l-2 border-transparent px-4 py-3 data-[state=active]:border-primary",
-                        "data-[state=active]:bg-muted data-[state=active]:text-primary"
-                      )}
-                    >
-                      Account
-                    </TabsTrigger>
-                  </TabsList>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Right column - Content area */}
+          <div
+            className={cn(
+              "flex-1",
+              isMobile && activeTab === "profile" ? "hidden" : "block"
+            )}
+          >
+            {/* Mobile back button */}
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mb-4 items-center md:hidden"
+                onClick={() => setActiveTab("profile")}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {t("common.goBack")}
+              </Button>
+            )}
 
             {/* Content */}
-            <div className="flex-1">
-              <TabsContent value="profile" className="m-0">
-                <ProfileForm />
-              </TabsContent>
-              <TabsContent value="password" className="m-0">
-                <PasswordChangeForm />
-              </TabsContent>
-              <TabsContent value="preferences" className="m-0">
-                <UserSettingsForm />
-              </TabsContent>
-              <TabsContent value="notifications" className="m-0">
-                <NotificationSettingsForm />
-              </TabsContent>
-              <TabsContent value="currency" className="m-0">
-                <CurrencySettingsForm />
-              </TabsContent>
-              <TabsContent value="theme" className="m-0">
-                <ThemeSettingsForm />
-              </TabsContent>
-              <TabsContent value="language" className="m-0">
-                <LanguageSettingsForm />
-              </TabsContent>
-              <TabsContent value="account" className="m-0">
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Account Management</CardTitle>
-                      <CardDescription>
-                        Manage your account settings and connected services.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="border-t pt-4">
-                        <h3 className="text-lg font-medium mb-2">
-                          Connected Services
-                        </h3>
-                        <p className="text-muted-foreground mb-4">
-                          No connected services yet. You'll be able to connect
-                          third-party services here in the future.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <AccountDeletionForm />
+            <div className="space-y-6">
+              {/* Page header */}
+              <div className="border-b pb-4">
+                <div className="flex items-center space-x-2">
+                  {getTabIcon(activeTab)}
+                  <h1 className="text-2xl font-bold tracking-tight">
+                    {tabItems.find((item) => item.value === activeTab)?.label}
+                  </h1>
                 </div>
-              </TabsContent>
+                <p
+                  className="text-muted-foreground mt-1"
+                  data-i18n-key={`settings.${activeTab}.description`}
+                >
+                  {t(`settings.${activeTab}.description`)}
+                </p>
+              </div>
+
+              {/* Tabs content */}
+              <div>
+                {activeTab === "profile" && <ProfileForm />}
+                {activeTab === "password" && <PasswordChangeForm />}
+                {activeTab === "preferences" && <UserSettingsForm />}
+                {activeTab === "notifications" && <NotificationSettingsForm />}
+                {activeTab === "currency" && <CurrencySettingsForm />}
+                {activeTab === "theme" && <ThemeSettingsForm />}
+                {activeTab === "language" && <LanguageSettingsForm />}
+                {activeTab === "account" && (
+                  <div className="space-y-6">
+                    <Card className="border shadow-sm">
+                      <CardHeader>
+                        <CardTitle>{t("settings.connectedServices")}</CardTitle>
+                        <CardDescription>
+                          {t("settings.connectedServicesDescription")}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-col divide-y">
+                          <div className="flex items-center justify-between py-3">
+                            <div className="flex items-center space-x-4">
+                              <div className="bg-muted rounded-full p-2">
+                                <CreditCard className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <p className="font-medium">
+                                  {t("settings.bankingIntegration")}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {t("settings.bankingIntegrationDescription")}
+                                </p>
+                              </div>
+                            </div>
+                            <Button variant="outline" size="sm">
+                              {t("settings.connect")}
+                            </Button>
+                          </div>
+
+                          <div className="flex items-center justify-between py-3">
+                            <div className="flex items-center space-x-4">
+                              <div className="bg-muted rounded-full p-2">
+                                <ShieldAlert className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <p className="font-medium">
+                                  {t("settings.twoFactorAuth")}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {t("settings.twoFactorAuthDescription")}
+                                </p>
+                              </div>
+                            </div>
+                            <Button variant="outline" size="sm">
+                              {t("settings.setup")}
+                            </Button>
+                          </div>
+
+                          <div className="flex items-center justify-between py-3">
+                            <div className="flex items-center space-x-4">
+                              <div className="bg-muted rounded-full p-2">
+                                <RefreshCw className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <p className="font-medium">
+                                  {t("settings.dataSync")}
+                                </p>
+                                <div className="flex items-center text-sm text-muted-foreground">
+                                  <CheckCircle className="w-3 h-3 mr-1 text-green-500" />{" "}
+                                  {t("settings.lastSynced", {
+                                    time: "5 minutes",
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                            <Button variant="outline" size="sm">
+                              {t("settings.syncNow")}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <AccountDeletionForm />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </Tabs>
+        </div>
       </div>
     </AppLayout>
   );

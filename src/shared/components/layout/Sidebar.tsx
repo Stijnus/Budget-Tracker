@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLanguage } from "../../../providers/LanguageProvider";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ import {
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   // No longer needed with Sheet component
   // const toggleSidebar = () => {

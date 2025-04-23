@@ -1,0 +1,16 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "summary": "Financial Summary",
+    "recent": "Recent Transactions",
+    "overview": "Overview",
+    "finances": "Finances",
+    "goals": "Goals",
+    "billReminders": "Bill Reminders",
+    "budgetProgress": "Budget Progress",
+    "expenseCategories": "Expense Categories",
+    "groups": "Budget Groups",
+    "groupActivity": "Group Activity"
+  }
+}

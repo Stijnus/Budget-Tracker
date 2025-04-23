@@ -3,7 +3,7 @@ import { AuthContext, UserProfile, UserSettings } from "./authContext";
 import { User, AuthError } from "@supabase/supabase-js";
 import * as authApi from "../api/supabase/auth";
 import { useTheme } from "../providers/ThemeProvider";
-import type { Theme } from "../providers/ThemeProvider";
+import type { Theme } from "../providers/themeUtils";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

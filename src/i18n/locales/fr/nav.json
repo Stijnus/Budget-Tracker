@@ -1,0 +1,14 @@
+{
+  "nav.dashboard": "Tableau de bord",
+  "nav.transactions": "Transactions",
+  "nav.expenses": "Dépenses",
+  "nav.income": "Revenus",
+  "nav.categories": "Catégories",
+  "nav.bills": "Factures & Abonnements",
+  "nav.budgets": "Budgets",
+  "nav.accounts": "Comptes Bancaires",
+  "nav.groups": "Groupes de Budget",
+  "nav.goals": "Objectifs",
+  "nav.analytics": "Analyses",
+  "nav.settings": "Paramètres"
+}

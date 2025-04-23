@@ -21,13 +21,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Convert the LANGUAGES object to an array for easier use in the component
-const LANGUAGE_OPTIONS = Object.entries(LANGUAGES).map(([code, details]) => ({
-  code,
-  name: code.toUpperCase(),
-  flag: details.flag,
-  native: details.nativeName,
-}));
+// Only show English for now
+const LANGUAGE_OPTIONS = [
+  {
+    code: "en",
+    name: "EN",
+    flag: "🇬🇧",
+    native: "English",
+  },
+];
+
+// Commented out for future use
+// const LANGUAGE_OPTIONS = Object.entries(LANGUAGES).map(([code, details]) => ({
+//   code,
+//   name: code.toUpperCase(),
+//   flag: details.flag,
+//   native: details.nativeName,
+// }));
 
 export function LanguageSettingsForm() {
   const { user, userSettings, refreshUserData } = useAuth();

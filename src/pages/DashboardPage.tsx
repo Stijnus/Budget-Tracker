@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../state/useAuth";
-import { useLanguage } from "../providers/LanguageProvider";
+import { useTranslation } from "react-i18next";
 import { AppLayout } from "../shared/components/layout";
 import { TransactionList } from "../features/transactions/components/TransactionList";
 import { BudgetSummary } from "../features/budgets/components/BudgetSummary";
@@ -26,7 +26,7 @@ import {
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
 
   // Get the current date for the expense category chart

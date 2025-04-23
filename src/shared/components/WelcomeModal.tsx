@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface WelcomeModalProps {
   isOpen: boolean;
@@ -14,65 +15,62 @@ export function WelcomeModal({
 }: WelcomeModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = 4;
+  const { t } = useTranslation("welcome");
 
   if (!isOpen) return null;
 
   const steps = [
     {
-      title: "Welcome to Budget Tracker",
+      title: t("welcome.title"),
       content: (
         <div className="space-y-4">
           <p className="text-gray-700">
-            Hi {userName}! We're excited to help you take control of your
-            finances. Budget Tracker makes it easy to track your spending, set
-            budgets, and achieve your financial goals.
+            {t("welcome.greeting", { name: userName })}
           </p>
-          <p className="text-gray-700">
-            Let's take a quick tour to help you get started.
-          </p>
+          <p className="text-gray-700">{t("welcome.tour")}</p>
         </div>
       ),
     },
     {
-      title: "Track Your Transactions",
+      title: t("welcome.transactions.title"),
       content: (
         <div className="space-y-4">
           <p className="text-gray-700">
-            Start by adding your income and expenses in the Transactions
-            section. You can categorize them and add tags for better
-            organization.
+            {t("welcome.transactions.description")}
           </p>
           <div className="bg-blue-50 p-4 rounded-md">
-            <p className="text-blue-700 font-medium">Pro Tip:</p>
+            <p className="text-blue-700 font-medium">
+              {t("welcome.transactions.proTip")}
+            </p>
             <p className="text-blue-700">
-              Use keyboard shortcut{" "}
-              <kbd className="px-1 bg-blue-100">N + T</kbd> to quickly add a new
-              transaction.
+              {t("welcome.transactions.shortcut", {
+                key: <kbd className="px-1 bg-blue-100">N + T</kbd>,
+              })}
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: "Set Budgets & Goals",
+      title: t("welcome.budgets.title"),
       content: (
         <div className="space-y-4">
-          <p className="text-gray-700">
-            Create monthly budgets for different categories to manage your
-            spending. Set financial goals like saving for a vacation or building
-            an emergency fund.
-          </p>
+          <p className="text-gray-700">{t("welcome.budgets.description")}</p>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-green-50 p-3 rounded-md">
-              <h4 className="font-medium text-green-800 mb-1">Budgets</h4>
+              <h4 className="font-medium text-green-800 mb-1">
+                {t("welcome.budgets.budgetsTitle")}
+              </h4>
               <p className="text-green-700 text-sm">
-                Track spending against your monthly limits
+                {t("welcome.budgets.budgetsDescription")}
               </p>
             </div>
             <div className="bg-purple-50 p-3 rounded-md">
-              <h4 className="font-medium text-purple-800 mb-1">Goals</h4>
+              <h4 className="font-medium text-purple-800 mb-1">
+                {t("welcome.budgets.goalsTitle")}
+              </h4>
               <p className="text-purple-700 text-sm">
-                Save for future purchases and dreams
+                {t("welcome.budgets.goalsDescription")}
               </p>
             </div>
           </div>
@@ -80,22 +78,14 @@ export function WelcomeModal({
       ),
     },
     {
-      title: "Manage Bills & Get Insights",
+      title: t("welcome.bills.title"),
       content: (
         <div className="space-y-4">
-          <p className="text-gray-700">
-            Keep track of your recurring bills and subscriptions. View detailed
-            reports and insights about your spending habits on the Dashboard.
-          </p>
+          <p className="text-gray-700">{t("welcome.bills.description")}</p>
           <div className="bg-yellow-50 p-4 rounded-md mb-4">
-            <p className="text-yellow-700">
-              Never miss a payment again with bill reminders and due date
-              tracking.
-            </p>
+            <p className="text-yellow-700">{t("welcome.bills.reminder")}</p>
           </div>
-          <p className="text-gray-700">
-            You're all set to start your financial journey with Budget Tracker!
-          </p>
+          <p className="text-gray-700">{t("welcome.bills.ready")}</p>
         </div>
       ),
     },
@@ -160,14 +150,14 @@ export function WelcomeModal({
                 className="flex items-center px-4 py-2 text-gray-700 hover:text-gray-900"
               >
                 <ChevronLeft size={16} className="mr-1" />
-                Back
+                {t("welcome.navigation.back")}
               </button>
             ) : (
               <button
                 onClick={handleSkip}
                 className="px-4 py-2 text-gray-500 hover:text-gray-700"
               >
-                Skip Tour
+                {t("welcome.navigation.skip")}
               </button>
             )}
           </div>
@@ -177,12 +167,12 @@ export function WelcomeModal({
           >
             {currentStep === totalSteps - 1 ? (
               <>
-                Get Started
+                {t("welcome.navigation.getStarted")}
                 <Check size={16} className="ml-1" />
               </>
             ) : (
               <>
-                Next
+                {t("welcome.navigation.next")}
                 <ChevronRight size={16} className="ml-1" />
               </>
             )}

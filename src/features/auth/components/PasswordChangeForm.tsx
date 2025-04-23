@@ -3,8 +3,6 @@ import { updatePassword } from "../../../api/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,51 +10,61 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useNotifications } from "../../../contexts/NotificationContext";
 
 export function PasswordChangeForm() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{
-    text: string;
-    type: "success" | "error";
-  } | null>(null);
+  const { addNotification } = useNotifications();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate form
     if (newPassword !== confirmPassword) {
-      setMessage({ text: "New passwords do not match", type: "error" });
+      addNotification(
+        "Password Mismatch",
+        "New passwords do not match. Please make sure both fields contain the same password.",
+        "error"
+      );
       return;
     }
 
     if (newPassword.length < 8) {
-      setMessage({
-        text: "Password must be at least 8 characters long",
-        type: "error",
-      });
+      addNotification(
+        "Invalid Password",
+        "Password must be at least 8 characters long.",
+        "warning"
+      );
       return;
     }
 
     setIsLoading(true);
-    setMessage(null);
 
     try {
       const { error } = await updatePassword(newPassword);
 
       if (error) {
-        setMessage({ text: error.message, type: "error" });
+        addNotification("Password Update Failed", error.message, "error");
       } else {
-        setMessage({ text: "Password updated successfully", type: "success" });
+        addNotification(
+          "Password Updated",
+          "Your password has been updated successfully.",
+          "success"
+        );
         // Clear form
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
       }
     } catch (err) {
-      setMessage({ text: "An unexpected error occurred", type: "error" });
+      addNotification(
+        "Error",
+        "An unexpected error occurred while updating your password.",
+        "error"
+      );
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -64,60 +72,55 @@ export function PasswordChangeForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Change Password</CardTitle>
+    <Card className="border shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold">Change Password</CardTitle>
         <CardDescription>Update your account password</CardDescription>
       </CardHeader>
       <CardContent>
-        {message && (
-          <Alert
-            variant={message.type === "success" ? "default" : "destructive"}
-            className="mb-4"
-          >
-            {message.type === "success" ? (
-              <CheckCircle className="h-4 w-4" />
-            ) : (
-              <AlertCircle className="h-4 w-4" />
-            )}
-            <AlertDescription>{message.text}</AlertDescription>
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-1.5">
+            <Label htmlFor="currentPassword" className="text-sm font-medium">
+              Current Password
+            </Label>
             <Input
               id="currentPassword"
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
+              className="focus-visible:ring-1"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="newPassword" className="text-sm font-medium">
+              New Password
+            </Label>
             <Input
               id="newPassword"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
+              className="focus-visible:ring-1"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-1">
               Password must be at least 8 characters long
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="confirmPassword" className="text-sm font-medium">
+              Confirm New Password
+            </Label>
             <Input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              className="focus-visible:ring-1"
             />
           </div>
 

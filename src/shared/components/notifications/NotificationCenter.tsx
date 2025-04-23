@@ -1,0 +1,100 @@
+import { Bell } from "lucide-react";
+import { useNotifications } from "../../../contexts/NotificationContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { NotificationItem } from "./NotificationItem";
+import { useLanguage } from "../../../providers/LanguageProvider";
+
+export function NotificationCenter() {
+  const { notifications, hasUnreadNotifications, markAllAsRead, clearAll } =
+    useNotifications();
+  const { t } = useLanguage();
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground relative"
+                aria-label={t("common.notifications")}
+              >
+                <Bell size={18} />
+                {hasUnreadNotifications && (
+                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 max-h-[70vh]">
+              <div className="flex items-center justify-between p-3">
+                <h3 className="font-medium">{t("common.notifications")}</h3>
+                <div className="flex gap-1.5">
+                  {hasUnreadNotifications && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto px-2 py-1 text-xs text-muted-foreground"
+                      onClick={markAllAsRead}
+                    >
+                      {t("common.markAllAsRead")}
+                    </Button>
+                  )}
+                  {notifications.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto px-2 py-1 text-xs text-muted-foreground"
+                      onClick={clearAll}
+                    >
+                      {t("common.clear")}
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <DropdownMenuSeparator />
+
+              <div className="overflow-y-auto max-h-[50vh]">
+                <DropdownMenuGroup>
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <NotificationItem
+                        key={notification.id}
+                        notification={notification}
+                      />
+                    ))
+                  ) : (
+                    <DropdownMenuItem
+                      className="text-center text-sm text-muted-foreground p-8 opacity-70"
+                      disabled
+                    >
+                      {t("common.noNotifications")}
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuGroup>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{t("common.notifications")}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}

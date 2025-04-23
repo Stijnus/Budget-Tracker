@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { X, AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   showItemCreatedToast,
   showItemUpdatedToast,
@@ -45,6 +46,7 @@ export function TransactionForm({
   defaultType,
 }: TransactionFormProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<
@@ -138,7 +140,7 @@ export function TransactionForm({
         }
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError("Failed to load data");
+        setError(t("transactions.error.load"));
       }
     }
 
@@ -160,12 +162,12 @@ export function TransactionForm({
 
       // Validate form
       if (!amount || isNaN(parseFloat(amount))) {
-        setError("Please enter a valid amount");
+        setError(t("transactions.error.amount"));
         return;
       }
 
       if (!date) {
-        setError("Please select a date");
+        setError(t("transactions.error.date"));
         return;
       }
 
@@ -208,8 +210,8 @@ export function TransactionForm({
       onClose();
     } catch (err) {
       console.error("Error saving transaction:", err);
-      setError("Failed to save transaction");
-      showErrorToast("Failed to save transaction");
+      setError(t("transactions.error.save"));
+      showErrorToast(t("transactions.error.save"));
     } finally {
       setIsLoading(false);
     }
@@ -219,7 +221,7 @@ export function TransactionForm({
     <Card className="max-w-md w-full mx-auto">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl">
-          {transaction ? "Edit Transaction" : "Add Transaction"}
+          {transaction ? t("transactions.edit") : t("transactions.add")}
         </CardTitle>
         <Button
           variant="ghost"
@@ -251,20 +253,20 @@ export function TransactionForm({
                 value="expense"
                 className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700"
               >
-                Expense
+                {t("transactions.expense")}
               </TabsTrigger>
               <TabsTrigger
                 value="income"
                 className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
               >
-                Income
+                {t("transactions.income")}
               </TabsTrigger>
             </TabsList>
           </Tabs>
 
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount">{t("transactions.amount")}</Label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                 $
@@ -285,19 +287,19 @@ export function TransactionForm({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t("transactions.description")}</Label>
             <Input
               type="text"
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="e.g., Grocery shopping"
+              placeholder={t("transactions.description.placeholder")}
             />
           </div>
 
           {/* Date */}
           <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
+            <Label htmlFor="date">{t("transactions.date")}</Label>
             <Input
               type="date"
               id="date"
@@ -309,13 +311,17 @@ export function TransactionForm({
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">{t("transactions.category")}</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger id="category">
-                <SelectValue placeholder="Select a category" />
+                <SelectValue
+                  placeholder={t("transactions.category.placeholder")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="none">
+                  {t("transactions.category.none")}
+                </SelectItem>
                 {filteredCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
@@ -327,16 +333,22 @@ export function TransactionForm({
 
           {/* Bank Account */}
           <div className="space-y-2">
-            <Label htmlFor="bankAccount">Bank Account</Label>
+            <Label htmlFor="bankAccount">{t("transactions.bankAccount")}</Label>
             <Select value={bankAccountId} onValueChange={setBankAccountId}>
               <SelectTrigger id="bankAccount">
-                <SelectValue placeholder="Select a bank account" />
+                <SelectValue
+                  placeholder={t("transactions.bankAccount.placeholder")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="none">
+                  {t("transactions.bankAccount.none")}
+                </SelectItem>
                 {bankAccounts.map((account) => (
                   <SelectItem key={account.id} value={account.id}>
-                    {account.name} {account.is_default && "(Default)"}
+                    {account.name}{" "}
+                    {account.is_default &&
+                      t("transactions.bankAccount.default")}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -345,26 +357,44 @@ export function TransactionForm({
 
           {/* Payment Method */}
           <div className="space-y-2">
-            <Label htmlFor="paymentMethod">Payment Method</Label>
+            <Label htmlFor="paymentMethod">
+              {t("transactions.paymentMethod")}
+            </Label>
             <Select value={paymentMethod} onValueChange={setPaymentMethod}>
               <SelectTrigger id="paymentMethod">
-                <SelectValue placeholder="Select a payment method" />
+                <SelectValue
+                  placeholder={t("transactions.paymentMethod.placeholder")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                <SelectItem value="cash">Cash</SelectItem>
-                <SelectItem value="credit_card">Credit Card</SelectItem>
-                <SelectItem value="debit_card">Debit Card</SelectItem>
-                <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                <SelectItem value="mobile_payment">Mobile Payment</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="none">
+                  {t("transactions.paymentMethod.none")}
+                </SelectItem>
+                <SelectItem value="cash">
+                  {t("transactions.paymentMethod.cash")}
+                </SelectItem>
+                <SelectItem value="credit_card">
+                  {t("transactions.paymentMethod.creditCard")}
+                </SelectItem>
+                <SelectItem value="debit_card">
+                  {t("transactions.paymentMethod.debitCard")}
+                </SelectItem>
+                <SelectItem value="bank_transfer">
+                  {t("transactions.paymentMethod.bankTransfer")}
+                </SelectItem>
+                <SelectItem value="mobile_payment">
+                  {t("transactions.paymentMethod.mobilePayment")}
+                </SelectItem>
+                <SelectItem value="other">
+                  {t("transactions.paymentMethod.other")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">{t("transactions.status")}</Label>
             <Select
               value={status}
               onValueChange={(value) =>
@@ -372,31 +402,39 @@ export function TransactionForm({
               }
             >
               <SelectTrigger id="status">
-                <SelectValue placeholder="Select status" />
+                <SelectValue
+                  placeholder={t("transactions.status.placeholder")}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="completed">
+                  {t("transactions.status.completed")}
+                </SelectItem>
+                <SelectItem value="pending">
+                  {t("transactions.status.pending")}
+                </SelectItem>
+                <SelectItem value="cancelled">
+                  {t("transactions.status.cancelled")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{t("transactions.notes")}</Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder="Additional notes..."
+              placeholder={t("transactions.notes.placeholder")}
             />
           </div>
 
           {/* Tags */}
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags</Label>
+            <Label htmlFor="tags">{t("transactions.tags")}</Label>
             <TagSelector
               transactionId={transaction?.id}
               selectedTagIds={selectedTagIds}
@@ -407,14 +445,14 @@ export function TransactionForm({
           {/* Submit Button */}
           <div className="flex justify-end space-x-3 pt-4">
             <Button type="button" onClick={onClose} variant="outline">
-              Cancel
+              {t("transactions.cancel")}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading
-                ? "Saving..."
+                ? t("transactions.saving")
                 : transaction
-                ? "Update Transaction"
-                : "Add Transaction"}
+                ? t("transactions.update")
+                : t("transactions.add")}
             </Button>
           </div>
         </form>

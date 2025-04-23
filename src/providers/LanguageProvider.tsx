@@ -47,6 +47,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         language: i18n.language,
         changeLanguage,
         t,
+        i18n: {
+          language: i18n.language,
+          changeLanguage: async (lang: string) => {
+            await i18n.changeLanguage(lang);
+          },
+        },
       }}
     >
       {children}

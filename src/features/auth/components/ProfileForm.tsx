@@ -4,27 +4,33 @@ import { updateUserProfile } from "../../../api/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle } from "lucide-react";
+import { X, Info } from "lucide-react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useNotifications } from "../../../contexts/NotificationContext";
 
 export function ProfileForm() {
   const { user, userProfile, refreshUserData } = useAuth();
+  const { addNotification } = useNotifications();
+
   // Use default values if userProfile is undefined
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{
-    text: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [previewError, setPreviewError] = useState(false);
 
   // Initialize form with user data
   useEffect(() => {
@@ -40,7 +46,6 @@ export function ProfileForm() {
     if (!user) return;
 
     setIsLoading(true);
-    setMessage(null);
 
     try {
       const { error } = await updateUserProfile(user.id, {
@@ -49,16 +54,25 @@ export function ProfileForm() {
       });
 
       if (error) {
-        setMessage({ text: error.message, type: "error" });
+        addNotification("Profile Update Failed", error.message, "error");
       } else {
-        setMessage({ text: "Profile updated successfully", type: "success" });
+        addNotification(
+          "Profile Updated",
+          "Your profile information has been updated successfully.",
+          "success"
+        );
+
         // Refresh user data to update the UI
         if (refreshUserData) {
           await refreshUserData();
         }
       }
     } catch (err) {
-      setMessage({ text: "An unexpected error occurred", type: "error" });
+      addNotification(
+        "Error",
+        "An unexpected error occurred while updating your profile.",
+        "error"
+      );
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -66,81 +80,126 @@ export function ProfileForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile Information</CardTitle>
+    <Card className="border rounded-lg shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold">
+          Profile Information
+        </CardTitle>
         <CardDescription>Update your personal information</CardDescription>
       </CardHeader>
-      <CardContent>
-        {message && (
-          <Alert
-            variant={message.type === "success" ? "default" : "destructive"}
-            className="mb-4"
-          >
-            {message.type === "success" ? (
-              <CheckCircle className="h-4 w-4" />
-            ) : (
-              <AlertCircle className="h-4 w-4" />
-            )}
-            <AlertDescription>{message.text}</AlertDescription>
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={user?.email || ""} disabled />
-            <p className="text-xs text-muted-foreground">
+      <CardContent className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-sm font-medium">
+              Email
+            </Label>
+            <div className="relative">
+              <Input
+                id="email"
+                type="email"
+                value={user?.email || ""}
+                disabled
+                className="pr-10 bg-muted/50"
+              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="absolute inset-y-0 right-3 flex items-center">
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Email cannot be changed here</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
               To change your email, use the account settings
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="fullName" className="text-sm font-medium">
+              Full Name
+            </Label>
             <Input
               id="fullName"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
+              className="focus-visible:ring-1"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="avatarUrl">Avatar URL</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="avatarUrl" className="text-sm font-medium">
+              Avatar URL
+            </Label>
             <Input
               id="avatarUrl"
               type="text"
               value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
+              onChange={(e) => {
+                setAvatarUrl(e.target.value);
+                setPreviewError(false); // Reset error state when URL changes
+              }}
               placeholder="https://example.com/avatar.jpg"
+              className="focus-visible:ring-1"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-1">
               Enter a URL to an image for your profile picture
             </p>
           </div>
 
           {avatarUrl && (
-            <div className="flex justify-center py-2">
-              <Avatar className="w-20 h-20">
-                <AvatarImage
-                  src={avatarUrl}
-                  alt="Avatar preview"
-                  onError={(e) => {
-                    // Handle image load error
-                    (e.target as HTMLImageElement).src =
-                      "https://via.placeholder.com/150?text=Error";
-                  }}
-                />
-                <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
-              </Avatar>
+            <div className="flex flex-col items-center py-2 space-y-2">
+              <div className="relative">
+                <Avatar className="w-20 h-20 border">
+                  <AvatarImage
+                    src={avatarUrl}
+                    alt="Avatar preview"
+                    onError={(e) => {
+                      // Handle image load error
+                      setPreviewError(true);
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <AvatarFallback
+                    className={`text-lg ${
+                      previewError ? "bg-red-50 text-red-500" : ""
+                    }`}
+                  >
+                    {previewError
+                      ? "Error"
+                      : fullName.charAt(0).toUpperCase() || "?"}
+                  </AvatarFallback>
+                </Avatar>
+                {previewError && (
+                  <div className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-1">
+                    <X className="h-4 w-4" />
+                  </div>
+                )}
+              </div>
+              {previewError && (
+                <p className="text-xs text-red-500">
+                  Failed to load image. Please check the URL.
+                </p>
+              )}
             </div>
           )}
-
-          <Button type="submit" className="w-full mt-4" disabled={isLoading}>
-            {isLoading ? "Saving..." : "Save Changes"}
-          </Button>
         </form>
       </CardContent>
+      <CardFooter className="flex justify-end pt-2">
+        <Button
+          type="submit"
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="w-full md:w-auto"
+        >
+          {isLoading ? "Saving..." : "Save Changes"}
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

@@ -1,5 +1,5 @@
 import { toast } from "@/hooks/use-toast";
-import { i18n } from "../i18n";
+import { i18n } from "../i18n/translations-loader";
 import { ToastActionElement } from "@/components/ui/toast";
 
 type ToastType = "success" | "error" | "info" | "warning";

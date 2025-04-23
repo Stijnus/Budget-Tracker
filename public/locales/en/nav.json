@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "expenses": "Expenses",
+    "income": "Income",
+    "categories": "Categories",
+    "bills": "Bills & Subscriptions",
+    "budgets": "Budgets",
+    "accounts": "Bank Accounts",
+    "groups": "Budget Groups",
+    "goals": "Goals",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  }
+}
