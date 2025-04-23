@@ -347,22 +347,40 @@ export async function removeGroupMember(groupId: string, userId: string) {
  * Get all invitations for a budget group
  */
 export async function getGroupInvitations(groupId: string) {
-  return supabase
-    .from("group_invitations")
-    .select(
-      `
-      *,
-      inviter:invited_by(
+  try {
+    console.log(`Fetching invitations for group ID: ${groupId}`);
+
+    // Get the invitations - don't try to join with the users table
+    // as it causes permission issues
+    const { data, error } = await supabase
+      .from("group_invitations")
+      .select(
+        `
         id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
-        )
+        group_id,
+        email,
+        role,
+        status,
+        expires_at,
+        created_at,
+        token,
+        invited_by
+      `
       )
-    `
-    )
-    .eq("group_id", groupId)
-    .order("created_at", { ascending: false });
+      .eq("group_id", groupId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching group invitations:", error);
+      return { data: [], error };
+    }
+
+    console.log("Group invitations data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupInvitations:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**
@@ -377,12 +395,20 @@ export async function getInvitationsByEmail(email: string) {
 
     console.log(`Fetching invitations for email: ${email}`);
 
-    // Get the invitations
+    // Get the invitations - don't try to join with the users table
+    // as it causes permission issues
     const { data, error } = await supabase
       .from("group_invitations")
       .select(
         `
-        *,
+        id,
+        group_id,
+        email,
+        role,
+        status,
+        expires_at,
+        created_at,
+        token,
         group:group_id(
           id,
           name,
@@ -415,12 +441,21 @@ export async function getInvitationByToken(token: string) {
   try {
     console.log(`Fetching invitation with token: ${token}`);
 
-    // Get the invitation
+    // Get the invitation - don't try to join with the users table
+    // as it causes permission issues
     const { data, error } = await supabase
       .from("group_invitations")
       .select(
         `
-        *,
+        id,
+        group_id,
+        email,
+        role,
+        status,
+        expires_at,
+        created_at,
+        token,
+        invited_by,
         group:group_id(
           id,
           name,
