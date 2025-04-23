@@ -3,10 +3,16 @@ import { BankAccountList } from "../components/BankAccountList";
 import { BankAccountForm } from "../components/BankAccountForm";
 import { BankAccount } from "../../../api/supabase/bankAccounts";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Plus, CreditCard, Wallet } from "lucide-react";
+import { 
+  Dialog, 
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageHeader } from "../../../shared/components/PageHeader";
+import { Badge } from "@/components/ui/badge";
+import { formatDate } from "../../../utils/formatters";
 
 type AccountType = "checking" | "savings" | "credit" | "investment" | "other";
 
@@ -39,17 +45,20 @@ export function BankAccountsPage() {
   };
 
   return (
-    <div className="container mx-auto py-6 max-w-5xl">
-      <PageHeader
-        title="Bank Accounts"
-        description="Manage your bank accounts and track your balances"
-        action={
-          <Button onClick={handleAddAccount}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Account
-          </Button>
-        }
-      />
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CreditCard className="h-6 w-6 text-blue-500" />
+          <h2 className="text-2xl font-bold">Bank Accounts</h2>
+        </div>
+        <Badge
+          variant="outline"
+          className="flex items-center gap-2 px-3 py-1"
+        >
+          <Wallet className="h-4 w-4" />
+          <span>{formatDate(new Date(), "long")}</span>
+        </Badge>
+      </div>
 
       <div className="mt-6">
         <Tabs
@@ -59,11 +68,36 @@ export function BankAccountsPage() {
           className="w-full"
         >
           <TabsList className="mb-4">
-            <TabsTrigger value="all">All Accounts</TabsTrigger>
-            <TabsTrigger value="checking">Checking</TabsTrigger>
-            <TabsTrigger value="savings">Savings</TabsTrigger>
-            <TabsTrigger value="credit">Credit</TabsTrigger>
-            <TabsTrigger value="investment">Investment</TabsTrigger>
+            <TabsTrigger 
+              value="all"
+              className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+            >
+              All Accounts
+            </TabsTrigger>
+            <TabsTrigger 
+              value="checking"
+              className="data-[state=active]:bg-green-50 data-[state=active]:text-green-700"
+            >
+              Checking
+            </TabsTrigger>
+            <TabsTrigger 
+              value="savings"
+              className="data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700"
+            >
+              Savings
+            </TabsTrigger>
+            <TabsTrigger 
+              value="credit"
+              className="data-[state=active]:bg-red-50 data-[state=active]:text-red-700"
+            >
+              Credit
+            </TabsTrigger>
+            <TabsTrigger 
+              value="investment"
+              className="data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700"
+            >
+              Investment
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="mt-0">
@@ -107,9 +141,14 @@ export function BankAccountsPage() {
         </Tabs>
       </div>
 
-      {/* Bank Account Form Sheet */}
-      <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <SheetContent className="sm:max-w-md md:max-w-lg overflow-y-auto">
+      {/* Bank Account Form Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-md md:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedAccount ? "Edit Account" : "Add Account"}
+            </DialogTitle>
+          </DialogHeader>
           <BankAccountForm
             account={selectedAccount}
             onClose={handleFormClose}
@@ -118,8 +157,8 @@ export function BankAccountsPage() {
               activeTab === "all" ? "checking" : (activeTab as AccountType)
             }
           />
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

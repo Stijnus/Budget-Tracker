@@ -3,7 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { BankAccountDetails } from "../components/BankAccountDetails";
 import { BankAccountForm } from "../components/BankAccountForm";
 import { BankAccount } from "../../../api/supabase/bankAccounts";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { 
+  Dialog, 
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, CreditCard } from "lucide-react";
 
 export function BankAccountPage() {
   const { id } = useParams<{ id: string }>();
@@ -33,23 +40,39 @@ export function BankAccountPage() {
   };
 
   return (
-    <div className="container mx-auto py-6 max-w-5xl">
+    <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate("/accounts")}
+          className="mr-2"
+        >
+          <ChevronLeft size={20} />
+        </Button>
+        <CreditCard className="h-6 w-6 text-blue-500" />
+        <h2 className="text-2xl font-bold">Account Details</h2>
+      </div>
+
       <BankAccountDetails
         accountId={id}
         onEdit={handleEditAccount}
         onDelete={handleDelete}
       />
 
-      {/* Bank Account Form Sheet */}
-      <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <SheetContent className="sm:max-w-md md:max-w-lg overflow-y-auto">
+      {/* Bank Account Form Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-md md:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Account</DialogTitle>
+          </DialogHeader>
           <BankAccountForm
             account={selectedAccount}
             onClose={handleFormClose}
             onSuccess={handleFormSuccess}
           />
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

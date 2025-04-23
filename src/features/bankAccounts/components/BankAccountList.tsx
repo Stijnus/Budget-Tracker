@@ -181,9 +181,10 @@ export function BankAccountList({
   return (
     <div className="space-y-4">
       {/* Total Balance Card */}
-      <Card className="bg-primary text-primary-foreground">
+      <Card className="border-t-4 border-t-blue-500 bg-gradient-to-br from-blue-50/50 to-transparent">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg">
+          <CardTitle className="text-lg flex items-center">
+            <CreditCard className="mr-2 h-5 w-5 text-blue-500" />
             {accountType
               ? `Total ${
                   accountType.charAt(0).toUpperCase() + accountType.slice(1)
@@ -192,19 +193,20 @@ export function BankAccountList({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold">
+          <div className="text-3xl font-bold text-blue-700">
             {formatCurrency(totalBalance)}
           </div>
-          <p className="text-sm opacity-90 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Across {accounts.length} account{accounts.length !== 1 ? "s" : ""}
           </p>
         </CardContent>
       </Card>
 
       {/* Accounts List */}
-      <Card>
+      <Card className="border-t-4 border-t-blue-500">
         <CardHeader className="flex flex-row items-center justify-between py-4">
-          <CardTitle className="text-xl">
+          <CardTitle className="text-xl flex items-center">
+            <Wallet className="mr-2 h-5 w-5 text-blue-500" />
             {accountType
               ? `Your ${
                   accountType.charAt(0).toUpperCase() + accountType.slice(1)
@@ -212,7 +214,11 @@ export function BankAccountList({
               : "Your Accounts"}
           </CardTitle>
           {showAddButton && (
-            <Button onClick={handleAddAccount} size="sm">
+            <Button
+              onClick={handleAddAccount}
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               <Plus className="h-4 w-4 mr-1" />
               Add Account
             </Button>

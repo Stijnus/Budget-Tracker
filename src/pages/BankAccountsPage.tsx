@@ -4,7 +4,9 @@ import { AppLayout } from "../shared/components/layout/AppLayout";
 export function BankAccountsPage() {
   return (
     <AppLayout>
-      <BankAccountsPageComponent />
+      <div className="container mx-auto py-6 max-w-5xl">
+        <BankAccountsPageComponent />
+      </div>
     </AppLayout>
   );
 }
