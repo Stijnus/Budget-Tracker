@@ -1,0 +1,332 @@
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../state/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { getCategories } from "../../../api/supabase/categories";
+import {
+  createGroupTransaction,
+  updateGroupTransaction,
+} from "../../../api/supabase/groupTransactions";
+
+interface GroupTransactionFormProps {
+  groupId: string;
+  transaction?: any;
+  onSuccess: () => void;
+}
+
+export function GroupTransactionForm({
+  groupId,
+  transaction,
+  onSuccess,
+}: GroupTransactionFormProps) {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const [amount, setAmount] = useState(
+    transaction ? transaction.amount.toString() : ""
+  );
+  const [description, setDescription] = useState(
+    transaction?.description || ""
+  );
+  const [date, setDate] = useState<Date>(
+    transaction?.date ? new Date(transaction.date) : new Date()
+  );
+  const [type, setType] = useState<"expense" | "income">(
+    transaction?.type || "expense"
+  );
+  const [categoryId, setCategoryId] = useState(
+    transaction?.category_id || "none"
+  );
+  const [paymentMethod, setPaymentMethod] = useState(
+    transaction?.payment_method || "none"
+  );
+  const [status, setStatus] = useState<"pending" | "completed" | "cancelled">(
+    transaction?.status || "completed"
+  );
+  const [notes, setNotes] = useState(transaction?.notes || "");
+  const [categories, setCategories] = useState<
+    { id: string; name: string; type: string }[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      if (!user) return;
+
+      try {
+        const { data, error } = await getCategories();
+        if (error) throw error;
+        setCategories(data || []);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setError("Failed to load categories");
+      }
+    }
+
+    fetchCategories();
+  }, [user]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!user) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Validate amount
+      if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+        throw new Error("Please enter a valid amount");
+      }
+
+      // Prepare transaction data
+      const transactionData = {
+        group_id: groupId,
+        created_by: user.id,
+        amount: parseFloat(amount),
+        description: description || null,
+        date: format(date, "yyyy-MM-dd"),
+        type,
+        category_id: categoryId === "none" ? null : categoryId,
+        payment_method: paymentMethod === "none" ? null : paymentMethod,
+        status,
+        notes: notes || null,
+      };
+
+      if (transaction) {
+        // Update existing transaction
+        const { error } = await updateGroupTransaction(
+          transaction.id,
+          transactionData
+        );
+        if (error) throw error;
+      } else {
+        // Create new transaction
+        const { error } = await createGroupTransaction(transactionData);
+        if (error) throw error;
+      }
+
+      onSuccess();
+    } catch (err) {
+      console.error("Error saving transaction:", err);
+      setError(
+        typeof err === "string"
+          ? err
+          : (err as any).message || "Failed to save transaction"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Filter categories based on transaction type
+  const filteredCategories = categories.filter(
+    (category) => category.type === "both" || category.type === type
+  );
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 py-4">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <div className="space-y-4">
+        {/* Transaction Type */}
+        <div className="space-y-2">
+          <Label>{t("groups.transactionType")}</Label>
+          <RadioGroup
+            value={type}
+            onValueChange={(value) => setType(value as "expense" | "income")}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="expense" id="expense" />
+              <Label htmlFor="expense" className="cursor-pointer">
+                {t("groups.expense")}
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="income" id="income" />
+              <Label htmlFor="income" className="cursor-pointer">
+                {t("groups.income")}
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Amount */}
+          <div className="space-y-2">
+            <Label htmlFor="amount">{t("groups.amount")}</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2">
+                $
+              </span>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                min="0.01"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="pl-8"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Date */}
+          <div className="space-y-2">
+            <Label>{t("groups.date")}</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(date) => date && setDate(date)}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="space-y-2">
+          <Label htmlFor="description">{t("groups.description")}</Label>
+          <Input
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder={t("groups.descriptionPlaceholder")}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Category */}
+          <div className="space-y-2">
+            <Label htmlFor="category">{t("groups.category")}</Label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger id="category">
+                <SelectValue placeholder={t("groups.selectCategory")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{t("groups.none")}</SelectItem>
+                {filteredCategories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Payment Method */}
+          <div className="space-y-2">
+            <Label htmlFor="paymentMethod">{t("groups.paymentMethod")}</Label>
+            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+              <SelectTrigger id="paymentMethod">
+                <SelectValue placeholder={t("groups.selectPaymentMethod")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{t("groups.none")}</SelectItem>
+                <SelectItem value="cash">{t("groups.cash")}</SelectItem>
+                <SelectItem value="credit_card">
+                  {t("groups.creditCard")}
+                </SelectItem>
+                <SelectItem value="debit_card">
+                  {t("groups.debitCard")}
+                </SelectItem>
+                <SelectItem value="bank_transfer">
+                  {t("groups.bankTransfer")}
+                </SelectItem>
+                <SelectItem value="mobile_payment">
+                  {t("groups.mobilePayment")}
+                </SelectItem>
+                <SelectItem value="other">{t("groups.other")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Status */}
+        <div className="space-y-2">
+          <Label htmlFor="status">{t("groups.status")}</Label>
+          <Select
+            value={status}
+            onValueChange={(value) => setStatus(value as any)}
+          >
+            <SelectTrigger id="status">
+              <SelectValue placeholder={t("groups.selectStatus")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="completed">{t("groups.completed")}</SelectItem>
+              <SelectItem value="pending">{t("groups.pending")}</SelectItem>
+              <SelectItem value="cancelled">{t("groups.cancelled")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Notes */}
+        <div className="space-y-2">
+          <Label htmlFor="notes">{t("groups.notes")}</Label>
+          <Textarea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder={t("groups.notesPlaceholder")}
+            rows={3}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="submit" disabled={isLoading}>
+          {isLoading
+            ? transaction
+              ? t("common.saving")
+              : t("common.creating")
+            : transaction
+            ? t("common.save")
+            : t("common.create")}
+        </Button>
+      </div>
+    </form>
+  );
+}
