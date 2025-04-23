@@ -12,8 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// Separator is imported but not used
-// import { Separator } from "@/components/ui/separator";
 import { Plus, Users, UserPlus } from "lucide-react";
 import { GroupList } from "../components/GroupList";
 import { GroupInvitationsList } from "../components/GroupInvitationsList";
@@ -23,38 +21,39 @@ import { getInvitationsByEmail } from "../../../api/supabase/budgetGroups";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function GroupsPage() {
-  const { t } = useTranslation();
-  const { user } = useAuth();
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  // Define proper types for groups and invitations
-  interface Group {
+// Define proper types for groups and invitations
+interface Group {
+  id: string;
+  name: string;
+  description: string | null;
+  avatar_url: string | null;
+  role: string;
+}
+
+interface Invitation {
+  id: string;
+  group_id: string;
+  email: string;
+  role: string;
+  token: string;
+  status: string;
+  invited_by: string;
+  expires_at: string;
+  created_at: string;
+  updated_at?: string;
+  group?: {
     id: string;
     name: string;
     description: string | null;
     avatar_url: string | null;
-    role: string;
-  }
+  };
+  inviter?: any; // Using any for now due to Supabase query error
+}
 
-  interface Invitation {
-    id: string;
-    group_id: string;
-    email: string;
-    role: string;
-    token: string;
-    status: string;
-    invited_by: string;
-    expires_at: string;
-    created_at: string;
-    updated_at?: string;
-    group?: {
-      id: string;
-      name: string;
-      description: string | null;
-      avatar_url: string | null;
-    };
-    inviter?: any; // Using any for now due to Supabase query error
-  }
+export function GroupsPage() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const [groups, setGroups] = useState<Group[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);

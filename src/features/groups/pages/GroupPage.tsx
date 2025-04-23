@@ -5,6 +5,10 @@ import { useAuth } from "../../../state/useAuth";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   Users,
   Receipt,
@@ -14,6 +18,23 @@ import {
   Calendar,
   Activity,
 } from "lucide-react";
+import {
+  getBudgetGroup,
+  getGroupMembers,
+  getUserRole,
+  getGroupActivity,
+} from "../../../api/supabase/budgetGroups";
+import {
+  getGroupTransactions,
+  getGroupTransactionsSummary,
+} from "../../../api/supabase/groupTransactions";
+import { getGroupBudgets } from "../../../api/supabase/groupBudgets";
+import { GroupMembers } from "../components/GroupMembers";
+import { GroupTransactions } from "../components/GroupTransactions";
+import { GroupBudgets } from "../components/GroupBudgets";
+import { GroupSettings } from "../components/GroupSettings";
+import { GroupActivityFeed } from "../components/GroupActivityFeed";
+import { InviteMemberDialog } from "../components/InviteMemberDialog";
 
 // Define TypeScript interfaces for our data structures
 interface BudgetGroup {
@@ -27,14 +48,19 @@ interface BudgetGroup {
   updated_at: string;
 }
 
-type SelectQueryError<T> = any; // Helper type for Supabase query errors
-
 interface GroupMember {
   group_id: string;
   user_id: string;
   role: "owner" | "admin" | "member" | "viewer";
   joined_at: string;
-  user: any; // Using any for now due to SelectQueryError
+  user: {
+    id: string;
+    email?: string;
+    user_profiles?: {
+      full_name?: string | null;
+      avatar_url?: string | null;
+    } | null;
+  } | null;
 }
 
 interface GroupTransaction {
@@ -51,7 +77,13 @@ interface GroupTransaction {
   notes: string | null;
   created_at: string;
   updated_at: string;
-  creator?: any; // Using any for now due to SelectQueryError
+  creator?: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
 }
 
 interface GroupBudget {
@@ -66,11 +98,19 @@ interface GroupBudget {
   end_date: string | null;
   created_at: string;
   updated_at: string;
-  category?: any; // Using any for now due to SelectQueryError
-  creator?: any; // Using any for now due to SelectQueryError
+  category?: {
+    id: string;
+    name: string;
+    color: string;
+  } | null;
+  creator?: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
 }
-
-type Json = any; // Helper type for JSON data
 
 interface GroupActivity {
   id: string;
@@ -79,9 +119,15 @@ interface GroupActivity {
   action: string;
   entity_type: string;
   entity_id: string | null;
-  details: Json;
+  details: Record<string, unknown>;
   created_at: string;
-  user: any; // Using any for now due to SelectQueryError
+  user: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
 }
 
 interface TransactionSummary {
@@ -89,27 +135,6 @@ interface TransactionSummary {
   totalExpenses: number;
   balance: number;
 }
-import {
-  getBudgetGroup,
-  getGroupMembers,
-  getUserRole,
-  getGroupActivity,
-} from "../../../api/supabase/budgetGroups";
-import {
-  getGroupTransactions,
-  getGroupTransactionsSummary,
-} from "../../../api/supabase/groupTransactions";
-import { getGroupBudgets } from "../../../api/supabase/groupBudgets";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { GroupMembers } from "../components/GroupMembers";
-import { GroupTransactions } from "../components/GroupTransactions";
-import { GroupBudgets } from "../components/GroupBudgets";
-import { GroupSettings } from "../components/GroupSettings";
-import { GroupActivityFeed } from "../components/GroupActivityFeed";
-import { InviteMemberDialog } from "../components/InviteMemberDialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 
 export function GroupPage() {
   const { t } = useTranslation();
@@ -149,7 +174,8 @@ export function GroupPage() {
 
         if (membersError) throw membersError;
 
-        setMembers(membersData || []);
+        // Type assertion to handle API response
+        setMembers((membersData || []) as unknown as GroupMember[]);
 
         // Get user's role in the group
         const { data: roleData, error: roleError } = await getUserRole(
@@ -167,7 +193,10 @@ export function GroupPage() {
 
         if (transactionsError) throw transactionsError;
 
-        setTransactions(transactionsData || []);
+        // Type assertion to handle API response
+        setTransactions(
+          (transactionsData || []) as unknown as GroupTransaction[]
+        );
 
         // Fetch group budgets
         const { data: budgetsData, error: budgetsError } =
@@ -175,7 +204,8 @@ export function GroupPage() {
 
         if (budgetsError) throw budgetsError;
 
-        setBudgets(budgetsData || []);
+        // Type assertion to handle API response
+        setBudgets((budgetsData || []) as unknown as GroupBudget[]);
 
         // Fetch group activity
         const { data: activityData, error: activityError } =
@@ -183,7 +213,8 @@ export function GroupPage() {
 
         if (activityError) throw activityError;
 
-        setActivity(activityData || []);
+        // Type assertion to handle API response
+        setActivity((activityData || []) as unknown as GroupActivity[]);
 
         // Fetch transactions summary
         const { data: summaryData, error: summaryError } =
@@ -210,7 +241,8 @@ export function GroupPage() {
 
       if (error) throw error;
 
-      setMembers(data || []);
+      // Type assertion to handle API response
+      setMembers((data || []) as unknown as GroupMember[]);
       setIsInviteDialogOpen(false);
     } catch (err) {
       console.error("Error refreshing members:", err);
@@ -230,7 +262,10 @@ export function GroupPage() {
 
       if (transactionsError) throw transactionsError;
 
-      setTransactions(transactionsData || []);
+      // Type assertion to handle API response
+      setTransactions(
+        (transactionsData || []) as unknown as GroupTransaction[]
+      );
 
       // Refresh summary
       const { data: summaryData, error: summaryError } =
@@ -246,7 +281,8 @@ export function GroupPage() {
 
       if (activityError) throw activityError;
 
-      setActivity(activityData || []);
+      // Type assertion to handle API response
+      setActivity((activityData || []) as unknown as GroupActivity[]);
     } catch (err) {
       console.error("Error refreshing data after transaction change:", err);
       setError("Failed to refresh data. Please try again.");
@@ -262,7 +298,8 @@ export function GroupPage() {
 
       if (budgetsError) throw budgetsError;
 
-      setBudgets(budgetsData || []);
+      // Type assertion to handle API response
+      setBudgets((budgetsData || []) as unknown as GroupBudget[]);
 
       // Refresh activity
       const { data: activityData, error: activityError } =
@@ -270,7 +307,8 @@ export function GroupPage() {
 
       if (activityError) throw activityError;
 
-      setActivity(activityData || []);
+      // Type assertion to handle API response
+      setActivity((activityData || []) as unknown as GroupActivity[]);
     } catch (err) {
       console.error("Error refreshing data after budget change:", err);
       setError("Failed to refresh data. Please try again.");
