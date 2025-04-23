@@ -617,6 +617,49 @@ export async function createInvitation(
     }
 
     console.log("Invitation created successfully:", data);
+
+    // Try to send an invitation email
+    try {
+      // Get the group name
+      const { data: groupData } = await supabase
+        .from("budget_groups")
+        .select("name")
+        .eq("id", invitation.group_id)
+        .single();
+
+      // Get the inviter's name
+      const { data: userData } = await supabase
+        .from("user_profiles")
+        .select("full_name")
+        .eq("id", invitation.invited_by)
+        .single();
+
+      // Generate the invitation link
+      const invitationLink = `${window.location.origin}/invitations/${token}`;
+
+      // Call the Edge Function to send the email
+      const { error: emailError } = await supabase.functions.invoke(
+        "send-invitation-email",
+        {
+          body: {
+            email: invitation.email,
+            groupName: groupData?.name || "Budget Group",
+            inviterName: userData?.full_name || "A user",
+            invitationLink,
+          },
+        }
+      );
+
+      if (emailError) {
+        console.error("Error sending invitation email:", emailError);
+      } else {
+        console.log("Invitation email sent successfully");
+      }
+    } catch (emailErr) {
+      console.error("Exception sending invitation email:", emailErr);
+      // Don't fail the invitation creation if email sending fails
+    }
+
     return { data, error: null };
   } catch (err) {
     console.error("Unexpected error in createInvitation:", err);

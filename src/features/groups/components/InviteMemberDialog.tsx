@@ -143,12 +143,12 @@ export function InviteMemberDialog({
                 {invitedEmail && (
                   <div className="text-sm">
                     <p>
-                      An invitation has been created for:{" "}
+                      An invitation email has been sent to:{" "}
                       <strong>{invitedEmail}</strong>
                     </p>
                     <p>
-                      The user will see the invitation when they log in. The
-                      invitation will expire in 7 days.
+                      The user will also see the invitation when they log in.
+                      The invitation will expire in 7 days.
                     </p>
                   </div>
                 )}
