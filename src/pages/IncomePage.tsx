@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "../shared/components/layout";
 import { TransactionList } from "../features/transactions/components/TransactionList";
 import { TransactionFilters } from "../features/transactions/components/TransactionFilters";
+import { TransactionDialog } from "../features/transactions/components/TransactionDialog";
 import { formatDate } from "../utils/formatters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ export function IncomePage() {
   const [filters, setFilters] = useState<TransactionFilters>({
     type: "INCOME",
   });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <AppLayout>
@@ -37,9 +39,7 @@ export function IncomePage() {
               Income Transactions
             </CardTitle>
             <Button
-              onClick={() =>
-                (window.location.href = "/transactions/new?type=income")
-              }
+              onClick={() => setIsDialogOpen(true)}
               className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
             >
               <Plus size={16} />
@@ -68,6 +68,20 @@ export function IncomePage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Transaction Dialog */}
+        <TransactionDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          onSuccess={() => {
+            setIsDialogOpen(false);
+            // Refresh the transaction list
+            const newFilters = { ...filters };
+            setFilters(newFilters);
+          }}
+          defaultType="income"
+          title="Add Income"
+        />
       </div>
     </AppLayout>
   );

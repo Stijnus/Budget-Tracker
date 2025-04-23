@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { AppLayout } from "../shared/components/layout";
 import { TransactionList } from "../features/transactions/components/TransactionList";
 import { TransactionFilters } from "../features/transactions/components/TransactionFilters";
+import { TransactionDialog } from "../features/transactions/components/TransactionDialog";
 import { formatDate } from "../utils/formatters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,14 +10,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownCircle, CalendarIcon, Plus } from "lucide-react";
 
 export function ExpensesPage() {
-  const navigate = useNavigate();
   const [filters, setFilters] = useState<TransactionFilters>({
     type: "EXPENSE",
   });
-
-  const handleAddExpense = () => {
-    navigate("/expenses/new");
-  };
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <AppLayout>
@@ -43,7 +39,7 @@ export function ExpensesPage() {
               Expense Transactions
             </CardTitle>
             <Button
-              onClick={handleAddExpense}
+              onClick={() => setIsDialogOpen(true)}
               className="flex items-center gap-1 bg-red-600 hover:bg-red-700"
             >
               <Plus size={16} />
@@ -72,6 +68,20 @@ export function ExpensesPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Transaction Dialog */}
+        <TransactionDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          onSuccess={() => {
+            setIsDialogOpen(false);
+            // Refresh the transaction list
+            const newFilters = { ...filters };
+            setFilters(newFilters);
+          }}
+          defaultType="expense"
+          title="Add Expense"
+        />
       </div>
     </AppLayout>
   );

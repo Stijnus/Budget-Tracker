@@ -8,6 +8,7 @@ import {
 } from "../../../api/supabase/transactions";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
 import { TransactionFilters } from "./TransactionFilters";
+import { TransactionDialog } from "./TransactionDialog";
 import type { TransactionType as FilterTransactionType } from "./TransactionFilters";
 import { Edit, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,9 @@ export function TransactionList({
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
     null
   );
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TransactionType | null>(null);
 
   // Update internal filters when external filters change
   useEffect(() => {
@@ -147,13 +151,15 @@ export function TransactionList({
     fetchTransactions();
   }, [filters, limit]);
 
-  // Handle navigation to add/edit transaction page
+  // Handle opening the transaction dialog
   const handleAddTransaction = () => {
-    navigate("/transactions/new");
+    setSelectedTransaction(null);
+    setIsDialogOpen(true);
   };
 
   const handleEditTransaction = (transaction: TransactionType) => {
-    navigate(`/transactions/${transaction.id}`);
+    setSelectedTransaction(transaction);
+    setIsDialogOpen(true);
   };
 
   // Handle transaction deletion
@@ -349,6 +355,20 @@ export function TransactionList({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Transaction Dialog */}
+      <TransactionDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        transaction={selectedTransaction || undefined}
+        onSuccess={() => {
+          setIsDialogOpen(false);
+          setSelectedTransaction(null);
+          // Refresh the transaction list
+          const newFilters = { ...filters };
+          setFilters(newFilters);
+        }}
+      />
     </div>
   );
 }

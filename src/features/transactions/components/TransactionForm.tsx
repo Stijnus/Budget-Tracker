@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
-import { X, AlertCircle } from "lucide-react";
-// Translation imports removed
+import { AlertCircle } from "lucide-react";
 import {
   showItemCreatedToast,
   showItemUpdatedToast,
@@ -19,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   createTransaction,
@@ -46,7 +44,6 @@ export function TransactionForm({
   defaultType,
 }: TransactionFormProps) {
   const { user } = useAuth();
-  // Translation hooks removed
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<
@@ -82,40 +79,47 @@ export function TransactionForm({
   );
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
-  // Fetch transaction tags if editing
+  // Fetch categories and tags
   useEffect(() => {
-    if (transaction?.id) {
-      async function fetchTransactionTags() {
-        try {
-          const { data, error } = await getTagsForTransaction(
-            transaction?.id || ""
-          );
-          if (error) throw error;
+    if (!user) return;
 
-          if (data) {
-            const tagIds = data.map((item) => item.tag_id);
-            setSelectedTagIds(tagIds);
-          }
-        } catch (err) {
-          console.error("Error fetching transaction tags:", err);
-        }
-      }
-
-      fetchTransactionTags();
-    }
-  }, [transaction]);
-
-  // Fetch categories and bank accounts on mount
-  useEffect(() => {
     async function fetchData() {
-      if (!user) return;
-
       try {
+        setIsLoading(true);
+
         // Fetch categories
         const { data: categoriesData, error: categoriesError } =
           await getCategories();
+
         if (categoriesError) throw categoriesError;
-        setCategories(categoriesData || []);
+
+        // Filter categories by type if adding a new transaction with a specific type
+        let filteredCategories = categoriesData || [];
+        if (!transaction && defaultType) {
+          filteredCategories = filteredCategories.filter(
+            (cat) => cat.type === defaultType.toUpperCase()
+          );
+        }
+
+        setCategories(filteredCategories);
+
+        // Fetch tags for existing transaction
+        if (transaction?.id) {
+          try {
+            const { data: tagsData, error: tagsError } =
+              await getTagsForTransaction(transaction.id);
+
+            if (tagsError) throw tagsError;
+
+            setSelectedTagIds(
+              tagsData?.map((tag: { tag_id: string }) => tag.tag_id) || []
+            );
+          } catch (tagErr) {
+            console.warn("Error fetching tags:", tagErr);
+            // Continue without tags
+            setSelectedTagIds([]);
+          }
+        }
 
         try {
           // Fetch bank accounts
@@ -140,21 +144,17 @@ export function TransactionForm({
         }
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError("Load");
+        setError("Failed to load data. Please try again.");
+      } finally {
+        setIsLoading(false);
       }
     }
 
     fetchData();
-  }, [user, bankAccountId, transaction?.bank_account_id]);
-
-  // Filter categories based on transaction type
-  const filteredCategories = categories.filter(
-    (category) => category.type === type || category.type === "both"
-  );
+  }, [user, bankAccountId, transaction?.bank_account_id, transaction?.id, defaultType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
 
     try {
       setIsLoading(true);
@@ -162,12 +162,12 @@ export function TransactionForm({
 
       // Validate form
       if (!amount || isNaN(parseFloat(amount))) {
-        setError("Amount");
+        setError("Please enter a valid amount.");
         return;
       }
 
       if (!date) {
-        setError("Date");
+        setError("Please select a date.");
         return;
       }
 
@@ -210,219 +210,222 @@ export function TransactionForm({
       onClose();
     } catch (err) {
       console.error("Error saving transaction:", err);
-      setError("Save");
-      showErrorToast("Save");
+      setError("Failed to save transaction. Please try again.");
+      showErrorToast("Failed to save transaction");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className="max-w-md w-full mx-auto">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl">
-          {transaction ? "Edit" : "Add"}
-        </CardTitle>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          aria-label="Close"
+    <div className="w-full">
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Transaction Type */}
+        <Tabs
+          defaultValue={type}
+          onValueChange={(value) => setType(value as "expense" | "income")}
+          className="w-full"
         >
-          <X className="h-4 w-4" />
-        </Button>
-      </CardHeader>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger
+              value="expense"
+              className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700"
+            >
+              Expense
+            </TabsTrigger>
+            <TabsTrigger
+              value="income"
+              className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
+            >
+              Income
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
 
-      <CardContent>
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Transaction Type */}
-          <Tabs
-            defaultValue={type}
-            onValueChange={(value) => setType(value as "expense" | "income")}
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger
-                value="expense"
-                className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700"
-              >
-                {"Expense"}
-              </TabsTrigger>
-              <TabsTrigger
-                value="income"
-                className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
-              >
-                {"Income"}
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          {/* Amount */}
-          <div className="space-y-2">
-            <Label htmlFor="amount">{"Amount"}</Label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                $
-              </span>
-              <Input
-                type="number"
-                id="amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                step="0.01"
-                min="0"
-                required
-                className="pl-8"
-                placeholder="0.00"
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">{"Description"}</Label>
+        {/* Amount */}
+        <div className="space-y-2">
+          <Label htmlFor="amount">Amount</Label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+              $
+            </span>
             <Input
-              type="text"
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={"Placeholder"}
-            />
-          </div>
-
-          {/* Date */}
-          <div className="space-y-2">
-            <Label htmlFor="date">{"Date"}</Label>
-            <Input
-              type="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              type="number"
+              id="amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              step="0.01"
+              min="0"
               required
+              className="pl-8"
+              placeholder="0.00"
             />
           </div>
+        </div>
 
-          {/* Category */}
-          <div className="space-y-2">
-            <Label htmlFor="category">{"Category"}</Label>
-            <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger id="category">
-                <SelectValue placeholder={"Placeholder"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">{"None"}</SelectItem>
-                {filteredCategories.map((category) => (
+        {/* Description */}
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Input
+            type="text"
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter a description"
+          />
+        </div>
+
+        {/* Date */}
+        <div className="space-y-2">
+          <Label htmlFor="date">Date</Label>
+          <Input
+            type="date"
+            id="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Category */}
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <Select
+            value={categoryId}
+            onValueChange={setCategoryId}
+          >
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              {categories
+                .filter(
+                  (cat) =>
+                    !type ||
+                    cat.type === type.toUpperCase() ||
+                    cat.type === "BOTH"
+                )
+                .map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Bank Account */}
-          <div className="space-y-2">
-            <Label htmlFor="bankAccount">{"BankAccount"}</Label>
-            <Select value={bankAccountId} onValueChange={setBankAccountId}>
-              <SelectTrigger id="bankAccount">
-                <SelectValue placeholder={"Placeholder"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">{"None"}</SelectItem>
-                {bankAccounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>
-                    {account.name} {account.is_default && "Default"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Payment Method */}
-          <div className="space-y-2">
-            <Label htmlFor="paymentMethod">{"PaymentMethod"}</Label>
-            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-              <SelectTrigger id="paymentMethod">
-                <SelectValue placeholder={"Placeholder"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">{"None"}</SelectItem>
-                <SelectItem value="cash">{"Cash"}</SelectItem>
-                <SelectItem value="credit_card">{"CreditCard"}</SelectItem>
-                <SelectItem value="debit_card">{"DebitCard"}</SelectItem>
-                <SelectItem value="bank_transfer">{"BankTransfer"}</SelectItem>
-                <SelectItem value="mobile_payment">
-                  {"MobilePayment"}
+        {/* Bank Account */}
+        <div className="space-y-2">
+          <Label htmlFor="bankAccount">Bank Account</Label>
+          <Select
+            value={bankAccountId}
+            onValueChange={setBankAccountId}
+          >
+            <SelectTrigger id="bankAccount">
+              <SelectValue placeholder="Select a bank account" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              {bankAccounts.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.name}
                 </SelectItem>
-                <SelectItem value="other">{"Other"}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Status */}
-          <div className="space-y-2">
-            <Label htmlFor="status">{"Status"}</Label>
-            <Select
-              value={status}
-              onValueChange={(value) =>
-                setStatus(value as "pending" | "completed" | "cancelled")
-              }
-            >
-              <SelectTrigger id="status">
-                <SelectValue placeholder={"Placeholder"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="completed">{"Completed"}</SelectItem>
-                <SelectItem value="pending">{"Pending"}</SelectItem>
-                <SelectItem value="cancelled">{"Cancelled"}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Payment Method */}
+        <div className="space-y-2">
+          <Label htmlFor="paymentMethod">Payment Method</Label>
+          <Select
+            value={paymentMethod}
+            onValueChange={setPaymentMethod}
+          >
+            <SelectTrigger id="paymentMethod">
+              <SelectValue placeholder="Select a payment method" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              <SelectItem value="cash">Cash</SelectItem>
+              <SelectItem value="credit_card">Credit Card</SelectItem>
+              <SelectItem value="debit_card">Debit Card</SelectItem>
+              <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+              <SelectItem value="check">Check</SelectItem>
+              <SelectItem value="mobile_payment">Mobile Payment</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Notes */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">{"Notes"}</Label>
-            <Textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              placeholder={"Placeholder"}
-            />
-          </div>
+        {/* Status */}
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <Select
+            value={status}
+            onValueChange={(value) =>
+              setStatus(value as "pending" | "completed" | "cancelled")
+            }
+          >
+            <SelectTrigger id="status">
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Tags */}
-          <div className="space-y-2">
-            <Label htmlFor="tags">{"Tags"}</Label>
-            <TagSelector
-              transactionId={transaction?.id}
-              selectedTagIds={selectedTagIds}
-              onTagsChange={setSelectedTagIds}
-            />
-          </div>
+        {/* Notes */}
+        <div className="space-y-2">
+          <Label htmlFor="notes">Notes</Label>
+          <Textarea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Add any additional notes"
+            rows={3}
+          />
+        </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button type="button" onClick={onClose} variant="outline">
-              {"Cancel"}
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading
-                ? "Saving"
-                : transaction
-                ? "Update"
-                : "Add Transaction"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        {/* Tags */}
+        <div className="space-y-2">
+          <Label htmlFor="tags">Tags</Label>
+          <TagSelector
+            transactionId={transaction?.id}
+            selectedTagIds={selectedTagIds}
+            onTagsChange={setSelectedTagIds}
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-end space-x-3 pt-4">
+          <Button type="button" onClick={onClose} variant="outline">
+            Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+            className={type === "expense" ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
+          >
+            {isLoading
+              ? "Saving..."
+              : transaction
+              ? "Update Transaction"
+              : "Add Transaction"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
