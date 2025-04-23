@@ -1,0 +1,165 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# UI Component Patterns
+
+This document outlines the UI component patterns and usage guidelines for the Budget-Tracker application.
+
+## Component Library Structure
+
+The application uses a combination of:
+
+1. **shadcn/ui Components**: Located in `src/components/ui`
+2. **Custom Shared Components**: Located in `src/shared/components`
+3. **Feature-Specific Components**: Located in `src/features/*/components`
+
+## Component Usage Guidelines
+
+### Form Components
+
+1. **Form Structure**
+   - Use `<form>` element with react-hook-form
+   - Group related fields with `<fieldset>`
+   - Use `<Label>` component for all form inputs
+   - Include clear validation error messages
+
+2. **Input Components**
+   - Use `<Input>` for text input
+   - Use `<Select>` for dropdown selections
+   - Use `<Checkbox>` for boolean values
+   - Use `<DatePicker>` for date selection
+   - Use `<Switch>` for toggle options
+
+3. **Form Submission**
+   - Disable submit button during form submission
+   - Show loading indicator during submission
+   - Display toast notification on success/error
+   - Implement proper form validation with zod
+
+### Card Components
+
+1. **Card Usage**
+   - Use `<Card>` for containing related information
+   - Include `<CardHeader>`, `<CardTitle>`, and `<CardContent>`
+   - Add actions in `<CardFooter>`
+   - Maintain consistent spacing and padding
+
+2. **Card Patterns**
+   - Transaction Cards show amount, category, date
+   - Budget Cards include progress indicators
+   - Goal Cards display progress towards target
+   - Account Cards show balance and account type
+
+### List Components
+
+1. **List Structure**
+   - Use consistent list layouts across features
+   - Include sorting and filtering options
+   - Implement pagination for long lists
+   - Add empty state messaging
+
+2. **List Item Patterns**
+   - Consistent item height and padding
+   - Clear visual hierarchy of information
+   - Action buttons positioned consistently
+   - Visual indicators for status (completed, pending)
+
+### Dialog Components
+
+1. **Dialog Usage**
+   - Use for confirmation of destructive actions
+   - Use for forms that don't require full page
+   - Include clear titles and descriptions
+   - Provide "Cancel" and action buttons
+
+2. **Modal Patterns**
+   - Form modals for creating/editing items
+   - Confirmation modals for deletions
+   - Information modals for details
+   - Alert modals for important notifications
+
+### Button Components
+
+1. **Button Variants**
+   - `primary`: Main actions (Submit, Save)
+   - `secondary`: Alternative actions
+   - `outline`: Less prominent actions
+   - `destructive`: Delete or cancel actions
+   - `ghost`: Subtle UI actions
+
+2. **Button Usage**
+   - Use consistent button sizing
+   - Include icons for visual cues
+   - Disable buttons during loading states
+   - Use tooltips for additional context
+
+### Layout Components
+
+1. **Page Layout**
+   - Consistent header with page title
+   - Breadcrumb navigation where appropriate
+   - Action buttons in consistent location
+   - Responsive grid system
+
+2. **Sidebar Navigation**
+   - Clear visual hierarchy of sections
+   - Active state for current page
+   - Collapsible on mobile devices
+   - Consistent icon usage
+
+### Data Visualization
+
+1. **Chart Components**
+   - Use consistent color schemes
+   - Include proper legends and labels
+   - Support for different screen sizes
+   - Loading and empty states
+
+2. **Progress Indicators**
+   - Use `<Progress>` component for showing completion
+   - Consistent color coding (green for good, yellow for warning, red for alert)
+   - Include textual representation of progress
+
+## Accessibility Guidelines
+
+1. **Keyboard Navigation**
+   - All interactive elements must be keyboard accessible
+   - Use proper tab order
+   - Implement keyboard shortcuts where appropriate
+
+2. **Screen Reader Support**
+   - Use semantic HTML elements
+   - Include proper ARIA attributes
+   - Provide text alternatives for non-text content
+
+3. **Color and Contrast**
+   - Maintain sufficient color contrast (WCAG AA)
+   - Don't rely solely on color to convey information
+   - Support dark and light themes
+
+## Responsive Design
+
+1. **Mobile-First Approach**
+   - Design for mobile screens first
+   - Use responsive utilities from Tailwind
+   - Test on various screen sizes
+
+2. **Responsive Patterns**
+   - Stack elements vertically on small screens
+   - Adjust font sizes and spacing
+   - Collapse or hide secondary information
+   - Full-width forms on mobile
+
+## Theme Customization
+
+1. **Theme Variables**
+   - Use CSS variables for theme values
+   - Support light and dark modes
+   - Consistent color palette across components
+
+2. **Component Customization**
+   - Follow shadcn/ui customization patterns
+   - Maintain consistent styling across custom components
+   - Use Tailwind utility classes for styling

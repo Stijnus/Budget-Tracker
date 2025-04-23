@@ -10,3 +10,66 @@ This is a Budgeting and Expense Tracking Dashboard built with React, TypeScript,
 ## Project Organization
 
 The project follows a modular architecture with clear separation of concerns:
+
+### Core Directories
+
+1. **src/api** - API client and data fetching logic
+   - **supabase/** - Supabase client configuration and API functions
+   - **types/** - API and response type definitions
+
+2. **src/components** - Reusable UI components
+   - **ui/** - shadcn/ui component library customizations
+
+3. **src/features** - Feature-specific components organized by domain
+   - **analytics/** - Data visualization and reporting
+   - **auth/** - Authentication forms and logic
+   - **bankAccounts/** - Bank account management
+   - **bills/** - Bills and subscriptions tracking
+   - **budgets/** - Budget creation and monitoring
+   - **categories/** - Transaction category management
+   - **dashboard/** - Dashboard components and widgets
+   - **expenses/** - Expense tracking components
+   - **goals/** - Financial goals tracking
+   - **groups/** - Collaborative budget group management
+   - **tags/** - Tag management system
+   - **transactions/** - Transaction management components
+
+4. **src/hooks** - Custom React hooks for shared logic
+
+5. **src/pages** - Page components that compose features
+   - Entry points that integrate feature components
+
+6. **src/lib** - Utility libraries and type definitions
+   - **database.types.ts** - Generated Supabase database types
+
+7. **src/providers** - Context providers for global state
+   - **ThemeProvider.tsx** - Theme management
+   - **LanguageProvider.tsx** - i18n configuration
+
+8. **src/shared** - Shared utilities and components
+   - **components/layout** - Layout components (Sidebar, Navbar)
+   - **components/Toast** - Toast notification system
+   - **hooks/** - Shared custom hooks
+
+9. **src/utils** - Utility functions and helpers
+
+### Key Files
+
+- **src/App.tsx** - Main application component with routing
+- **src/api/supabase/client.ts** - Supabase client configuration
+- **src/lib/database.types.ts** - Generated TypeScript types from the database schema
+- **src/i18n/config.ts** - Internationalization configuration
+
+### Database Structure
+
+The database schema includes tables for:
+- User management (user_profiles, user_settings)
+- Financial tracking (transactions, categories, tags)
+- Budget management (budgets, bank_accounts)
+- Goal tracking (financial_goals, goal_contributions)
+- Bill management (bills_subscriptions, bill_payments)
+- Collaborative features (budget_groups, group_members, group_transactions)
+
+### UI Component System
+
+The project uses shadcn/ui components with Tailwind CSS for styling. Component customizations are located in `src/components/ui/`.

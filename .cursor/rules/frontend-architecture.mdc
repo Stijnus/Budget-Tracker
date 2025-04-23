@@ -1,0 +1,89 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Frontend Architecture
+
+The Budget-Tracker application follows a feature-based architecture with React, TypeScript, and Supabase integration.
+
+## Component Structure
+
+1. **Feature-First Organization**
+   - Components are organized by domain/feature rather than by type
+   - Each feature contains its own components, pages, and state management
+   - Features are designed to be self-contained and modular
+
+2. **Component Hierarchy**
+   - **Page Components**: High-level containers in `/src/pages`
+   - **Feature Components**: Domain-specific components in `/src/features/*`
+   - **Shared Components**: Reusable UI elements in `/src/shared/components`
+   - **UI Components**: shadcn/ui primitive components in `/src/components/ui`
+
+3. **Component Patterns**
+   - Functional components with React hooks
+   - Props are typed with TypeScript interfaces
+   - Components include proper loading states and error handling
+   - Form components use react-hook-form with zod validation
+
+## State Management
+
+1. **Global State**
+   - Authentication state managed via AuthProvider
+   - Theme preferences via ThemeProvider
+   - Language settings via LanguageProvider
+
+2. **Feature State**
+   - Local state for UI interactions
+   - React Query for server state management
+   - Local storage for persisting user preferences
+
+3. **Context API Usage**
+   - AuthContext for managing user authentication
+   - ThemeContext for theme switching
+   - ToastContext for global notifications
+
+## Routing Structure
+
+The application uses React Router v7 with a nested routing structure:
+
+1. **Public Routes**
+   - Landing page and authentication screens
+   - Password reset and verification flows
+
+2. **Protected Routes**
+   - Dashboard and feature pages
+   - Settings and user profile
+   - Wrapped with ProtectedRoute component
+
+3. **Layout Composition**
+   - AppLayout wraps authenticated routes
+   - LandingLayout for public pages
+   - Error boundaries at route level
+
+## Data Fetching and API Integration
+
+1. **Supabase Integration**
+   - Client configured in `src/api/supabase/client.ts`
+   - Strongly typed with database schema types
+   - API functions organized by domain in `src/api/supabase/*`
+
+2. **Data Fetching Patterns**
+   - Custom hooks for data operations
+   - Loading and error states
+   - Data transformation utilities
+
+## UI Component Library
+
+The application uses shadcn/ui components customized with Tailwind CSS:
+
+1. **Component Usage**
+   - Consistent component usage following shadcn/ui patterns
+   - Custom theme configuration in `components.json`
+   - Reusable component compositions
+
+2. **Design System**
+   - Consistent spacing, typography, and color schemes
+   - Responsive design patterns
+   - Dark mode support
+   - Accessible components following WCAG guidelines
