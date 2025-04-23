@@ -79,7 +79,27 @@ export async function getBudgetGroups() {
  * Get a budget group by ID
  */
 export async function getBudgetGroup(id: string) {
-  return supabase.from("budget_groups").select("*").eq("id", id).single();
+  try {
+    console.log(`Fetching budget group with ID: ${id}`);
+
+    // Get the group details
+    const { data, error } = await supabase
+      .from("budget_groups")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching budget group:", error);
+      return { data: null, error };
+    }
+
+    console.log("Budget group data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getBudgetGroup:", err);
+    return { data: null, error: err as Error };
+  }
 }
 
 /**
@@ -224,23 +244,39 @@ export async function deleteBudgetGroup(id: string) {
  * Get all members of a budget group
  */
 export async function getGroupMembers(groupId: string) {
-  return supabase
-    .from("group_members")
-    .select(
-      `
-      *,
-      user:user_id(
-        id,
-        email,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(`Fetching members for group ID: ${groupId}`);
+
+    // Get the group members
+    const { data, error } = await supabase
+      .from("group_members")
+      .select(
+        `
+        *,
+        user:user_id(
+          id,
+          email,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `
-    )
-    .eq("group_id", groupId)
-    .order("role");
+      .eq("group_id", groupId)
+      .order("role");
+
+    if (error) {
+      console.error("Error fetching group members:", error);
+      return { data: [], error };
+    }
+
+    console.log("Group members data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupMembers:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**
@@ -318,62 +354,80 @@ export async function getGroupInvitations(groupId: string) {
  * Get invitations sent to a specific email
  */
 export async function getInvitationsByEmail(email: string) {
-  // If email is empty or null, return empty result
-  if (!email) {
-    return { data: [], error: null };
-  }
+  try {
+    // If email is empty or null, return empty result
+    if (!email) {
+      return { data: [], error: null };
+    }
 
-  return supabase
-    .from("group_invitations")
-    .select(
-      `
-      *,
-      group:group_id(
-        id,
-        name,
-        description,
-        avatar_url
-      ),
-      inviter:invited_by(
-        id,
-        user_profiles!inner(
-          full_name,
+    console.log(`Fetching invitations for email: ${email}`);
+
+    // Get the invitations
+    const { data, error } = await supabase
+      .from("group_invitations")
+      .select(
+        `
+        *,
+        group:group_id(
+          id,
+          name,
+          description,
           avatar_url
         )
+      `
       )
-    `
-    )
-    .eq("email", email)
-    .eq("status", "pending")
-    .order("created_at", { ascending: false });
+      .eq("email", email)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching invitations:", error);
+      return { data: [], error };
+    }
+
+    console.log("Invitations data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getInvitationsByEmail:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**
  * Get an invitation by token
  */
 export async function getInvitationByToken(token: string) {
-  return supabase
-    .from("group_invitations")
-    .select(
-      `
-      *,
-      group:group_id(
-        id,
-        name,
-        description,
-        avatar_url
-      ),
-      inviter:invited_by(
-        id,
-        user_profiles!inner(
-          full_name,
+  try {
+    console.log(`Fetching invitation with token: ${token}`);
+
+    // Get the invitation
+    const { data, error } = await supabase
+      .from("group_invitations")
+      .select(
+        `
+        *,
+        group:group_id(
+          id,
+          name,
+          description,
           avatar_url
         )
+      `
       )
-    `
-    )
-    .eq("token", token)
-    .single();
+      .eq("token", token)
+      .single();
+
+    if (error) {
+      console.error("Error fetching invitation by token:", error);
+      return { data: null, error };
+    }
+
+    console.log("Invitation data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getInvitationByToken:", err);
+    return { data: null, error: err as Error };
+  }
 }
 
 /**
@@ -382,26 +436,61 @@ export async function getInvitationByToken(token: string) {
 export async function createInvitation(
   invitation: Omit<GroupInvitationInsert, "token">
 ) {
-  // Generate a token using the server function
-  const { data: tokenData, error: tokenError } = await supabase.rpc(
-    "generate_invitation_token"
-  );
+  try {
+    console.log("Creating invitation with data:", invitation);
 
-  if (tokenError) return { data: null, error: tokenError };
+    // Generate a token using the server function or create a random one if that fails
+    let token;
+    try {
+      const { data: tokenData, error: tokenError } = await supabase.rpc(
+        "generate_invitation_token"
+      );
 
-  // Set expiration date to 7 days from now
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
+      if (tokenError) {
+        console.error("Error generating invitation token:", tokenError);
+        // Generate a random token as fallback
+        token =
+          Math.random().toString(36).substring(2, 15) +
+          Math.random().toString(36).substring(2, 15);
+      } else {
+        token = tokenData;
+      }
+    } catch (tokenErr) {
+      console.error("Exception generating invitation token:", tokenErr);
+      // Generate a random token as fallback
+      token =
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
+    }
 
-  return supabase
-    .from("group_invitations")
-    .insert({
-      ...invitation,
-      token: tokenData,
-      expires_at: expiresAt.toISOString(),
-    })
-    .select()
-    .single();
+    console.log("Using token:", token);
+
+    // Set expiration date to 7 days from now
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    // Create the invitation
+    const { data, error } = await supabase
+      .from("group_invitations")
+      .insert({
+        ...invitation,
+        token,
+        expires_at: expiresAt.toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating invitation:", error);
+      return { data: null, error };
+    }
+
+    console.log("Invitation created successfully:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in createInvitation:", err);
+    return { data: null, error: err as Error };
+  }
 }
 
 /**
