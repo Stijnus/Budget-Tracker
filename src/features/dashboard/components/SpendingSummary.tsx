@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { getMonthlySpending } from "../../../api/supabase/transactions";
 import { formatCurrency } from "../../../utils/formatters";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, ArrowUpCircle, ArrowDownCircle, Calendar } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 interface SpendingSummaryData {
   totalIncome: number;
@@ -59,37 +60,71 @@ export function SpendingSummary() {
 
   // If no summary data, show a simplified view with zeros
   if (!summary) {
-    // Simple view with zeros - no need for month/year in this version
-
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Monthly Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="bg-destructive/10 border-0 dark:bg-destructive/20">
-              <CardContent className="p-6">
-                <p className="text-sm text-destructive mb-1">Expenses</p>
-                <p className="text-2xl font-bold text-destructive">
-                  {formatCurrency(0)}
-                </p>
-              </CardContent>
-            </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="overflow-hidden border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-transparent">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <ArrowUpCircle className="h-4 w-4 text-green-500" />
+              Total Income
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-2">
+            <div className="text-2xl font-bold text-green-600">
+              {formatCurrency(0)}
+            </div>
+            <div className="mt-3">
+              <Progress value={0} className="h-2 bg-green-100" />
+            </div>
+          </CardContent>
+          <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3 mr-1" />
+            Current month
+          </CardFooter>
+        </Card>
 
-            <Card className="bg-green-500/10 border-0 dark:bg-green-500/20">
-              <CardContent className="p-6">
-                <p className="text-sm text-green-600 dark:text-green-400 mb-1">
-                  Savings
-                </p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {formatCurrency(0)}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
+        <Card className="overflow-hidden border-l-4 border-l-red-500 bg-gradient-to-br from-red-50/50 to-transparent">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <ArrowDownCircle className="h-4 w-4 text-red-500" />
+              Total Expenses
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-2">
+            <div className="text-2xl font-bold text-red-600">
+              {formatCurrency(0)}
+            </div>
+            <div className="mt-3">
+              <Progress value={0} className="h-2 bg-red-100" />
+            </div>
+          </CardContent>
+          <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3 mr-1" />
+            Current month
+          </CardFooter>
+        </Card>
+
+        <Card className="overflow-hidden border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-transparent">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <ArrowUpCircle className="h-4 w-4 text-green-500" />
+              Savings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-2">
+            <div className="text-2xl font-bold text-green-600">
+              {formatCurrency(0)}
+            </div>
+            <div className="mt-3">
+              <Progress value={0} className="h-2 bg-green-100" />
+            </div>
+          </CardContent>
+          <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3 mr-1" />
+            Current month
+          </CardFooter>
+        </Card>
+      </div>
     );
   }
 
@@ -98,85 +133,103 @@ export function SpendingSummary() {
     totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100) : 0;
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">
-          {month} {year} Summary
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-blue-500/10 border-0 dark:bg-blue-500/20">
-            <CardContent className="p-4">
-              <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">
-                Income
-              </p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {formatCurrency(totalIncome)}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-destructive/10 border-0 dark:bg-destructive/20">
-            <CardContent className="p-4">
-              <p className="text-sm text-destructive mb-1">Expenses</p>
-              <p className="text-2xl font-bold text-destructive">
-                {formatCurrency(totalExpenses)}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card
-            className={`${
-              netSavings >= 0
-                ? "bg-green-500/10 dark:bg-green-500/20"
-                : "bg-yellow-500/10 dark:bg-yellow-500/20"
-            } border-0`}
-          >
-            <CardContent className="p-4">
-              <p
-                className={`text-sm ${
-                  netSavings >= 0
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-yellow-600 dark:text-yellow-400"
-                } mb-1`}
-              >
-                {netSavings >= 0 ? "Savings" : "Deficit"}
-              </p>
-              <p
-                className={`text-2xl font-bold ${
-                  netSavings >= 0
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-yellow-600 dark:text-yellow-400"
-                }`}
-              >
-                {formatCurrency(Math.abs(netSavings))}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {totalIncome > 0 && (
-          <div className="mt-6">
-            <div className="flex justify-between items-center mb-2">
-              <p className="text-sm text-muted-foreground">Savings Rate</p>
-              <p className="text-sm font-medium">{savingsRate}%</p>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2.5">
-              <div
-                className={`h-2.5 rounded-full ${
-                  savingsRate >= 20
-                    ? "bg-green-600 dark:bg-green-500"
-                    : savingsRate >= 0
-                    ? "bg-yellow-500 dark:bg-yellow-400"
-                    : "bg-destructive"
-                }`}
-                style={{ width: `${Math.max(savingsRate, 0)}%` }}
-              ></div>
-            </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Card className="overflow-hidden border-l-4 border-l-green-500 bg-gradient-to-br from-green-50/50 to-transparent">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <ArrowUpCircle className="h-4 w-4 text-green-500" />
+            Total Income
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <div className="text-2xl font-bold text-green-600">
+            {formatCurrency(totalIncome)}
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <div className="mt-3">
+            <Progress
+              value={totalIncome > 0 ? 100 : 0}
+              className="h-2 bg-green-100"
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground">
+          <Calendar className="h-3 w-3 mr-1" />
+          {month} {year}
+        </CardFooter>
+      </Card>
+
+      <Card className="overflow-hidden border-l-4 border-l-red-500 bg-gradient-to-br from-red-50/50 to-transparent">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <ArrowDownCircle className="h-4 w-4 text-red-500" />
+            Total Expenses
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <div className="text-2xl font-bold text-red-600">
+            {formatCurrency(totalExpenses)}
+          </div>
+          <div className="mt-3">
+            <Progress
+              value={totalExpenses > 0 ? 100 : 0}
+              className="h-2 bg-red-100"
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground">
+          <Calendar className="h-3 w-3 mr-1" />
+          {month} {year}
+        </CardFooter>
+      </Card>
+
+      <Card
+        className={`overflow-hidden border-l-4 ${
+          netSavings >= 0
+            ? "border-l-green-500 bg-gradient-to-br from-green-50/50 to-transparent"
+            : "border-l-red-500 bg-gradient-to-br from-red-50/50 to-transparent"
+        }`}
+      >
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            {netSavings >= 0 ? (
+              <ArrowUpCircle className="h-4 w-4 text-green-500" />
+            ) : (
+              <ArrowDownCircle className="h-4 w-4 text-red-500" />
+            )}
+            {netSavings >= 0 ? "Savings" : "Deficit"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <div
+            className={`text-2xl font-bold ${
+              netSavings >= 0 ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {formatCurrency(Math.abs(netSavings))}
+          </div>
+          <div className="mt-3">
+            {totalIncome > 0 && (
+              <Progress
+                value={Math.min(100, Math.abs((netSavings / totalIncome) * 100))}
+                className="h-2 bg-gray-100"
+              />
+            )}
+          </div>
+        </CardContent>
+        <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground flex justify-between">
+          <div>
+            <Calendar className="h-3 w-3 mr-1 inline" />
+            {month} {year}
+          </div>
+          <div>
+            {totalIncome > 0 && (
+              <span className="font-medium">
+                {savingsRate}% of income
+              </span>
+            )}
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

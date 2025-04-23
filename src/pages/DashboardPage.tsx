@@ -23,6 +23,10 @@ import {
   PieChart,
   ArrowRight,
   Users,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Receipt,
+  Calendar,
 } from "lucide-react";
 
 export function DashboardPage() {
@@ -95,16 +99,16 @@ export function DashboardPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Bill reminders */}
-                <Card className="md:col-span-1">
+                <Card className="md:col-span-1 border-t-4 border-t-blue-500">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
-                      <Bell className="mr-2 h-5 w-5" />
+                      <Bell className="mr-2 h-5 w-5 text-blue-500" />
                       Bill Reminders
                     </CardTitle>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="gap-1"
+                      className="gap-1 border-blue-200 text-blue-700 hover:bg-blue-50"
                       onClick={() => (window.location.href = "/bills")}
                     >
                       View All
@@ -117,16 +121,16 @@ export function DashboardPage() {
                 </Card>
 
                 {/* Budget summary */}
-                <Card className="md:col-span-1">
+                <Card className="md:col-span-1 border-t-4 border-t-amber-500">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
-                      <PiggyBank className="mr-2 h-5 w-5" />
+                      <PiggyBank className="mr-2 h-5 w-5 text-amber-500" />
                       Budget Progress
                     </CardTitle>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="gap-1"
+                      className="gap-1 border-amber-200 text-amber-700 hover:bg-amber-50"
                       onClick={() => (window.location.href = "/budgets")}
                     >
                       View All
@@ -141,16 +145,16 @@ export function DashboardPage() {
                 {/* Budget Groups card removed */}
 
                 {/* Expense categories */}
-                <Card className="md:col-span-1">
+                <Card className="md:col-span-1 border-t-4 border-t-purple-500">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
-                      <PieChart className="mr-2 h-5 w-5" />
+                      <PieChart className="mr-2 h-5 w-5 text-purple-500" />
                       Expense Categories
                     </CardTitle>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="gap-1"
+                      className="gap-1 border-purple-200 text-purple-700 hover:bg-purple-50"
                       onClick={() => (window.location.href = "/analytics")}
                     >
                       View All
@@ -167,16 +171,16 @@ export function DashboardPage() {
               </div>
 
               {/* Recent transactions */}
-              <Card>
+              <Card className="border-t-4 border-t-green-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
-                    <CreditCard className="mr-2 h-5 w-5" />
+                    <Receipt className="mr-2 h-5 w-5 text-green-500" />
                     Recent Transactions
                   </CardTitle>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="gap-1"
+                    className="gap-1 border-green-200 text-green-700 hover:bg-green-50"
                     onClick={() => (window.location.href = "/transactions")}
                   >
                     View All
@@ -198,16 +202,16 @@ export function DashboardPage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Budget summary */}
-                <Card>
+                <Card className="border-t-4 border-t-amber-500">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
-                      <PiggyBank className="mr-2 h-5 w-5" />
+                      <PiggyBank className="mr-2 h-5 w-5 text-amber-500" />
                       Budget Progress
                     </CardTitle>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="gap-1"
+                      className="gap-1 border-amber-200 text-amber-700 hover:bg-amber-50"
                       onClick={() => (window.location.href = "/budgets")}
                     >
                       View All
@@ -220,16 +224,16 @@ export function DashboardPage() {
                 </Card>
 
                 {/* Expense categories */}
-                <Card>
+                <Card className="border-t-4 border-t-purple-500">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
-                      <PieChart className="mr-2 h-5 w-5" />
+                      <PieChart className="mr-2 h-5 w-5 text-purple-500" />
                       Expense Categories
                     </CardTitle>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="gap-1"
+                      className="gap-1 border-purple-200 text-purple-700 hover:bg-purple-50"
                       onClick={() => (window.location.href = "/analytics")}
                     >
                       View All
@@ -246,16 +250,16 @@ export function DashboardPage() {
               </div>
 
               {/* Recent transactions */}
-              <Card>
+              <Card className="border-t-4 border-t-green-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
-                    <CreditCard className="mr-2 h-5 w-5" />
+                    <Receipt className="mr-2 h-5 w-5 text-green-500" />
                     Recent Transactions
                   </CardTitle>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="gap-1"
+                    className="gap-1 border-green-200 text-green-700 hover:bg-green-50"
                     onClick={() => (window.location.href = "/transactions")}
                   >
                     View All
@@ -268,16 +272,16 @@ export function DashboardPage() {
               </Card>
 
               {/* Bill reminders */}
-              <Card>
+              <Card className="border-t-4 border-t-blue-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
-                    <Bell className="mr-2 h-5 w-5" />
+                    <Bell className="mr-2 h-5 w-5 text-blue-500" />
                     Bill Reminders
                   </CardTitle>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="gap-1"
+                    className="gap-1 border-blue-200 text-blue-700 hover:bg-blue-50"
                     onClick={() => (window.location.href = "/bills")}
                   >
                     View All
@@ -300,16 +304,16 @@ export function DashboardPage() {
               <GoalsList showAddButton={true} />
 
               {/* Bill reminders */}
-              <Card>
+              <Card className="border-t-4 border-t-blue-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
-                    <Bell className="mr-2 h-5 w-5" />
+                    <Bell className="mr-2 h-5 w-5 text-blue-500" />
                     Bill Reminders
                   </CardTitle>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="gap-1"
+                    className="gap-1 border-blue-200 text-blue-700 hover:bg-blue-50"
                     onClick={() => (window.location.href = "/bills")}
                   >
                     View All
