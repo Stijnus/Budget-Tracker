@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../state/useAuth";
 // Translation imports removed
 import { AppLayout } from "../shared/components/layout";
@@ -26,6 +27,7 @@ import {
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   // Translation hooks removed
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -50,6 +52,15 @@ export function DashboardPage() {
               {formatDate(new Date(), "long")}
             </p>
           </div>
+
+          <Button
+            onClick={() => navigate("/group-dashboard")}
+            variant="outline"
+            className="sm:ml-auto mb-4 sm:mb-0 gap-2"
+          >
+            <Users className="h-4 w-4" />
+            Household Dashboard
+          </Button>
 
           {/* Dashboard tabs */}
           <Tabs

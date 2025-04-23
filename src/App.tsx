@@ -27,6 +27,7 @@ import { BankAccountsPage } from "./pages/BankAccountsPage";
 import { BankAccountPage } from "./pages/BankAccountPage";
 import { GroupsPage } from "./pages/GroupsPage";
 import { GroupPage } from "./pages/GroupPage";
+import { GroupDashboardPage } from "./pages/GroupDashboardPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { AuthProvider } from "./state/auth"; // Using the AuthProvider from auth.tsx
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -345,6 +346,28 @@ function App() {
                         <ProtectedRoute>
                           <ErrorBoundary>
                             <GroupPage />
+                          </ErrorBoundary>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* Group Dashboard routes */}
+                    <Route
+                      path="/group-dashboard"
+                      element={
+                        <ProtectedRoute>
+                          <ErrorBoundary>
+                            <GroupDashboardPage />
+                          </ErrorBoundary>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/group-dashboard/:id"
+                      element={
+                        <ProtectedRoute>
+                          <ErrorBoundary>
+                            <GroupDashboardPage />
                           </ErrorBoundary>
                         </ProtectedRoute>
                       }
