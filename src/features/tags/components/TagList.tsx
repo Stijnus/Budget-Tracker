@@ -20,6 +20,7 @@ interface TagListProps {
   onTagSelect?: (tag: Tag) => void;
   selectedTags?: string[];
   className?: string;
+  onAddTag?: () => void;
 }
 
 export function TagList({
@@ -27,6 +28,7 @@ export function TagList({
   onTagSelect,
   selectedTags = [],
   className = "",
+  onAddTag,
 }: TagListProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +72,11 @@ export function TagList({
   // Handle opening the add/edit modal
   const handleAddTag = () => {
     setSelectedTag(undefined);
-    setIsModalOpen(true);
+    if (onAddTag) {
+      onAddTag();
+    } else {
+      setIsModalOpen(true);
+    }
   };
 
   const handleEditTag = (tag: Tag) => {

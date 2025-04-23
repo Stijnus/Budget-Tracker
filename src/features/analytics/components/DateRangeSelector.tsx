@@ -78,87 +78,100 @@ export function DateRangeSelector({
   };
 
   return (
-    <Card className={className}>
-      <CardHeader className="pb-3">
-        <CardTitle>Date Range</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Button
-            onClick={() => handleRangeSelect("This Month")}
-            variant="outline"
-            size="sm"
-          >
-            This Month
-          </Button>
-          <Button
-            onClick={() => handleRangeSelect("Last Month")}
-            variant="outline"
-            size="sm"
-          >
-            Last Month
-          </Button>
-          <Button
-            onClick={() => handleRangeSelect("This Quarter")}
-            variant="outline"
-            size="sm"
-          >
-            This Quarter
-          </Button>
-          <Button
-            onClick={() => handleRangeSelect("This Year")}
-            variant="outline"
-            size="sm"
-          >
-            This Year
-          </Button>
-          <Button
-            onClick={() => handleRangeSelect("Last Year")}
-            variant="outline"
-            size="sm"
-          >
-            Last Year
-          </Button>
-          <Button
-            onClick={() => handleRangeSelect("Custom")}
-            variant="outline"
-            size="sm"
-          >
-            Custom
-          </Button>
-        </div>
+    <div className={className}>
+      <div className="flex flex-wrap gap-2 mb-4">
+        <Button
+          onClick={() => handleRangeSelect("this-month")}
+          variant="outline"
+          size="sm"
+          className="border-teal-200 text-teal-700 hover:bg-teal-50"
+        >
+          This Month
+        </Button>
+        <Button
+          onClick={() => handleRangeSelect("last-month")}
+          variant="outline"
+          size="sm"
+          className="border-teal-200 text-teal-700 hover:bg-teal-50"
+        >
+          Last Month
+        </Button>
+        <Button
+          onClick={() => handleRangeSelect("this-quarter")}
+          variant="outline"
+          size="sm"
+          className="border-teal-200 text-teal-700 hover:bg-teal-50"
+        >
+          This Quarter
+        </Button>
+        <Button
+          onClick={() => handleRangeSelect("this-year")}
+          variant="outline"
+          size="sm"
+          className="border-teal-200 text-teal-700 hover:bg-teal-50"
+        >
+          This Year
+        </Button>
+        <Button
+          onClick={() => handleRangeSelect("last-year")}
+          variant="outline"
+          size="sm"
+          className="border-teal-200 text-teal-700 hover:bg-teal-50"
+        >
+          Last Year
+        </Button>
+        <Button
+          onClick={() => handleRangeSelect("custom")}
+          variant="outline"
+          size="sm"
+          className={`border-teal-200 text-teal-700 hover:bg-teal-50 ${
+            customRange ? "bg-teal-100" : ""
+          }`}
+        >
+          Custom
+        </Button>
+      </div>
 
-        {customRange && (
-          <div className="flex flex-col sm:flex-row gap-4 items-end">
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="start-date">Start Date</Label>
-              <Input
-                type="date"
-                id="start-date"
-                value={customStartDate}
-                onChange={(e) => setCustomStartDate(e.target.value)}
-              />
-            </div>
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="end-date">End Date</Label>
-              <Input
-                type="date"
-                id="end-date"
-                value={customEndDate}
-                onChange={(e) => setCustomEndDate(e.target.value)}
-              />
-            </div>
-            <Button onClick={handleCustomDateChange}>Apply</Button>
+      {customRange && (
+        <div className="flex flex-col sm:flex-row gap-4 items-end">
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="start-date">Start Date</Label>
+            <Input
+              type="date"
+              id="start-date"
+              value={customStartDate}
+              onChange={(e) => setCustomStartDate(e.target.value)}
+              className="border-teal-200 focus-visible:ring-teal-500"
+            />
           </div>
-        )}
-
-        <div className="mt-4 flex items-center justify-center">
-          <Badge variant="outline" className="text-sm px-3 py-1">
-            {new Date(startDate).toLocaleDateString()} -{" "}
-            {new Date(endDate).toLocaleDateString()}
-          </Badge>
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="end-date">End Date</Label>
+            <Input
+              type="date"
+              id="end-date"
+              value={customEndDate}
+              onChange={(e) => setCustomEndDate(e.target.value)}
+              className="border-teal-200 focus-visible:ring-teal-500"
+            />
+          </div>
+          <Button
+            onClick={handleCustomDateChange}
+            className="bg-teal-600 hover:bg-teal-700"
+          >
+            Apply
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      )}
+
+      <div className="mt-4 flex items-center justify-center">
+        <Badge
+          variant="outline"
+          className="text-sm px-3 py-1 border-teal-200 text-teal-700"
+        >
+          {new Date(startDate).toLocaleDateString()} -{" "}
+          {new Date(endDate).toLocaleDateString()}
+        </Badge>
+      </div>
+    </div>
   );
 }

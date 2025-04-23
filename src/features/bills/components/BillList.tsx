@@ -34,11 +34,13 @@ import {
 interface BillListProps {
   showAddButton?: boolean;
   className?: string;
+  onAddBill?: () => void;
 }
 
 export function BillList({
   showAddButton = false,
   className = "",
+  onAddBill,
 }: BillListProps) {
   const navigate = useNavigate();
   const [bills, setBills] = useState<BillWithCategory[]>([]);
@@ -74,7 +76,11 @@ export function BillList({
 
   // Navigate to add/edit pages
   const handleAddBill = () => {
-    navigate("/bills/new");
+    if (onAddBill) {
+      onAddBill();
+    } else {
+      navigate("/bills/new");
+    }
   };
 
   const handleEditBill = (bill: BillWithCategory) => {
