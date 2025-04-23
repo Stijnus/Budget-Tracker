@@ -81,7 +81,7 @@ export async function getSpendingTrend(
   const dateMap = new Map();
 
   transactions.forEach((transaction) => {
-    const date = new Date(transaction.date);
+    const date = new Date((transaction as any).date);
     let groupKey;
 
     if (groupBy === "month") {
@@ -92,7 +92,7 @@ export async function getSpendingTrend(
       )}`;
     } else {
       // Format as YYYY-MM-DD
-      groupKey = transaction.date;
+      groupKey = (transaction as any).date;
     }
 
     if (!dateMap.has(groupKey)) {
@@ -105,10 +105,10 @@ export async function getSpendingTrend(
 
     const entry = dateMap.get(groupKey);
 
-    if (transaction.type === "income") {
-      entry.income += transaction.amount || 0;
+    if ((transaction as any).type === "income") {
+      entry.income += (transaction as any).amount || 0;
     } else {
-      entry.expenses += transaction.amount || 0;
+      entry.expenses += (transaction as any).amount || 0;
     }
   });
 
@@ -131,7 +131,7 @@ export async function getIncomeVsExpenses(
   // Get all transactions in the date range
   const { data: transactions, error } = await supabase
     .from("transactions")
-    .select("Date, amount, type")
+    .select("date, amount, type")
     .gte("date", startDate)
     .lte("date", endDate)
     .order("date", { ascending: true });
@@ -145,7 +145,7 @@ export async function getIncomeVsExpenses(
     const monthMap = new Map();
 
     transactions.forEach((transaction) => {
-      const date = new Date(transaction.date);
+      const date = new Date((transaction as any).date);
       // Format as YYYY-MM
       const monthKey = `${date.getFullYear()}-${String(
         date.getMonth() + 1
@@ -166,10 +166,10 @@ export async function getIncomeVsExpenses(
 
       const entry = monthMap.get(monthKey);
 
-      if (transaction.type === "income") {
-        entry.income += transaction.amount || 0;
+      if ((transaction as any).type === "income") {
+        entry.income += (transaction as any).amount || 0;
       } else {
-        entry.expenses += transaction.amount || 0;
+        entry.expenses += (transaction as any).amount || 0;
       }
     });
 
@@ -182,7 +182,7 @@ export async function getIncomeVsExpenses(
     const dayMap = new Map();
 
     transactions.forEach((transaction) => {
-      const date = transaction.date;
+      const date = (transaction as any).date;
       const dayName = new Date(date).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -198,10 +198,10 @@ export async function getIncomeVsExpenses(
 
       const entry = dayMap.get(date);
 
-      if (transaction.type === "income") {
-        entry.income += transaction.amount || 0;
+      if ((transaction as any).type === "income") {
+        entry.income += (transaction as any).amount || 0;
       } else {
-        entry.expenses += transaction.amount || 0;
+        entry.expenses += (transaction as any).amount || 0;
       }
     });
 
@@ -259,7 +259,7 @@ export async function getBudgetVsActual() {
       // Get transactions for this category in the date range
       const { data: transactions, error: transactionsError } = await supabase
         .from("transactions")
-        .select("Amount")
+        .select("amount")
         .eq("category_id", budget.category_id)
         .eq("type", "expense")
         .gte("date", startDate)
@@ -280,7 +280,10 @@ export async function getBudgetVsActual() {
       }
 
       // Calculate total spent
-      const actual = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+      const actual = transactions.reduce(
+        (sum, t) => sum + ((t as any).amount || 0),
+        0
+      );
 
       return {
         name: budget.name,

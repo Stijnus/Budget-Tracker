@@ -16,10 +16,10 @@ export const useCategories = () => {
       try {
         const { data: categories, error } = await supabase
           .from("categories")
-          .select("Id, name");
+          .select("id, name");
 
         if (error) throw error;
-        setData(categories);
+        setData(categories as Category[]);
       } catch (err) {
         setError(
           err instanceof Error ? err : new Error("Failed to fetch categories")

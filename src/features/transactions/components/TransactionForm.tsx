@@ -145,7 +145,7 @@ export function TransactionForm({
     }
 
     fetchData();
-  }, [user, bankAccountId, transaction?.bank_account_id, t]);
+  }, [user, bankAccountId, transaction?.bank_account_id]);
 
   // Filter categories based on transaction type
   const filteredCategories = categories.filter(
@@ -314,14 +314,10 @@ export function TransactionForm({
             <Label htmlFor="category">{"Category"}</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger id="category">
-                <SelectValue
-                  placeholder={"Placeholder"}
-                />
+                <SelectValue placeholder={"Placeholder"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">
-                  {"None"}
-                </SelectItem>
+                <SelectItem value="none">{"None"}</SelectItem>
                 {filteredCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
@@ -336,19 +332,13 @@ export function TransactionForm({
             <Label htmlFor="bankAccount">{"BankAccount"}</Label>
             <Select value={bankAccountId} onValueChange={setBankAccountId}>
               <SelectTrigger id="bankAccount">
-                <SelectValue
-                  placeholder={"Placeholder"}
-                />
+                <SelectValue placeholder={"Placeholder"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">
-                  {"None"}
-                </SelectItem>
+                <SelectItem value="none">{"None"}</SelectItem>
                 {bankAccounts.map((account) => (
                   <SelectItem key={account.id} value={account.id}>
-                    {account.name}{" "}
-                    {account.is_default &&
-                      "Default"}
+                    {account.name} {account.is_default && "Default"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -357,37 +347,21 @@ export function TransactionForm({
 
           {/* Payment Method */}
           <div className="space-y-2">
-            <Label htmlFor="paymentMethod">
-              {"PaymentMethod"}
-            </Label>
+            <Label htmlFor="paymentMethod">{"PaymentMethod"}</Label>
             <Select value={paymentMethod} onValueChange={setPaymentMethod}>
               <SelectTrigger id="paymentMethod">
-                <SelectValue
-                  placeholder={"Placeholder"}
-                />
+                <SelectValue placeholder={"Placeholder"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">
-                  {"None"}
-                </SelectItem>
-                <SelectItem value="cash">
-                  {"Cash"}
-                </SelectItem>
-                <SelectItem value="credit_card">
-                  {"CreditCard"}
-                </SelectItem>
-                <SelectItem value="debit_card">
-                  {"DebitCard"}
-                </SelectItem>
-                <SelectItem value="bank_transfer">
-                  {"BankTransfer"}
-                </SelectItem>
+                <SelectItem value="none">{"None"}</SelectItem>
+                <SelectItem value="cash">{"Cash"}</SelectItem>
+                <SelectItem value="credit_card">{"CreditCard"}</SelectItem>
+                <SelectItem value="debit_card">{"DebitCard"}</SelectItem>
+                <SelectItem value="bank_transfer">{"BankTransfer"}</SelectItem>
                 <SelectItem value="mobile_payment">
                   {"MobilePayment"}
                 </SelectItem>
-                <SelectItem value="other">
-                  {"Other"}
-                </SelectItem>
+                <SelectItem value="other">{"Other"}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -402,20 +376,12 @@ export function TransactionForm({
               }
             >
               <SelectTrigger id="status">
-                <SelectValue
-                  placeholder={"Placeholder"}
-                />
+                <SelectValue placeholder={"Placeholder"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="completed">
-                  {"Completed"}
-                </SelectItem>
-                <SelectItem value="pending">
-                  {"Pending"}
-                </SelectItem>
-                <SelectItem value="cancelled">
-                  {"Cancelled"}
-                </SelectItem>
+                <SelectItem value="completed">{"Completed"}</SelectItem>
+                <SelectItem value="pending">{"Pending"}</SelectItem>
+                <SelectItem value="cancelled">{"Cancelled"}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -452,7 +418,7 @@ export function TransactionForm({
                 ? "Saving"
                 : transaction
                 ? "Update"
-                : t("transactions.add")}
+                : "Add Transaction"}
             </Button>
           </div>
         </form>

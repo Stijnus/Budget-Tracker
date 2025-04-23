@@ -79,7 +79,10 @@ export async function getCurrentBudgets() {
       }
 
       // Calculate total spent
-      const spent = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+      const spent = transactions.reduce(
+        (sum, t) => sum + ((t as any).amount || 0),
+        0
+      );
 
       return {
         ...budget,

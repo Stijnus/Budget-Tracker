@@ -460,7 +460,7 @@ export function GroupPage() {
               {group.name}
               {!group.is_active && (
                 <Badge variant="outline" className="ml-2">
-                  {"Inactive" || "Inactive"}
+                  Inactive
                 </Badge>
               )}
             </h1>
