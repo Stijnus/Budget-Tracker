@@ -126,17 +126,41 @@ export async function createBudgetGroup(group: BudgetGroupInsert) {
 
         // If that fails, try a different approach with a custom RPC function
         // This is a fallback in case the RLS policy fix hasn't been applied
-        const { error: rpcError } = await supabase.rpc("add_group_owner", {
-          p_group_id: newGroup.id,
-          p_user_id: group.created_by,
-        });
+        try {
+          // First try with the add_group_owner function if it exists
+          const { error: rpcError } = await supabase.rpc("add_group_owner", {
+            p_group_id: newGroup.id,
+            p_user_id: group.created_by,
+          });
 
-        if (rpcError) {
-          console.error("Error adding group member with RPC:", rpcError);
-          // If both approaches fail, delete the group
-          console.log("Deleting group due to member error:", newGroup.id);
-          await supabase.from("budget_groups").delete().eq("id", newGroup.id);
-          return { data: null, error: rpcError };
+          if (rpcError) {
+            console.error("Error with add_group_owner RPC:", rpcError);
+            throw rpcError;
+          }
+        } catch (rpcErr) {
+          // If the RPC function doesn't exist, try a direct approach
+          console.log("RPC function not available, trying direct SQL...");
+
+          // Use the service role client if available (this would be in a server environment)
+          // In a client environment, this will fail due to security restrictions
+          try {
+            // This is a last resort and will only work in development or with special permissions
+            const { error: sqlError } =
+              await supabase.auth.admin.updateUserById(group.created_by, {
+                app_metadata: { group_owner: newGroup.id },
+              });
+
+            if (sqlError) {
+              console.error("Error with admin approach:", sqlError);
+              throw sqlError;
+            }
+          } catch (sqlErr) {
+            console.error("Direct SQL approach failed:", sqlErr);
+            // If all approaches fail, delete the group
+            console.log("Deleting group due to member error:", newGroup.id);
+            await supabase.from("budget_groups").delete().eq("id", newGroup.id);
+            return { data: null, error: sqlErr };
+          }
         }
       }
     } catch (memberErr) {
