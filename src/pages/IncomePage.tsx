@@ -5,7 +5,8 @@ import { TransactionFilters } from "../features/transactions/components/Transact
 import { formatDate } from "../utils/formatters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpCircle, CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowUpCircle, CalendarIcon, Plus } from "lucide-react";
 
 export function IncomePage() {
   const [filters, setFilters] = useState<TransactionFilters>({
