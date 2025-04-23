@@ -34,9 +34,43 @@ import {
   calculateGroupBudgetProgress,
 } from "../../../api/supabase/groupBudgets";
 
+interface GroupBudget {
+  id: string;
+  group_id: string;
+  created_by: string;
+  category_id: string;
+  name: string;
+  amount: number;
+  period: "daily" | "weekly" | "monthly" | "yearly";
+  start_date: string;
+  end_date: string | null;
+  created_at: string;
+  updated_at: string;
+  category?: {
+    id: string;
+    name: string;
+    type: string;
+    color?: string;
+  };
+  creator?: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
+}
+
+interface BudgetProgress {
+  budgetAmount: number;
+  spentAmount: number;
+  progressPercentage: number;
+  isOverBudget: boolean;
+}
+
 interface GroupBudgetsProps {
   groupId: string;
-  budgets: any[];
+  budgets: GroupBudget[];
   userRole: string;
   onChange: () => void;
 }
@@ -51,14 +85,18 @@ export function GroupBudgets({
   const { user } = useAuth();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedBudget, setSelectedBudget] = useState<any>(null);
-  const [budgetProgress, setBudgetProgress] = useState<Record<string, any>>({});
+  const [selectedBudget, setSelectedBudget] = useState<GroupBudget | null>(
+    null
+  );
+  const [budgetProgress, setBudgetProgress] = useState<
+    Record<string, BudgetProgress>
+  >({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const canCreateBudget =
     userRole === "owner" || userRole === "admin" || userRole === "member";
-  const canEditBudget = (budget: any) => {
+  const canEditBudget = (budget: GroupBudget) => {
     return (
       userRole === "owner" ||
       userRole === "admin" ||
@@ -66,7 +104,7 @@ export function GroupBudgets({
     );
   };
 
-  const handleOpenForm = (budget?: any) => {
+  const handleOpenForm = (budget?: GroupBudget) => {
     setSelectedBudget(budget || null);
     setIsFormDialogOpen(true);
   };
@@ -251,13 +289,16 @@ export function GroupBudgets({
 
                     <div className="flex items-center gap-2 text-sm">
                       <Avatar className="h-6 w-6">
-                        <AvatarImage
-                          src={budget.creator?.user_profiles?.avatar_url}
-                          alt={
-                            budget.creator?.user_profiles?.full_name ||
-                            budget.creator?.id
-                          }
-                        />
+                        {budget.creator?.user_profiles?.avatar_url && (
+                          <AvatarImage
+                            src={budget.creator.user_profiles.avatar_url}
+                            alt={
+                              budget.creator?.user_profiles?.full_name ||
+                              budget.creator?.id ||
+                              ""
+                            }
+                          />
+                        )}
                         <AvatarFallback>
                           {(
                             budget.creator?.user_profiles?.full_name ||

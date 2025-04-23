@@ -27,9 +27,28 @@ import {
   updateGroupBudget,
 } from "../../../api/supabase/groupBudgets";
 
+interface GroupBudget {
+  id: string;
+  group_id: string;
+  created_by: string;
+  category_id: string;
+  name: string;
+  amount: number;
+  period: "daily" | "weekly" | "monthly" | "yearly";
+  start_date: string;
+  end_date: string | null;
+  created_at: string;
+  updated_at: string;
+  category?: {
+    id: string;
+    name: string;
+    type: string;
+  };
+}
+
 interface GroupBudgetFormProps {
   groupId: string;
-  budget?: any;
+  budget?: GroupBudget;
   onSuccess: () => void;
 }
 
@@ -122,7 +141,7 @@ export function GroupBudgetForm({
       setError(
         typeof err === "string"
           ? err
-          : (err as any).message || "Failed to save budget"
+          : (err as Error).message || "Failed to save budget"
       );
     } finally {
       setIsLoading(false);
@@ -194,7 +213,9 @@ export function GroupBudgetForm({
           <Label htmlFor="period">{t("groups.period")}</Label>
           <Select
             value={period}
-            onValueChange={(value) => setPeriod(value as any)}
+            onValueChange={(value) =>
+              setPeriod(value as "daily" | "weekly" | "monthly" | "yearly")
+            }
           >
             <SelectTrigger id="period">
               <SelectValue placeholder={t("groups.selectPeriod")} />

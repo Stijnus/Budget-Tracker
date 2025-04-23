@@ -29,9 +29,20 @@ import {
 } from "../../../api/supabase/budgetGroups";
 import { Trash2 } from "lucide-react";
 
+interface Group {
+  id: string;
+  name: string;
+  description: string | null;
+  avatar_url: string | null;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface GroupSettingsProps {
-  group: any;
-  onUpdateGroup: (group: any) => void;
+  group: Group;
+  onUpdateGroup: (group: Group) => void;
 }
 
 export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {

@@ -17,12 +17,32 @@ import {
   Edit,
 } from "lucide-react";
 
+interface GroupActivity {
+  id: string;
+  group_id: string;
+  user_id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  details: Record<string, unknown>;
+  created_at: string;
+  user?: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
+}
+
 interface GroupActivityFeedProps {
-  groupId: string;
-  activity: any[];
+  groupId: string; // Not used but kept for API consistency
+  activity: GroupActivity[];
 }
 
 export function GroupActivityFeed({
+  // groupId is not used but kept for API consistency
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   groupId,
   activity,
 }: GroupActivityFeedProps) {
@@ -58,7 +78,7 @@ export function GroupActivityFeed({
     return <Activity className="h-4 w-4" />;
   };
 
-  const getActivityMessage = (item: any) => {
+  const getActivityMessage = (item: GroupActivity) => {
     const { action, entity_type, details } = item;
 
     // Format user name
@@ -150,10 +170,16 @@ export function GroupActivityFeed({
               <div key={item.id} className="flex">
                 <div className="mr-4 flex flex-col items-center">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage
-                      src={item.user?.user_profiles?.avatar_url}
-                      alt={item.user?.user_profiles?.full_name || item.user?.id}
-                    />
+                    {item.user?.user_profiles?.avatar_url && (
+                      <AvatarImage
+                        src={item.user.user_profiles.avatar_url}
+                        alt={
+                          item.user?.user_profiles?.full_name ||
+                          item.user?.id ||
+                          ""
+                        }
+                      />
+                    )}
                     <AvatarFallback>
                       {(
                         item.user?.user_profiles?.full_name ||

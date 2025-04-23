@@ -13,8 +13,17 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, ArrowRight } from "lucide-react";
 
+interface Group {
+  id: string;
+  name: string;
+  description: string | null;
+  avatar_url: string | null;
+  is_active: boolean;
+  role: string;
+}
+
 interface GroupListProps {
-  groups: any[];
+  groups: Group[];
 }
 
 export function GroupList({ groups }: GroupListProps) {
@@ -29,7 +38,9 @@ export function GroupList({ groups }: GroupListProps) {
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-2">
                 <Avatar>
-                  <AvatarImage src={group.avatar_url} alt={group.name} />
+                  {group.avatar_url && (
+                    <AvatarImage src={group.avatar_url} alt={group.name} />
+                  )}
                   <AvatarFallback>
                     {group.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>

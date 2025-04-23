@@ -29,9 +29,30 @@ import {
   updateGroupTransaction,
 } from "../../../api/supabase/groupTransactions";
 
+interface GroupTransaction {
+  id: string;
+  group_id: string;
+  created_by: string;
+  category_id: string | null;
+  amount: number;
+  description: string | null;
+  date: string;
+  type: "expense" | "income";
+  payment_method: string | null;
+  status: "pending" | "completed" | "cancelled";
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  category?: {
+    id: string;
+    name: string;
+    type: string;
+  } | null;
+}
+
 interface GroupTransactionFormProps {
   groupId: string;
-  transaction?: any;
+  transaction?: GroupTransaction;
   onSuccess: () => void;
 }
 
@@ -134,7 +155,7 @@ export function GroupTransactionForm({
       setError(
         typeof err === "string"
           ? err
-          : (err as any).message || "Failed to save transaction"
+          : (err as Error).message || "Failed to save transaction"
       );
     } finally {
       setIsLoading(false);
@@ -290,7 +311,9 @@ export function GroupTransactionForm({
           <Label htmlFor="status">{t("groups.status")}</Label>
           <Select
             value={status}
-            onValueChange={(value) => setStatus(value as any)}
+            onValueChange={(value) =>
+              setStatus(value as "pending" | "completed" | "cancelled")
+            }
           >
             <SelectTrigger id="status">
               <SelectValue placeholder={t("groups.selectStatus")} />

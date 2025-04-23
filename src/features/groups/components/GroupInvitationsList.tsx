@@ -19,8 +19,34 @@ import {
 } from "../../../api/supabase/budgetGroups";
 import { Check, X, Clock } from "lucide-react";
 
+interface Invitation {
+  id: string;
+  group_id: string;
+  email: string;
+  role: "admin" | "member" | "viewer";
+  token: string;
+  status: "pending" | "accepted" | "rejected" | "expired";
+  invited_by: string;
+  expires_at: string;
+  created_at: string;
+  updated_at?: string;
+  group?: {
+    id: string;
+    name: string;
+    description: string | null;
+    avatar_url: string | null;
+  };
+  inviter?: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
+}
+
 interface GroupInvitationsListProps {
-  invitations: any[];
+  invitations: Invitation[];
   onAccept: () => void;
 }
 
@@ -96,10 +122,12 @@ export function GroupInvitationsList({
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-2">
                 <Avatar>
-                  <AvatarImage
-                    src={invitation.group?.avatar_url}
-                    alt={invitation.group?.name}
-                  />
+                  {invitation.group?.avatar_url && (
+                    <AvatarImage
+                      src={invitation.group.avatar_url}
+                      alt={invitation.group?.name || ""}
+                    />
+                  )}
                   <AvatarFallback>
                     {invitation.group?.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
