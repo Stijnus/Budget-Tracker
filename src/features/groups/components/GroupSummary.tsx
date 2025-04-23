@@ -1,25 +1,65 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getBudgetGroups, getGroupActivity } from "../../../api/supabase/budgetGroups";
+import {
+  getBudgetGroups,
+  getGroupActivity,
+} from "../../../api/supabase/budgetGroups";
 import { formatDate } from "../../../utils/formatters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Loader2, ArrowRight, Users, Activity } from "lucide-react";
+import { AlertCircle, ArrowRight, Users, Activity } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface GroupSummaryProps {
   limit?: number;
 }
 
+interface GroupData {
+  id: string;
+  name: string;
+  description: string | null;
+  avatar_url: string | null;
+  is_active: boolean;
+  created_by: string;
+  updated_at: string;
+  created_at: string;
+  role?: string;
+}
+
+interface ActivityData {
+  id: string;
+  group_id: string;
+  user_id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  details: {
+    type?: string;
+    name?: string;
+    user_id?: string;
+    group_name?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  };
+  created_at: string;
+  user?: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
+}
+
 export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [groups, setGroups] = useState<any[]>([]);
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [groups, setGroups] = useState<GroupData[]>([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,8 +74,10 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
         }
 
         // Sort groups by most recently updated
-        const sortedGroups = (data || []).sort((a: any, b: any) => {
-          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+        const sortedGroups = (data || []).sort((a: GroupData, b: GroupData) => {
+          return (
+            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+          );
         });
 
         // Limit the number of groups to display
@@ -60,13 +102,13 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
   async function fetchGroupActivity(groupId: string) {
     try {
       const { data, error } = await getGroupActivity(groupId, 3);
-      
+
       if (error) {
         console.warn("Error fetching group activity:", error);
         return;
       }
-      
-      setRecentActivity(data || []);
+
+      setRecentActivity((data || []) as ActivityData[]);
     } catch (err) {
       console.warn("Error fetching group activity:", err);
     }
@@ -177,19 +219,28 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
           <Card>
             <CardContent className="p-4 space-y-4">
               {recentActivity.map((item) => {
-                const userName = item.user?.user_profiles?.full_name || item.user?.id || "Unknown user";
+                const userName =
+                  item.user?.user_profiles?.full_name ||
+                  item.user?.id ||
+                  "Unknown user";
                 let message = "";
-                
+
                 if (item.entity_type === "transaction") {
-                  message = `${userName} ${item.action} a ${item.details?.type || ""} transaction`;
+                  message = `${userName} ${item.action} a ${
+                    item.details?.type || ""
+                  } transaction`;
                 } else if (item.entity_type === "budget") {
-                  message = `${userName} ${item.action} a budget "${item.details?.name || ""}"`;
+                  message = `${userName} ${item.action} a budget "${
+                    item.details?.name || ""
+                  }"`;
                 } else if (item.entity_type === "member") {
-                  message = `${userName} ${item.action.replace("_", " ")} ${item.details?.user_id || ""}`;
+                  message = `${userName} ${item.action.replace("_", " ")} ${
+                    item.details?.user_id || ""
+                  }`;
                 } else {
                   message = `${userName} ${item.action} a ${item.entity_type}`;
                 }
-                
+
                 return (
                   <div key={item.id} className="flex items-start gap-3">
                     <Avatar className="h-8 w-8">
@@ -206,7 +257,7 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
                     <div className="flex-1">
                       <p className="text-sm">{message}</p>
                       <p className="text-xs text-muted-foreground">
-                        {formatDate(new Date(item.created_at), "relative")}
+                        {formatDate(new Date(item.created_at), "short")}
                       </p>
                     </div>
                   </div>
