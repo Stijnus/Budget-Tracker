@@ -8,7 +8,7 @@ import { BudgetSummary } from "../features/budgets/components/BudgetSummary";
 import { SpendingSummary } from "../features/dashboard/components/SpendingSummary";
 import { BillReminders } from "../features/bills/components/BillReminders";
 import { GoalsList } from "../features/goals/components/GoalsList";
-import { GroupSummary } from "../features/groups/components/GroupSummary";
+// GroupSummary import removed
 import { ExpenseCategoryChart } from "../features/analytics/components/ExpenseCategoryChart";
 import { formatDate } from "../utils/formatters";
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,7 @@ export function DashboardPage() {
             onValueChange={setActiveTab}
             className="w-full sm:w-auto"
           >
-            <TabsList className="grid grid-cols-4 w-full sm:w-auto">
+            <TabsList className="grid grid-cols-3 w-full sm:w-auto">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
                 <span className="hidden sm:inline">Overview</span>
@@ -76,10 +76,6 @@ export function DashboardPage() {
               <TabsTrigger value="finances" className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
                 <span className="hidden sm:inline">Finances</span>
-              </TabsTrigger>
-              <TabsTrigger value="groups" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Budget Groups</span>
               </TabsTrigger>
               <TabsTrigger value="goals" className="flex items-center gap-2">
                 <Target className="h-4 w-4" />
@@ -97,7 +93,7 @@ export function DashboardPage() {
               {/* Monthly spending summary */}
               <SpendingSummary />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Bill reminders */}
                 <Card className="md:col-span-1">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -142,30 +138,10 @@ export function DashboardPage() {
                   </CardContent>
                 </Card>
 
-                {/* Group summary */}
-                <Card className="md:col-span-1">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-lg flex items-center">
-                      <Users className="mr-2 h-5 w-5" />
-                      Budget Groups
-                    </CardTitle>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1"
-                      onClick={() => (window.location.href = "/groups")}
-                    >
-                      View All
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    <GroupSummary limit={1} />
-                  </CardContent>
-                </Card>
+                {/* Budget Groups card removed */}
 
                 {/* Expense categories */}
-                <Card className="md:col-span-2 lg:col-span-1">
+                <Card className="md:col-span-1">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
                       <PieChart className="mr-2 h-5 w-5" />
@@ -315,54 +291,7 @@ export function DashboardPage() {
             </div>
           )}
 
-          {/* Groups Tab */}
-          {activeTab === "groups" && (
-            <div className="space-y-6">
-              {/* Group summary */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <Users className="mr-2 h-5 w-5" />
-                    My Groups
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1"
-                    onClick={() => (window.location.href = "/groups")}
-                  >
-                    View All
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <GroupSummary limit={5} />
-                </CardContent>
-              </Card>
-
-              {/* Recent transactions */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Recent Transactions
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1"
-                    onClick={() => (window.location.href = "/transactions")}
-                  >
-                    View All
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <TransactionList limit={5} showAddButton={true} />
-                </CardContent>
-              </Card>
-            </div>
-          )}
+          {/* Groups Tab removed */}
 
           {/* Goals Tab */}
           {activeTab === "goals" && (
