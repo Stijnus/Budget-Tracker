@@ -8,12 +8,27 @@ import { GroupMembers } from "../features/groups/components/GroupMembers";
 import { GroupActivityFeed } from "../features/groups/components/GroupActivityFeed";
 import { formatDate } from "../utils/formatters";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   LayoutDashboard,
   CreditCard,
@@ -170,18 +185,21 @@ export function GroupDashboardPage() {
         }
 
         // Sort groups by most recently updated
-        const sortedGroups = (data || []).sort((a: BudgetGroup, b: BudgetGroup) => {
-          return (
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-          );
-        });
+        const sortedGroups = (data || []).sort(
+          (a: BudgetGroup, b: BudgetGroup) => {
+            return (
+              new Date(b.updated_at).getTime() -
+              new Date(a.updated_at).getTime()
+            );
+          }
+        );
 
         setGroups(sortedGroups);
 
         // If id is provided in URL, use that as selected group
         if (id) {
           setSelectedGroupId(id);
-        } 
+        }
         // Otherwise use the first group if available
         else if (sortedGroups.length > 0) {
           setSelectedGroupId(sortedGroups[0].id);
@@ -208,7 +226,9 @@ export function GroupDashboardPage() {
       try {
         // Fetch group details
         console.log("Fetching group details for ID:", selectedGroupId);
-        const { data: groupData, error: groupError } = await getBudgetGroup(selectedGroupId);
+        const { data: groupData, error: groupError } = await getBudgetGroup(
+          selectedGroupId
+        );
 
         if (groupError) {
           console.error("Error fetching group details:", groupError);
@@ -345,7 +365,7 @@ export function GroupDashboardPage() {
 
   const handleTransactionChange = async () => {
     if (!selectedGroupId) return;
-    
+
     try {
       // Refresh transactions
       const { data: transactionsData, error: transactionsError } =
@@ -390,7 +410,7 @@ export function GroupDashboardPage() {
 
   const handleBudgetChange = async () => {
     if (!selectedGroupId) return;
-    
+
     try {
       // Refresh budgets
       const { data: budgetsData, error: budgetsError } = await getGroupBudgets(
@@ -457,19 +477,26 @@ export function GroupDashboardPage() {
       <AppLayout>
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold tracking-tight">Household Dashboard</h1>
-            <Button onClick={() => navigate("/dashboard")} variant="outline" className="gap-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Household Dashboard
+            </h1>
+            <Button
+              onClick={() => navigate("/dashboard")}
+              variant="outline"
+              className="gap-2"
+            >
               <Home className="h-4 w-4" />
               Personal Dashboard
             </Button>
           </div>
-          
+
           <Card className="p-6 text-center">
             <div className="flex flex-col items-center justify-center space-y-4 py-8">
               <Users className="h-12 w-12 text-muted-foreground" />
               <h2 className="text-2xl font-semibold">No Budget Groups Found</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
-                You don't have any budget groups yet. Create a group to start managing household finances together.
+                You don't have any budget groups yet. Create a group to start
+                managing household finances together.
               </p>
               <Button onClick={() => navigate("/groups/new")} size="lg">
                 Create a Budget Group
@@ -486,19 +513,27 @@ export function GroupDashboardPage() {
       <AppLayout>
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold tracking-tight">Household Dashboard</h1>
-            <Button onClick={() => navigate("/dashboard")} variant="outline" className="gap-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Household Dashboard
+            </h1>
+            <Button
+              onClick={() => navigate("/dashboard")}
+              variant="outline"
+              className="gap-2"
+            >
               <Home className="h-4 w-4" />
               Personal Dashboard
             </Button>
           </div>
-          
+
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error || "Failed to load group data"}</AlertDescription>
+            <AlertDescription>
+              {error || "Failed to load group data"}
+            </AlertDescription>
           </Alert>
-          
+
           <Button onClick={() => navigate("/groups")}>View All Groups</Button>
         </div>
       </AppLayout>
@@ -511,28 +546,46 @@ export function GroupDashboardPage() {
         {/* Header with group selector and tabs */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-10 w-10">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-12 w-12 border-2 border-primary/20">
                 {group.avatar_url && (
                   <AvatarImage src={group.avatar_url} alt={group.name} />
                 )}
-                <AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-bold">
                   {group.name.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <div className="flex items-center gap-2">
-                  <select 
-                    className="text-xl font-bold bg-transparent border-none focus:outline-none focus:ring-0 p-0 -ml-1"
+                  <Select
                     value={selectedGroupId || ""}
-                    onChange={(e) => handleGroupChange(e.target.value)}
+                    onValueChange={handleGroupChange}
                   >
-                    {groups.map((g) => (
-                      <option key={g.id} value={g.id}>
-                        {g.name}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-[200px] border-none shadow-none p-0 h-auto text-xl font-bold focus:ring-0">
+                      <SelectValue placeholder="Select a group" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {groups.map((g) => (
+                        <SelectItem
+                          key={g.id}
+                          value={g.id}
+                          className="flex items-center gap-2"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-6 w-6">
+                              {g.avatar_url && (
+                                <AvatarImage src={g.avatar_url} alt={g.name} />
+                              )}
+                              <AvatarFallback>
+                                {g.name.substring(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{g.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   {userRole && (
                     <Badge variant="secondary" className="ml-1">
                       {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
@@ -547,11 +600,19 @@ export function GroupDashboardPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={() => navigate(`/groups/${selectedGroupId}`)} variant="outline" className="gap-2">
+            <Button
+              onClick={() => navigate(`/groups/${selectedGroupId}`)}
+              variant="outline"
+              className="gap-2"
+            >
               <Settings className="h-4 w-4" />
               Group Settings
             </Button>
-            <Button onClick={() => navigate("/dashboard")} variant="outline" className="gap-2">
+            <Button
+              onClick={() => navigate("/dashboard")}
+              variant="outline"
+              className="gap-2"
+            >
               <Home className="h-4 w-4" />
               Personal Dashboard
             </Button>
@@ -559,17 +620,16 @@ export function GroupDashboardPage() {
         </div>
 
         {/* Dashboard tabs */}
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-4 w-full sm:w-auto">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <LayoutDashboard className="h-4 w-4" />
               <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="transactions" className="flex items-center gap-2">
+            <TabsTrigger
+              value="transactions"
+              className="flex items-center gap-2"
+            >
               <CreditCard className="h-4 w-4" />
               <span className="hidden sm:inline">Transactions</span>
             </TabsTrigger>
@@ -587,35 +647,57 @@ export function GroupDashboardPage() {
         {/* Financial summary */}
         {summary && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
                   Total Income
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-2">
                 <div className="text-2xl font-bold text-green-500">
                   ${summary.totalIncome.toFixed(2)}
                 </div>
+                <div className="mt-2">
+                  <Progress
+                    value={summary.totalIncome > 0 ? 100 : 0}
+                    className="h-2 bg-green-100"
+                    indicatorClassName="bg-green-500"
+                  />
+                </div>
               </CardContent>
+              <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3 mr-1" />
+                Current month
+              </CardFooter>
             </Card>
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
                   Total Expenses
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-2">
                 <div className="text-2xl font-bold text-red-500">
                   ${summary.totalExpenses.toFixed(2)}
                 </div>
+                <div className="mt-2">
+                  <Progress
+                    value={summary.totalExpenses > 0 ? 100 : 0}
+                    className="h-2 bg-red-100"
+                    indicatorClassName="bg-red-500"
+                  />
+                </div>
               </CardContent>
+              <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3 mr-1" />
+                Current month
+              </CardFooter>
             </Card>
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Balance</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-2">
                 <div
                   className={`text-2xl font-bold ${
                     summary.balance >= 0 ? "text-green-500" : "text-red-500"
@@ -623,7 +705,37 @@ export function GroupDashboardPage() {
                 >
                   ${summary.balance.toFixed(2)}
                 </div>
+                <div className="mt-2">
+                  {summary.totalIncome > 0 && (
+                    <Progress
+                      value={Math.min(
+                        100,
+                        (summary.balance / summary.totalIncome) * 100
+                      )}
+                      className="h-2 bg-gray-100"
+                      indicatorClassName={
+                        summary.balance >= 0 ? "bg-green-500" : "bg-red-500"
+                      }
+                    />
+                  )}
+                </div>
               </CardContent>
+              <CardFooter className="pt-0 pb-3 text-xs text-muted-foreground flex justify-between">
+                <div>
+                  <Calendar className="h-3 w-3 mr-1 inline" />
+                  Current month
+                </div>
+                <div>
+                  {summary.totalIncome > 0 && (
+                    <span>
+                      {Math.round(
+                        (summary.balance / summary.totalIncome) * 100
+                      )}
+                      % of income
+                    </span>
+                  )}
+                </div>
+              </CardFooter>
             </Card>
           </div>
         )}
@@ -729,9 +841,9 @@ export function GroupDashboardPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <GroupActivityFeed 
-                      groupId={selectedGroupId || ""} 
-                      activity={activity.slice(0, 5)} 
+                    <GroupActivityFeed
+                      groupId={selectedGroupId || ""}
+                      activity={activity.slice(0, 5)}
                       compact={true}
                     />
                   </CardContent>

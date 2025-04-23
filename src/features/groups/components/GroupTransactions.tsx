@@ -65,6 +65,7 @@ interface GroupTransactionsProps {
   transactions: GroupTransaction[];
   userRole: string;
   onChange: () => void;
+  compact?: boolean;
 }
 
 export function GroupTransactions({
@@ -72,6 +73,7 @@ export function GroupTransactions({
   transactions,
   userRole,
   onChange,
+  compact = false,
 }: GroupTransactionsProps) {
   // Translation hooks removed
   const { user } = useAuth();
@@ -140,15 +142,17 @@ export function GroupTransactions({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Transactions</h2>
-        {canCreateTransaction && (
-          <Button onClick={() => handleOpenForm()}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Transaction
-          </Button>
-        )}
-      </div>
+      {!compact && (
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">Transactions</h2>
+          {canCreateTransaction && (
+            <Button onClick={() => handleOpenForm()}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Transaction
+            </Button>
+          )}
+        </div>
+      )}
 
       {error && (
         <Alert variant="destructive">
@@ -176,10 +180,12 @@ export function GroupTransactions({
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
+                  {!compact && <TableHead>Category</TableHead>}
                   <TableHead>Amount</TableHead>
-                  <TableHead>Created By</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  {!compact && <TableHead>Created By</TableHead>}
+                  {!compact && (
+                    <TableHead className="text-right">Actions</TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -198,26 +204,28 @@ export function GroupTransactions({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      {transaction.category ? (
-                        <Badge
-                          variant="outline"
-                          style={{
-                            backgroundColor: transaction.category.color
-                              ? `${transaction.category.color}20`
-                              : undefined,
-                            color: transaction.category.color,
-                            borderColor: transaction.category.color,
-                          }}
-                        >
-                          {transaction.category.name}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">
-                          Uncategorized
-                        </span>
-                      )}
-                    </TableCell>
+                    {!compact && (
+                      <TableCell>
+                        {transaction.category ? (
+                          <Badge
+                            variant="outline"
+                            style={{
+                              backgroundColor: transaction.category.color
+                                ? `${transaction.category.color}20`
+                                : undefined,
+                              color: transaction.category.color,
+                              borderColor: transaction.category.color,
+                            }}
+                          >
+                            {transaction.category.name}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            Uncategorized
+                          </span>
+                        )}
+                      </TableCell>
+                    )}
                     <TableCell
                       className={
                         transaction.type === "expense"
@@ -228,65 +236,72 @@ export function GroupTransactions({
                       {transaction.type === "expense" ? "-" : "+"}
                       {formatCurrency(transaction.amount)}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                          {transaction.creator?.user_profiles?.avatar_url && (
-                            <AvatarImage
-                              src={transaction.creator.user_profiles.avatar_url}
-                              alt={
+                    {!compact && (
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-6 w-6">
+                            {transaction.creator?.user_profiles?.avatar_url && (
+                              <AvatarImage
+                                src={
+                                  transaction.creator.user_profiles.avatar_url
+                                }
+                                alt={
+                                  transaction.creator?.user_profiles
+                                    ?.full_name ||
+                                  transaction.creator?.id ||
+                                  ""
+                                }
+                              />
+                            )}
+                            <AvatarFallback>
+                              {(
                                 transaction.creator?.user_profiles?.full_name ||
                                 transaction.creator?.id ||
                                 ""
-                              }
-                            />
-                          )}
-                          <AvatarFallback>
-                            {(
-                              transaction.creator?.user_profiles?.full_name ||
-                              transaction.creator?.id ||
-                              ""
-                            )
-                              .substring(0, 2)
-                              .toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm truncate max-w-[100px]">
-                          {transaction.creator?.user_profiles?.full_name ||
-                            transaction.creator?.id}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {canEditTransaction(transaction) && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Actions</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleOpenForm(transaction)}
-                            >
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedTransaction(transaction);
-                                setIsDeleteDialogOpen(true);
-                              }}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </TableCell>
+                              )
+                                .substring(0, 2)
+                                .toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm truncate max-w-[100px]">
+                            {transaction.creator?.user_profiles?.full_name ||
+                              transaction.creator?.id}
+                          </span>
+                        </div>
+                      </TableCell>
+                    )}
+                    {!compact && (
+                      <TableCell className="text-right">
+                        {canEditTransaction(transaction) && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Actions</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleOpenForm(transaction)}
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedTransaction(transaction);
+                                  setIsDeleteDialogOpen(true);
+                                }}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
