@@ -5,7 +5,14 @@ import { useTheme } from "../../../providers/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle, Sun, Moon, Laptop } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle,
+  Sun,
+  Moon,
+  Laptop,
+  Palette,
+} from "lucide-react";
 import {
   Card,
   CardContent,

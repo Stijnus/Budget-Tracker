@@ -4,7 +4,7 @@ import { updateUserSettings } from "../../../api/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, CreditCard } from "lucide-react";
 import {
   Select,
   SelectContent,
