@@ -40,12 +40,9 @@ interface GroupActivityFeedProps {
   activity: GroupActivity[];
 }
 
-export function GroupActivityFeed({
+export function GroupActivityFeed(props: GroupActivityFeedProps) {
+  const { activity } = props;
   // groupId is not used but kept for API consistency
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  groupId,
-  activity,
-}: GroupActivityFeedProps) {
   const { t } = useTranslation();
 
   const formatDate = (dateString: string) => {

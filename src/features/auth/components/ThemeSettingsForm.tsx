@@ -52,7 +52,7 @@ export function ThemeSettingsForm() {
   // Initialize form with user settings
   useEffect(() => {
     if (userSettings) {
-      setTheme(userSettings.theme || "light");
+      setTheme((userSettings.theme || "light") as "light" | "dark" | "system");
     }
   }, [userSettings]);
 

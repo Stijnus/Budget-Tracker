@@ -68,7 +68,7 @@ export function InviteMemberDialog({
         invited_by: user.id,
         email,
         role,
-        status: "pending",
+        status: "pending" as "pending" | "accepted" | "rejected" | "expired",
         expires_at: expiresAt.toISOString(),
         // Include family role metadata if this is a family invitation
         metadata:

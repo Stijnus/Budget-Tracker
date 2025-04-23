@@ -67,6 +67,8 @@ export const translations = {
       "dashboard.billReminders": "Bill Reminders",
       "dashboard.budgetProgress": "Budget Progress",
       "dashboard.expenseCategories": "Expense Categories",
+      "dashboard.groups": "Budget Groups",
+      "dashboard.groupActivity": "Group Activity",
       "common.user": "User",
       "common.viewAll": "View All",
 
@@ -254,6 +256,8 @@ export const translations = {
       "dashboard.billReminders": "Betalingsherinneringen",
       "dashboard.budgetProgress": "Budget Voortgang",
       "dashboard.expenseCategories": "Uitgavencategorieën",
+      "dashboard.groups": "Budgetgroepen",
+      "dashboard.groupActivity": "Groepsactiviteit",
       "common.user": "Gebruiker",
       "common.viewAll": "Bekijk Alles",
 
@@ -446,6 +450,8 @@ export const translations = {
       "dashboard.billReminders": "Rappels de factures",
       "dashboard.budgetProgress": "Progression du budget",
       "dashboard.expenseCategories": "Catégories de dépenses",
+      "dashboard.groups": "Groupes de Budget",
+      "dashboard.groupActivity": "Activité de Groupe",
       "common.user": "Utilisateur",
       "common.viewAll": "Voir tout",
 

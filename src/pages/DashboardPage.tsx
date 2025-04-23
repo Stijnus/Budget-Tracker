@@ -7,6 +7,7 @@ import { BudgetSummary } from "../features/budgets/components/BudgetSummary";
 import { SpendingSummary } from "../features/dashboard/components/SpendingSummary";
 import { BillReminders } from "../features/bills/components/BillReminders";
 import { GoalsList } from "../features/goals/components/GoalsList";
+import { GroupSummary } from "../features/groups/components/GroupSummary";
 import { ExpenseCategoryChart } from "../features/analytics/components/ExpenseCategoryChart";
 import { formatDate } from "../utils/formatters";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import {
   Target,
   PieChart,
   ArrowRight,
+  Users,
 } from "lucide-react";
 
 export function DashboardPage() {
@@ -56,7 +58,7 @@ export function DashboardPage() {
             onValueChange={setActiveTab}
             className="w-full sm:w-auto"
           >
-            <TabsList className="grid grid-cols-3 w-full sm:w-auto">
+            <TabsList className="grid grid-cols-4 w-full sm:w-auto">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
                 <span className="hidden sm:inline">
@@ -68,6 +70,10 @@ export function DashboardPage() {
                 <span className="hidden sm:inline">
                   {t("dashboard.finances")}
                 </span>
+              </TabsTrigger>
+              <TabsTrigger value="groups" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("groups.title")}</span>
               </TabsTrigger>
               <TabsTrigger value="goals" className="flex items-center gap-2">
                 <Target className="h-4 w-4" />
@@ -85,7 +91,7 @@ export function DashboardPage() {
               {/* Monthly spending summary */}
               <SpendingSummary />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Bill reminders */}
                 <Card className="md:col-span-1">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -127,6 +133,28 @@ export function DashboardPage() {
                   </CardHeader>
                   <CardContent>
                     <BudgetSummary />
+                  </CardContent>
+                </Card>
+
+                {/* Group summary */}
+                <Card className="md:col-span-1">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-lg flex items-center">
+                      <Users className="mr-2 h-5 w-5" />
+                      {t("groups.title")}
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1"
+                      onClick={() => (window.location.href = "/groups")}
+                    >
+                      {t("common.viewAll")}
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <GroupSummary limit={1} />
                   </CardContent>
                 </Card>
 
@@ -276,6 +304,55 @@ export function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <BillReminders limit={5} />
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Groups Tab */}
+          {activeTab === "groups" && (
+            <div className="space-y-6">
+              {/* Group summary */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-lg flex items-center">
+                    <Users className="mr-2 h-5 w-5" />
+                    {t("groups.myGroups")}
+                  </CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1"
+                    onClick={() => (window.location.href = "/groups")}
+                  >
+                    {t("common.viewAll")}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <GroupSummary limit={5} />
+                </CardContent>
+              </Card>
+
+              {/* Recent transactions */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-lg flex items-center">
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    {t("dashboard.recent")}
+                  </CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1"
+                    onClick={() => (window.location.href = "/transactions")}
+                  >
+                    {t("common.viewAll")}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <TransactionList limit={5} showAddButton={true} />
                 </CardContent>
               </Card>
             </div>

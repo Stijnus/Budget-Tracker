@@ -12,7 +12,7 @@ import { ArrowDownCircle, CalendarIcon, Plus } from "lucide-react";
 export function ExpensesPage() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<TransactionFilters>({
-    type: "expense",
+    type: "EXPENSE",
   });
 
   const handleAddExpense = () => {
@@ -48,7 +48,17 @@ export function ExpensesPage() {
             </Button>
           </CardHeader>
           <CardContent>
-            <TransactionFilters filters={filters} onFilterChange={setFilters} />
+            <TransactionFilters
+              type={filters.type}
+              categoryId={filters.categoryId}
+              bankAccountId={filters.bankAccountId}
+              startDate={filters.startDate}
+              endDate={filters.endDate}
+              minAmount={filters.minAmount}
+              maxAmount={filters.maxAmount}
+              searchQuery={filters.searchQuery}
+              onChange={setFilters}
+            />
 
             <div className="mt-6">
               <TransactionList

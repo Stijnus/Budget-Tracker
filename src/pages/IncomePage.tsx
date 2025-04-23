@@ -9,7 +9,7 @@ import { ArrowUpCircle, CalendarIcon } from "lucide-react";
 
 export function IncomePage() {
   const [filters, setFilters] = useState<TransactionFilters>({
-    type: "income",
+    type: "INCOME",
   });
 
   return (
@@ -34,7 +34,17 @@ export function IncomePage() {
             <CardTitle className="text-lg">Income Transactions</CardTitle>
           </CardHeader>
           <CardContent>
-            <TransactionFilters filters={filters} onFilterChange={setFilters} />
+            <TransactionFilters
+              type={filters.type}
+              categoryId={filters.categoryId}
+              bankAccountId={filters.bankAccountId}
+              startDate={filters.startDate}
+              endDate={filters.endDate}
+              minAmount={filters.minAmount}
+              maxAmount={filters.maxAmount}
+              searchQuery={filters.searchQuery}
+              onChange={setFilters}
+            />
 
             <div className="mt-6">
               <TransactionList showAddButton={true} />
