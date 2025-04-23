@@ -90,11 +90,26 @@ export async function getGroupTransaction(id: string) {
 export async function createGroupTransaction(
   transaction: GroupTransactionInsert
 ) {
-  return supabase
-    .from("group_transactions")
-    .insert(transaction)
-    .select()
-    .single();
+  try {
+    console.log("Creating group transaction:", transaction);
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .insert(transaction)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating group transaction:", error);
+      return { data: null, error };
+    }
+
+    console.log("Group transaction created successfully:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in createGroupTransaction:", err);
+    return { data: null, error: err as Error };
+  }
 }
 
 /**
@@ -104,19 +119,52 @@ export async function updateGroupTransaction(
   id: string,
   updates: GroupTransactionUpdate
 ) {
-  return supabase
-    .from("group_transactions")
-    .update(updates)
-    .eq("id", id)
-    .select()
-    .single();
+  try {
+    console.log(`Updating group transaction ${id}:`, updates);
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating group transaction:", error);
+      return { data: null, error };
+    }
+
+    console.log("Group transaction updated successfully:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in updateGroupTransaction:", err);
+    return { data: null, error: err as Error };
+  }
 }
 
 /**
  * Delete a group transaction
  */
 export async function deleteGroupTransaction(id: string) {
-  return supabase.from("group_transactions").delete().eq("id", id);
+  try {
+    console.log(`Deleting group transaction ${id}`);
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error deleting group transaction:", error);
+      return { data: null, error };
+    }
+
+    console.log("Group transaction deleted successfully");
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in deleteGroupTransaction:", err);
+    return { data: null, error: err as Error };
+  }
 }
 
 /**
@@ -127,25 +175,42 @@ export async function getGroupTransactionsByDateRange(
   startDate: string,
   endDate: string
 ) {
-  return supabase
-    .from("group_transactions")
-    .select(
-      `
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(
+      `Fetching transactions for group ${groupId} between ${startDate} and ${endDate}`
+    );
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .select(
+        `
+        *,
+        category:category_id(*),
+        creator:created_by(
+          id,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `
-    )
-    .eq("group_id", groupId)
-    .gte("date", startDate)
-    .lte("date", endDate)
-    .order("date", { ascending: false });
+      .eq("group_id", groupId)
+      .gte("date", startDate)
+      .lte("date", endDate)
+      .order("date", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching transactions by date range:", error);
+      return { data: [], error };
+    }
+
+    console.log(`Retrieved ${data?.length || 0} transactions by date range`);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupTransactionsByDateRange:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**
@@ -155,24 +220,41 @@ export async function getGroupTransactionsByCategory(
   groupId: string,
   categoryId: string
 ) {
-  return supabase
-    .from("group_transactions")
-    .select(
-      `
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(
+      `Fetching transactions for group ${groupId} with category ${categoryId}`
+    );
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .select(
+        `
+        *,
+        category:category_id(*),
+        creator:created_by(
+          id,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `
-    )
-    .eq("group_id", groupId)
-    .eq("category_id", categoryId)
-    .order("date", { ascending: false });
+      .eq("group_id", groupId)
+      .eq("category_id", categoryId)
+      .order("date", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching transactions by category:", error);
+      return { data: [], error };
+    }
+
+    console.log(`Retrieved ${data?.length || 0} transactions by category`);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupTransactionsByCategory:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**
@@ -182,24 +264,39 @@ export async function getGroupTransactionsByType(
   groupId: string,
   type: "expense" | "income"
 ) {
-  return supabase
-    .from("group_transactions")
-    .select(
-      `
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(`Fetching ${type} transactions for group ${groupId}`);
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .select(
+        `
+        *,
+        category:category_id(*),
+        creator:created_by(
+          id,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `
-    )
-    .eq("group_id", groupId)
-    .eq("type", type)
-    .order("date", { ascending: false });
+      .eq("group_id", groupId)
+      .eq("type", type)
+      .order("date", { ascending: false });
+
+    if (error) {
+      console.error(`Error fetching ${type} transactions:`, error);
+      return { data: [], error };
+    }
+
+    console.log(`Retrieved ${data?.length || 0} ${type} transactions`);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupTransactionsByType:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**
@@ -209,52 +306,80 @@ export async function getGroupTransactionsByCreator(
   groupId: string,
   creatorId: string
 ) {
-  return supabase
-    .from("group_transactions")
-    .select(
-      `
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(
+      `Fetching transactions for group ${groupId} created by ${creatorId}`
+    );
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .select(
+        `
+        *,
+        category:category_id(*),
+        creator:created_by(
+          id,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `
-    )
-    .eq("group_id", groupId)
-    .eq("created_by", creatorId)
-    .order("date", { ascending: false });
+      .eq("group_id", groupId)
+      .eq("created_by", creatorId)
+      .order("date", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching transactions by creator:", error);
+      return { data: [], error };
+    }
+
+    console.log(`Retrieved ${data?.length || 0} transactions by creator`);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupTransactionsByCreator:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**
  * Get group transactions summary (total income, total expenses)
  */
 export async function getGroupTransactionsSummary(groupId: string) {
-  const { data: transactions, error } = await supabase
-    .from("group_transactions")
-    .select("amount, type")
-    .eq("group_id", groupId);
+  try {
+    console.log(`Calculating summary for group ${groupId}`);
 
-  if (error) return { data: null, error };
+    const { data: transactions, error } = await supabase
+      .from("group_transactions")
+      .select("amount, type")
+      .eq("group_id", groupId);
 
-  const summary = {
-    totalIncome: 0,
-    totalExpenses: 0,
-    balance: 0,
-  };
-
-  transactions.forEach((transaction) => {
-    if (transaction.type === "income") {
-      summary.totalIncome += transaction.amount;
-    } else {
-      summary.totalExpenses += transaction.amount;
+    if (error) {
+      console.error("Error fetching transactions for summary:", error);
+      return { data: null, error };
     }
-  });
 
-  summary.balance = summary.totalIncome - summary.totalExpenses;
+    const summary = {
+      totalIncome: 0,
+      totalExpenses: 0,
+      balance: 0,
+    };
 
-  return { data: summary, error: null };
+    transactions.forEach((transaction) => {
+      if (transaction.type === "income") {
+        summary.totalIncome += transaction.amount;
+      } else {
+        summary.totalExpenses += transaction.amount;
+      }
+    });
+
+    summary.balance = summary.totalIncome - summary.totalExpenses;
+
+    console.log("Calculated summary:", summary);
+    return { data: summary, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupTransactionsSummary:", err);
+    return { data: null, error: err as Error };
+  }
 }

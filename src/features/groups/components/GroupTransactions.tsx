@@ -37,27 +37,19 @@ import {
   ArrowDownCircle,
 } from "lucide-react";
 import { GroupTransactionForm } from "./GroupTransactionForm";
-import { deleteGroupTransaction } from "../../../api/supabase/groupTransactions";
+import {
+  deleteGroupTransaction,
+  type GroupTransaction as ApiGroupTransaction,
+} from "../../../api/supabase/groupTransactions";
 
 // Define the transaction interface
-interface GroupTransaction {
-  id: string;
-  group_id: string;
-  created_by: string;
-  category_id: string | null;
-  amount: number;
-  description: string | null;
-  date: string;
-  type: "expense" | "income";
-  payment_method: string | null;
-  status: string | null;
-  notes: string | null;
-  created_at: string;
-  updated_at: string;
+// Extend the API type for our component
+type GroupTransaction = ApiGroupTransaction & {
   category?: {
     id: string;
     name: string;
     color: string;
+    type?: string;
   } | null;
   creator?: {
     id: string;
@@ -66,7 +58,7 @@ interface GroupTransaction {
       avatar_url: string | null;
     } | null;
   } | null;
-}
+};
 
 interface GroupTransactionsProps {
   groupId: string;
@@ -114,7 +106,10 @@ export function GroupTransactions({
     try {
       const { error } = await deleteGroupTransaction(selectedTransaction.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error from API when deleting transaction:", error);
+        throw error;
+      }
 
       onChange();
       setIsDeleteDialogOpen(false);
@@ -314,7 +309,7 @@ export function GroupTransactions({
           </DialogHeader>
           <GroupTransactionForm
             groupId={groupId}
-            transaction={selectedTransaction}
+            transaction={selectedTransaction || undefined}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               onChange();

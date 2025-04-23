@@ -27,28 +27,25 @@ import { getCategories } from "../../../api/supabase/categories";
 import {
   createGroupTransaction,
   updateGroupTransaction,
+  type GroupTransaction as ApiGroupTransaction,
 } from "../../../api/supabase/groupTransactions";
 
-interface GroupTransaction {
-  id: string;
-  group_id: string;
-  created_by: string;
-  category_id: string | null;
-  amount: number;
-  description: string | null;
-  date: string;
-  type: "expense" | "income";
-  payment_method: string | null;
-  status: "pending" | "completed" | "cancelled";
-  notes: string | null;
-  created_at: string;
-  updated_at: string;
+// Extend the API type for our component
+type GroupTransaction = ApiGroupTransaction & {
   category?: {
     id: string;
     name: string;
-    type: string;
+    type?: string;
+    color?: string;
   } | null;
-}
+  creator?: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
+};
 
 interface GroupTransactionFormProps {
   groupId: string;
@@ -82,7 +79,8 @@ export function GroupTransactionForm({
     transaction?.payment_method || "none"
   );
   const [status, setStatus] = useState<"pending" | "completed" | "cancelled">(
-    transaction?.status || "completed"
+    (transaction?.status as "pending" | "completed" | "cancelled") ||
+      "completed"
   );
   const [notes, setNotes] = useState(transaction?.notes || "");
   const [categories, setCategories] = useState<
