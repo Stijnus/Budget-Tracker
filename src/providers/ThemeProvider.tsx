@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 type Theme = "light" | "dark" | "system";
 
@@ -20,25 +26,36 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
+// Consistent storage key for theme
+const THEME_STORAGE_KEY = "budget-tracker-theme";
+
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
-  storageKey = "theme",
+  defaultTheme = "system",
+  storageKey = THEME_STORAGE_KEY,
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
+  // Initialize theme from localStorage or use default
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Try to get from localStorage
+    const storedTheme = localStorage.getItem(storageKey) as Theme | null;
+    if (storedTheme && ["light", "dark", "system"].includes(storedTheme)) {
+      return storedTheme;
+    }
+    return defaultTheme;
+  });
 
+  // Apply theme changes to document
   useEffect(() => {
     const root = window.document.documentElement;
-    
+
     // Remove existing theme classes
     root.classList.remove("light", "dark");
-    
+
     // Apply new theme
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
         ? "dark"
         : "light";
       root.classList.add(systemTheme);
@@ -47,17 +64,29 @@ export function ThemeProvider({
       root.classList.add(theme);
       root.style.colorScheme = theme;
     }
-    
+
     // Store theme in localStorage
     localStorage.setItem(storageKey, theme);
+
+    // Also update userSettings in localStorage if it exists
+    try {
+      const userSettings = localStorage.getItem("userSettings");
+      if (userSettings) {
+        const settings = JSON.parse(userSettings);
+        settings.theme = theme;
+        localStorage.setItem("userSettings", JSON.stringify(settings));
+      }
+    } catch (error) {
+      console.error("Error updating theme in userSettings:", error);
+    }
   }, [theme, storageKey]);
 
   // Listen for system theme changes
   useEffect(() => {
     if (theme !== "system") return;
-    
+
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    
+
     const handleChange = () => {
       const root = window.document.documentElement;
       root.classList.remove("light", "dark");
@@ -65,7 +94,7 @@ export function ThemeProvider({
       root.classList.add(newTheme);
       root.style.colorScheme = newTheme;
     };
-    
+
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme]);

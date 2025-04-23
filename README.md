@@ -238,8 +238,8 @@ This structure provides several benefits:
 1. **Clone & Setup**:
 
    ```bash
-   git clone https://github.com/Stijnus/Budgeting_Expense_Tracking_Dashboard.git
-   cd Budgeting_Expense_Tracking_Dashboard
+   git clone https://github.com/Stijnus/Budget-Tracker.git
+   cd Budget-Tracker
    ```
 
 2. **Install Dependencies**:
@@ -250,21 +250,39 @@ This structure provides several benefits:
 
 3. **Environment Setup**:
 
-   - Create `.env` file
-   - Add required variables:
+   - Copy the `.env.example` file to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Edit the `.env` file and add your Supabase credentials:
      ```env
      VITE_SUPABASE_URL=your_supabase_project_url
      VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-     VITE_SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+     SUPABASE_URL=your_supabase_project_url
+     SUPABASE_ANON_KEY=your_supabase_anon_key
+     SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+     SUPABASE_PROJECT_ID=your_project_id
      ```
 
-4. **Development**:
+4. **Database Setup**:
+
+   - Apply the database migrations:
+     ```bash
+     chmod +x scripts/apply-migrations.sh
+     ./scripts/apply-migrations.sh
+     ```
+   - Alternatively, you can run the SQL script directly in the Supabase SQL editor:
+     ```sql
+     ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS language TEXT DEFAULT 'en';
+     ```
+
+5. **Development**:
 
    ```bash
    npm run dev
    ```
 
-5. **Type Checking & Linting**:
+6. **Type Checking & Linting**:
    ```bash
    npm run type-check  # Check TypeScript types
    npm run lint        # Run ESLint
@@ -332,7 +350,8 @@ npm run lint:fix
 - **Shared Components**: Created a `shared` directory for reusable components
 - **Page Components**: Separated page components into a dedicated `pages` directory
 - **Modern UI Components**: Implemented shadcn/ui components for a consistent, accessible UI
-- **Global Styling**: Adopted a global styling approach with Tailwind CSS instead of theme switching
+- **Global Styling**: Improved theme implementation with proper dark/light/system mode support
+- **Multilingual Support**: Added support for multiple languages (English, Dutch, French, German) with proper database storage
 
 ### New Features
 

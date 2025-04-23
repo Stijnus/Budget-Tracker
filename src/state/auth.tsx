@@ -2,7 +2,7 @@ import { useEffect, useState, ReactNode } from "react";
 import { AuthContext } from "./authContext";
 import { User, AuthError } from "@supabase/supabase-js";
 import * as authApi from "../api/supabase/auth";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "../providers/ThemeProvider";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

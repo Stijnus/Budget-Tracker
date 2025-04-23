@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     currency TEXT DEFAULT 'USD',
     theme TEXT DEFAULT 'light',
+    language TEXT DEFAULT 'en',
     notification_enabled BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -270,14 +271,14 @@ BEGIN
         COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
         COALESCE(NEW.raw_user_meta_data->>'last_name', '')
     );
-    
+
     -- Insert into user_settings with defaults
     INSERT INTO public.user_settings (id)
     VALUES (NEW.id);
-    
+
     -- Create default categories for the new user
     INSERT INTO public.categories (user_id, name, color, type, is_default)
-    VALUES 
+    VALUES
         (NEW.id, 'Food & Dining', '#FF5733', 'expense', TRUE),
         (NEW.id, 'Transportation', '#33A8FF', 'expense', TRUE),
         (NEW.id, 'Housing', '#33FF57', 'expense', TRUE),
@@ -293,7 +294,7 @@ BEGIN
         (NEW.id, 'Investments', '#FF8D33', 'income', TRUE),
         (NEW.id, 'Gifts Received', '#33FFBD', 'income', TRUE),
         (NEW.id, 'Other Income', '#BD33FF', 'income', TRUE);
-    
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

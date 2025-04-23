@@ -122,6 +122,7 @@ export interface Database {
           id: string;
           currency: string;
           theme: string;
+          language: string;
           notification_enabled: boolean;
           created_at: string;
           updated_at: string;
@@ -130,6 +131,7 @@ export interface Database {
           id: string;
           currency?: string;
           theme?: string;
+          language?: string;
           notification_enabled?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -138,6 +140,7 @@ export interface Database {
           id?: string;
           currency?: string;
           theme?: string;
+          language?: string;
           notification_enabled?: boolean;
           created_at?: string;
           updated_at?: string;
