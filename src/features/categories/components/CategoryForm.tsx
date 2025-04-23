@@ -255,38 +255,32 @@ export function CategoryForm({
             <Tag size={14} />
             <span>Icon</span>
           </Label>
-          <div className="grid grid-cols-2 gap-2">
-            <Select value={icon || ""} onValueChange={setIcon}>
-              <SelectTrigger id="icon">
-                <SelectValue placeholder="Select an icon" />
-              </SelectTrigger>
-              <SelectContent className="h-[300px]">
-                <div className="grid grid-cols-4 gap-2 p-2">
-                  {Object.entries(ICON_MAP).map(([iconName, iconComponent]) => (
-                    <Button
-                      key={iconName}
-                      type="button"
-                      variant={icon === iconName ? "default" : "outline"}
-                      className="h-12 w-12 p-0 relative"
-                      onClick={() => setIcon(iconName)}
-                    >
-                      <div className="flex items-center justify-center">
-                        {iconComponent}
-                      </div>
-                      {icon === iconName && (
-                        <div className="absolute bottom-0 right-0 bg-primary rounded-full p-0.5">
-                          <Check className="h-3 w-3 text-primary-foreground" />
-                        </div>
-                      )}
-                    </Button>
-                  ))}
-                </div>
-              </SelectContent>
-            </Select>
-            <div className="flex items-center justify-center border rounded-md bg-muted/20 h-10">
+          <div className="space-y-4">
+            <div className="grid grid-cols-6 gap-2">
+              {Object.entries(ICON_MAP).map(([iconName, iconComponent]) => (
+                <Button
+                  key={iconName}
+                  type="button"
+                  variant={icon === iconName ? "default" : "outline"}
+                  className="h-12 w-12 p-0 relative"
+                  onClick={() => setIcon(iconName)}
+                >
+                  <div className="flex items-center justify-center">
+                    {iconComponent}
+                  </div>
+                  {icon === iconName && (
+                    <div className="absolute bottom-0 right-0 bg-primary rounded-full p-0.5">
+                      <Check className="h-3 w-3 text-primary-foreground" />
+                    </div>
+                  )}
+                </Button>
+              ))}
+            </div>
+            <div className="flex items-center justify-center border rounded-md bg-muted/20 h-16 w-full">
               {icon && ICON_MAP[icon] ? (
-                <div className="flex items-center justify-center text-primary">
-                  {ICON_MAP[icon]}
+                <div className="flex flex-col items-center justify-center gap-1">
+                  <div className="text-primary">{ICON_MAP[icon]}</div>
+                  <span className="text-xs text-muted-foreground">{icon}</span>
                 </div>
               ) : (
                 <span className="text-xs text-muted-foreground">
