@@ -21,26 +21,20 @@ import { getInvitationsByEmail } from "../../../api/supabase/budgetGroups";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Define proper types for groups and invitations
-interface Group {
-  id: string;
-  name: string;
-  description: string | null;
-  avatar_url: string | null;
+// Import types from the API
+import type {
+  BudgetGroup,
+  GroupInvitation,
+} from "../../../api/supabase/budgetGroups";
+
+// Define component-specific types that match the component interfaces
+interface Group extends BudgetGroup {
   role: string;
 }
 
-interface Invitation {
-  id: string;
-  group_id: string;
-  email: string;
-  role: string;
-  token: string;
-  status: string;
-  invited_by: string;
-  expires_at: string;
-  created_at: string;
-  updated_at?: string;
+interface Invitation extends Omit<GroupInvitation, "role" | "status"> {
+  role: "admin" | "member" | "viewer";
+  status: "pending" | "accepted" | "rejected" | "expired";
   group?: {
     id: string;
     name: string;
@@ -68,25 +62,36 @@ export function GroupsPage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!user) return;
+      if (!user) {
+        console.log("No user found, skipping data fetch");
+        return;
+      }
 
+      console.log("Fetching data for user:", user.id);
       setIsLoading(true);
       setError(null);
 
       try {
         // Fetch user's groups
+        console.log("Fetching budget groups...");
         const { data: groupsData, error: groupsError } =
           await getBudgetGroups();
 
         if (groupsError) {
           console.error("Error fetching budget groups:", groupsError);
-          setError("Failed to load groups. Please try again.");
+          setError(
+            `Failed to load groups: ${
+              groupsError.message || "Please try again."
+            }`
+          );
           setGroups([]);
         } else {
+          console.log("Groups data received:", groupsData);
           setGroups(groupsData || []);
         }
 
         // Fetch invitations for the user's email
+        console.log("Fetching invitations for email:", user.email);
         const { data: invitationsData, error: invitationsError } =
           await getInvitationsByEmail(user.email || "");
 
@@ -95,12 +100,17 @@ export function GroupsPage() {
           // Don't set error here, just log it and continue
           setInvitations([]);
         } else {
+          console.log("Invitations data received:", invitationsData);
           // Type assertion to handle API response
           setInvitations((invitationsData || []) as unknown as Invitation[]);
         }
       } catch (err) {
         console.error("Error fetching groups data:", err);
-        setError("Failed to load groups. Please try again.");
+        setError(
+          `Failed to load groups: ${
+            (err as Error).message || "Please try again."
+          }`
+        );
         setGroups([]);
         setInvitations([]);
       } finally {
@@ -114,20 +124,32 @@ export function GroupsPage() {
   // The newGroup parameter is not used because we refresh from the server
   const handleCreateGroup = async () => {
     try {
+      console.log("Group created, refreshing groups list...");
+      setIsLoading(true);
+
       // Refresh the groups list after creating a new group
       const { data, error } = await getBudgetGroups();
 
       if (error) {
         console.error("Error refreshing groups:", error);
-        setError("Failed to refresh groups. Please try again.");
+        setError(
+          `Failed to refresh groups: ${error.message || "Please try again."}`
+        );
       } else {
+        console.log("Groups refreshed successfully:", data);
         setGroups(data || []);
         setIsCreateDialogOpen(false);
         setError(null); // Clear any previous errors
       }
     } catch (err) {
       console.error("Error refreshing groups:", err);
-      setError("Failed to refresh groups. Please try again.");
+      setError(
+        `Failed to refresh groups: ${
+          (err as Error).message || "Please try again."
+        }`
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 

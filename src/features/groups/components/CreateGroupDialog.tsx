@@ -37,26 +37,45 @@ export function CreateGroupDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) return;
+    if (!user) {
+      console.error("No user found");
+      setError("You must be logged in to create a group");
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const { error } = await createBudgetGroup({
+      console.log("Creating group with data:", {
         name,
         description,
         created_by: user.id,
         is_active: true,
       });
 
-      if (error) throw error;
+      const { error, data } = await createBudgetGroup({
+        name,
+        description,
+        created_by: user.id,
+        is_active: true,
+      });
 
+      if (error) {
+        console.error("Error creating group:", error);
+        throw error;
+      }
+
+      console.log("Group created successfully:", data);
       onCreateGroup();
       resetForm();
     } catch (err) {
       console.error("Error creating group:", err);
-      setError("Failed to create group. Please try again.");
+      setError(
+        `Failed to create group: ${
+          (err as Error).message || "Please try again."
+        }`
+      );
     } finally {
       setIsLoading(false);
     }
