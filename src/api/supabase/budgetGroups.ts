@@ -1,6 +1,6 @@
 import { supabase } from "./client";
 import type { Database } from "../../lib/database.types";
-import type { SupabaseClient } from "@supabase/supabase-js";
+// We need to extend the SupabaseClient type but don't use it directly
 
 // Extend the SupabaseClient type to include our custom RPC functions
 declare module "@supabase/supabase-js" {
