@@ -7,10 +7,8 @@ import {
   Transaction as TransactionType,
 } from "../../../api/supabase/transactions";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
-import {
-  TransactionFilters,
-  TransactionFilters as FilterType,
-} from "./TransactionFilters";
+import { TransactionFilters } from "./TransactionFilters";
+import type { TransactionType as FilterTransactionType } from "./TransactionFilters";
 import { Edit, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,19 +22,34 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+interface TransactionListFilters {
+  type?: FilterTransactionType;
+  categoryId?: string;
+  bankAccountId?: string;
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  searchQuery?: string;
+}
+
 interface TransactionListProps {
   limit?: number;
   showFilters?: boolean;
   showAddButton?: boolean;
+  showPagination?: boolean;
+  compact?: boolean;
   onTransactionClick?: (transaction: TransactionType) => void;
   className?: string;
-  filters?: FilterType;
+  filters?: TransactionListFilters;
 }
 
 export function TransactionList({
-  limit = 10,
+  limit: initialLimit = 10,
   showFilters = false,
   showAddButton = false,
+  showPagination = true,
+  compact = false,
   onTransactionClick,
   className = "",
   filters: externalFilters,
@@ -44,7 +57,10 @@ export function TransactionList({
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<FilterType>(externalFilters || {});
+  const [filters, setFilters] = useState<TransactionListFilters>(
+    externalFilters || {}
+  );
+  const [limit, setLimit] = useState(initialLimit);
   const navigate = useNavigate();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
@@ -81,50 +97,45 @@ export function TransactionList({
           throw new Error(result.error.message);
         }
 
-        let filteredData = result.data || [];
-
         // Apply client-side filters
-        if (filters.type && filters.type !== "all") {
-          filteredData = filteredData.filter((t) => t.type === filters.type);
-        }
+        const filteredData = (result.data || []).filter((transaction) => {
+          // Skip any filter that doesn't have a value
+          if (filters.type && filters.type !== "all") {
+            if (transaction.type !== filters.type.toLowerCase()) return false;
+          }
 
-        if (filters.categoryId) {
-          filteredData = filteredData.filter(
-            (t) => t.category_id === filters.categoryId
-          );
-        }
+          if (filters.categoryId) {
+            if (transaction.category_id !== filters.categoryId) return false;
+          }
 
-        if (filters.bankAccountId) {
-          filteredData = filteredData.filter(
-            (t) => t.bank_account_id === filters.bankAccountId
-          );
-        }
+          if (filters.bankAccountId) {
+            if (transaction.bank_account_id !== filters.bankAccountId)
+              return false;
+          }
 
-        if (filters.minAmount !== undefined) {
-          filteredData = filteredData.filter(
-            (t) => t.amount >= filters.minAmount!
-          );
-        }
+          if (filters.minAmount !== undefined) {
+            if (transaction.amount < filters.minAmount) return false;
+          }
 
-        if (filters.maxAmount !== undefined) {
-          filteredData = filteredData.filter(
-            (t) => t.amount <= filters.maxAmount!
-          );
-        }
+          if (filters.maxAmount !== undefined) {
+            if (transaction.amount > filters.maxAmount) return false;
+          }
 
-        if (filters.searchQuery) {
-          const query = filters.searchQuery.toLowerCase();
-          filteredData = filteredData.filter(
-            (t) =>
-              t.description?.toLowerCase().includes(query) ||
-              t.category_name?.toLowerCase().includes(query) ||
-              t.payment_method?.toLowerCase().includes(query) ||
-              t.notes?.toLowerCase().includes(query)
-          );
-        }
+          if (filters.searchQuery) {
+            const query = filters.searchQuery.toLowerCase();
+            const matchesSearch =
+              transaction.description?.toLowerCase().includes(query) ||
+              transaction.category_name?.toLowerCase().includes(query) ||
+              transaction.payment_method?.toLowerCase().includes(query) ||
+              transaction.notes?.toLowerCase().includes(query);
 
-        // Cast to TransactionType[] to ensure type compatibility
-        setTransactions(filteredData as TransactionType[]);
+            if (!matchesSearch) return false;
+          }
+
+          return true;
+        });
+
+        setTransactions(filteredData);
       } catch (err) {
         console.error("Error fetching transactions:", err);
         setError("Failed to load transactions");
@@ -173,10 +184,8 @@ export function TransactionList({
     setTransactionToDelete(null);
   };
 
-  // Note: Transaction refresh is now handled by navigation and useEffect
-
   // Handle filter changes
-  const handleFilterChange = (newFilters: FilterType) => {
+  const handleFilterChange = (newFilters: TransactionListFilters) => {
     setFilters(newFilters);
   };
 
@@ -207,129 +216,124 @@ export function TransactionList({
   }
 
   return (
-    <div className={`${className}`}>
+    <div className={`space-y-4 ${className}`}>
       {/* Filters */}
       {showFilters && (
         <TransactionFilters
-          filters={filters}
-          onFilterChange={handleFilterChange}
+          type={filters.type}
+          categoryId={filters.categoryId}
+          bankAccountId={filters.bankAccountId}
+          startDate={filters.startDate}
+          endDate={filters.endDate}
+          minAmount={filters.minAmount}
+          maxAmount={filters.maxAmount}
+          searchQuery={filters.searchQuery}
+          onChange={handleFilterChange}
         />
       )}
 
       {/* Add Transaction Button */}
       {showAddButton && (
-        <div className="mb-4 flex justify-end">
-          <Button
-            onClick={handleAddTransaction}
-            className="flex items-center gap-1"
-          >
-            <Plus size={16} />
+        <div className="flex justify-end mb-4">
+          <Button onClick={handleAddTransaction}>
+            <Plus className="h-4 w-4 mr-2" />
             Add Transaction
           </Button>
         </div>
       )}
 
       {/* Transactions List */}
-      <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
-        {transactions.length === 0 ? (
-          <div className="p-6 text-center text-muted-foreground">
-            <p className="mb-4">
-              No transactions found. Add your first transaction to get started!
-            </p>
-            {showAddButton && (
-              <Button
-                onClick={handleAddTransaction}
-                className="flex items-center gap-1"
-              >
-                <Plus size={16} />
-                Add Transaction
-              </Button>
-            )}
-          </div>
-        ) : (
-          <ul className="divide-y divide-border">
-            {transactions.map((transaction) => (
-              <li
-                key={transaction.id}
-                className="py-4 px-4 flex items-center hover:bg-accent/50"
-              >
-                <div
-                  className="w-2 h-10 rounded-full mr-4"
-                  style={{
-                    backgroundColor: transaction.category_color || "#CBD5E0",
-                  }}
-                />
-                <div
-                  className="flex-1 min-w-0 cursor-pointer"
-                  onClick={() =>
-                    onTransactionClick
-                      ? onTransactionClick(transaction)
-                      : handleEditTransaction(transaction)
-                  }
-                >
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {transaction.description || "Unnamed transaction"}
-                  </p>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {formatDate(transaction.date, "short")} •{" "}
-                    {transaction.category_name || "Uncategorized"}
-                    {transaction.bank_account_name && (
-                      <>
-                        {" "}
-                        •{" "}
-                        <span className="text-primary/70">
-                          {transaction.bank_account_name}
-                        </span>
-                      </>
-                    )}
-                  </p>
+      <div className={`space-y-2 ${compact ? "text-sm" : ""}`}>
+        {transactions.map((transaction) => (
+          <div
+            key={transaction.id}
+            className={`flex items-center justify-between p-3 bg-card hover:bg-accent/50 rounded-lg cursor-pointer ${
+              compact ? "py-2" : "py-4"
+            }`}
+            onClick={() =>
+              onTransactionClick
+                ? onTransactionClick(transaction)
+                : handleEditTransaction(transaction)
+            }
+          >
+            {/* Transaction details */}
+            <div className="flex items-center space-x-4">
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  transaction.type === "expense" ? "bg-red-500" : "bg-green-500"
+                }`}
+              />
+              <div>
+                <div className="font-medium">
+                  {transaction.description || "No description"}
                 </div>
-                <div
-                  className={`text-sm font-medium mr-4 ${
-                    transaction.type === "income"
-                      ? "text-green-600 dark:text-green-400"
-                      : "text-destructive"
-                  }`}
-                >
-                  {transaction.type === "income" ? "+" : "-"}
-                  {formatCurrency(transaction.amount)}
+                <div className="text-muted-foreground text-sm">
+                  {formatDate(transaction.date)}
+                  {transaction.category_name && <span className="mx-1">•</span>}
+                  {transaction.category_name}
                 </div>
+              </div>
+            </div>
 
-                {/* Action buttons */}
-                <div className="flex space-x-2 ml-2">
+            {/* Amount and Actions */}
+            <div className="flex items-center space-x-4">
+              <span
+                className={`font-medium ${
+                  transaction.type === "expense"
+                    ? "text-red-500"
+                    : "text-green-500"
+                }`}
+              >
+                {transaction.type === "expense" ? "-" : "+"}
+                {formatCurrency(transaction.amount)}
+              </span>
+
+              {!compact && (
+                <div className="flex space-x-2">
                   <Button
-                    onClick={() => handleEditTransaction(transaction)}
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
-                    aria-label="Edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditTransaction(transaction);
+                    }}
                   >
-                    <Edit size={16} />
+                    <Edit className="h-4 w-4" />
                   </Button>
                   <Button
-                    onClick={() => handleDeleteClick(transaction.id)}
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-destructive hover:text-destructive/90"
-                    aria-label="Delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(transaction.id);
+                    }}
                   >
-                    <Trash2 size={16} />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Pagination - if needed */}
+      {showPagination && transactions.length >= limit && (
+        <div className="flex justify-center mt-4">
+          <Button variant="outline" onClick={() => setLimit(limit + 10)}>
+            Load More
+          </Button>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
       <AlertDialog
         open={isDeleteConfirmOpen}
         onOpenChange={setIsDeleteConfirmOpen}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogTitle>Delete Transaction</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete this transaction? This action
               cannot be undone.
@@ -339,10 +343,7 @@ export function TransactionList({
             <AlertDialogCancel onClick={handleDeleteCancel}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
+            <AlertDialogAction onClick={handleDeleteConfirm}>
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

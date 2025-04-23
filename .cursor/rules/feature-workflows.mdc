@@ -3,3 +3,124 @@ description:
 globs:
 alwaysApply: false
 ---
+# Feature Workflows
+
+This document outlines the common workflows and implementation patterns for features in the Budget-Tracker application.
+
+## Transaction Management
+
+### Adding a Transaction
+
+1. User navigates to Transactions page or clicks "Add Transaction" from dashboard
+2. TransactionForm component is displayed
+3. User enters transaction details (amount, category, date, description)
+4. Form validation occurs using zod schema
+5. On submission, createTransaction API function is called
+6. Loading state is shown during API call
+7. Success/error toast notification is displayed
+8. Transaction list is updated with new transaction
+
+### Transaction Categories
+
+1. Categories are color-coded by type (expense/income)
+2. Categories can be created, edited, and deleted
+3. Default categories are provided for new users
+4. Categories are used in budgets, transactions, and analytics
+
+## Budget Management
+
+### Budget Creation Flow
+
+1. User navigates to Budgets page
+2. BudgetForm component is displayed
+3. User selects category, amount, period (monthly, weekly)
+4. On submission, createBudget API function is called
+5. Budget list is updated with new budget
+6. Budget progress is tracked automatically with transaction data
+
+### Budget Monitoring
+
+1. Budget progress is shown on budget cards
+2. Alerts are displayed when budget is near limit (80%) or exceeded
+3. Monthly analytics show budget performance over time
+4. Budget details page shows individual transactions contributing to budget
+
+## Financial Goals
+
+### Goal Tracking Flow
+
+1. User creates a savings goal with target amount and date
+2. Goal progress is tracked with contributions
+3. Goal cards show progress bar and percentage complete
+4. User can make manual contributions to goals
+5. Completion celebration shown when goal is achieved
+
+## Bills & Subscriptions
+
+### Bill Management
+
+1. User adds recurring bills with amount, due date, frequency
+2. Bills list shows upcoming due dates and payment status
+3. Reminders are displayed for upcoming bills
+4. Bill payments can be recorded manually or linked to transactions
+
+## Collaborative Features
+
+### Group Management
+
+1. User can create budget groups for family or team
+2. Group invitations can be sent via email
+3. Group members have different permission levels
+4. Group transactions and budgets are shared among members
+5. Activity log tracks all actions within the group
+
+## User Settings
+
+### Profile Management
+
+1. User can update profile information
+2. Settings include currency, language, theme preferences
+3. Account management (password change, account deletion)
+4. Notification preferences
+
+## Analytics & Reporting
+
+### Data Visualization
+
+1. Dashboard shows spending overview and recent activity
+2. Analytics page provides detailed spending charts
+3. Expense breakdown by category
+4. Income vs. expenses comparison
+5. Trends analysis over time periods
+6. Savings rate calculation
+
+## Common UI Patterns
+
+1. **Modal Flows**: Create/edit forms appear in modal dialogs
+2. **Confirmation Dialogs**: Delete actions require confirmation
+3. **Toast Notifications**: User feedback for actions
+4. **Loading States**: Skeleton loaders during data fetching
+5. **Empty States**: Helpful guidance when no data exists
+6. **Error Handling**: Graceful error recovery
+7. **Responsive Design**: Mobile-first approach
+
+## Implementation Pattern
+
+Each feature typically follows this structure:
+
+```
+features/
+  featureName/
+    components/
+      FeatureList.tsx      # List view of items
+      FeatureForm.tsx      # Form for creating/editing
+      FeatureCard.tsx      # Card view for item display
+      FeatureDetails.tsx   # Detailed view of item
+    pages/
+      FeaturePage.tsx      # Page component for feature
+    hooks/
+      useFeatureData.ts    # Data fetching hook
+      useFeatureOperations.ts # CRUD operations
+```
+
+This consistent pattern makes it easier to navigate and maintain the codebase.

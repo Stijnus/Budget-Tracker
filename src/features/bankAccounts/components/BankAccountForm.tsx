@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { AlertCircle, Building, CreditCard, Wallet } from "lucide-react";
 import {
@@ -51,14 +51,16 @@ export function BankAccountForm({
     "checking" | "savings" | "credit" | "investment" | "other"
   >(account?.account_type || defaultType);
   const [institution, setInstitution] = useState(account?.institution || "");
-  const [accountNumber, setAccountNumber] = useState(account?.account_number || "");
+  const [accountNumber, setAccountNumber] = useState(
+    account?.account_number || ""
+  );
   const [currentBalance, setCurrentBalance] = useState(
     account?.current_balance?.toString() || "0"
   );
   const [currency, setCurrency] = useState(account?.currency || "USD");
   const [isDefault, setIsDefault] = useState(account?.is_default || false);
   const [notes, setNotes] = useState(account?.notes || "");
-  const [color, setColor] = useState(account?.color || "#3B82F6"); // Default blue color
+  const [color] = useState(account?.color || "#3B82F6"); // Default blue color, we don't need setColor yet
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,7 +164,12 @@ export function BankAccountForm({
               value={accountType}
               onValueChange={(value) =>
                 setAccountType(
-                  value as "checking" | "savings" | "credit" | "investment" | "other"
+                  value as
+                    | "checking"
+                    | "savings"
+                    | "credit"
+                    | "investment"
+                    | "other"
                 )
               }
             >
@@ -196,7 +203,9 @@ export function BankAccountForm({
 
           {/* Account Number (masked) */}
           <div className="space-y-2">
-            <Label htmlFor="accountNumber">Account Number (last 4 digits)</Label>
+            <Label htmlFor="accountNumber">
+              Account Number (last 4 digits)
+            </Label>
             <div className="relative">
               <CreditCard className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -204,7 +213,9 @@ export function BankAccountForm({
                 value={accountNumber}
                 onChange={(e) => {
                   // Only allow up to 4 digits
-                  const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+                  const value = e.target.value
+                    .replace(/[^0-9]/g, "")
+                    .slice(0, 4);
                   setAccountNumber(value);
                 }}
                 placeholder="e.g., 1234"

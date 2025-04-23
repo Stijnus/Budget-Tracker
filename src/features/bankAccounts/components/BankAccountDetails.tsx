@@ -5,7 +5,6 @@ import {
   deleteBankAccount,
   BankAccount,
 } from "../../../api/supabase/bankAccounts";
-import { getTransactionsByBankAccount } from "../../../api/supabase/transactions";
 import { formatCurrency, formatDate } from "../../../utils/formatters";
 import { showItemDeletedToast, showErrorToast } from "../../../utils/toast";
 import {
@@ -59,8 +58,6 @@ export function BankAccountDetails({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
-  const [transactionsLoading, setTransactionsLoading] = useState(true);
 
   // Load account details
   useEffect(() => {
@@ -86,28 +83,6 @@ export function BankAccountDetails({
     loadAccount();
   }, [id]);
 
-  // Load recent transactions for this account
-  useEffect(() => {
-    const loadTransactions = async () => {
-      if (!id) return;
-
-      setTransactionsLoading(true);
-
-      try {
-        const { data, error } = await getTransactionsByBankAccount(id, 5);
-        if (error) throw error;
-
-        setRecentTransactions(data || []);
-      } catch (err) {
-        console.error("Error loading transactions:", err);
-      } finally {
-        setTransactionsLoading(false);
-      }
-    };
-
-    loadTransactions();
-  }, [id]);
-
   // Handle account deletion
   const handleDeleteClick = () => {
     setIsDeleteConfirmOpen(true);
@@ -122,7 +97,7 @@ export function BankAccountDetails({
 
       // Show success toast
       showItemDeletedToast("bank account");
-      
+
       // Navigate back or call onDelete
       if (onDelete) {
         onDelete();
@@ -140,7 +115,7 @@ export function BankAccountDetails({
   // Handle edit button click
   const handleEditClick = () => {
     if (!account) return;
-    
+
     if (onEdit) {
       onEdit(account);
     } else {
@@ -176,9 +151,7 @@ export function BankAccountDetails({
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          {error || "Bank account not found"}
-        </AlertDescription>
+        <AlertDescription>{error || "Bank account not found"}</AlertDescription>
       </Alert>
     );
   }
@@ -227,11 +200,7 @@ export function BankAccountDetails({
               <Edit className="h-4 w-4 mr-1" />
               Edit
             </Button>
-            <Button
-              onClick={handleDeleteClick}
-              size="sm"
-              variant="destructive"
-            >
+            <Button onClick={handleDeleteClick} size="sm" variant="destructive">
               <Trash2 className="h-4 w-4 mr-1" />
               Delete
             </Button>
@@ -248,16 +217,11 @@ export function BankAccountDetails({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="py-0">
-                  <div
-                    className={`text-2xl font-bold ${
-                      account.account_type === "credit" ? "text-red-500" : ""
-                    }`}
-                  >
-                    {formatCurrency(
-                      account.current_balance,
-                      account.currency
-                    )}
-                  </div>
+                  <p className="text-2xl font-bold">
+                    {formatCurrency(account.current_balance, {
+                      currency: account.currency,
+                    })}
+                  </p>
                 </CardContent>
               </Card>
 
@@ -287,9 +251,7 @@ export function BankAccountDetails({
                 </CardHeader>
                 <CardContent className="py-0 flex items-center">
                   <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                  <span>
-                    {formatDate(account.last_updated)}
-                  </span>
+                  <span>{formatDate(account.last_updated)}</span>
                 </CardContent>
               </Card>
             </div>
@@ -313,7 +275,9 @@ export function BankAccountDetails({
                 {account.notes && (
                   <div className="col-span-2 mt-2">
                     <dt className="text-sm text-muted-foreground">Notes</dt>
-                    <dd className="mt-1 whitespace-pre-wrap">{account.notes}</dd>
+                    <dd className="mt-1 whitespace-pre-wrap">
+                      {account.notes}
+                    </dd>
                   </div>
                 )}
               </dl>
@@ -337,21 +301,12 @@ export function BankAccountDetails({
           </div>
         </CardHeader>
         <CardContent>
-          {transactionsLoading ? (
-            <div className="flex justify-center items-center p-8">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            </div>
-          ) : recentTransactions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No transactions found for this account.
-            </div>
-          ) : (
-            <TransactionList
-              transactions={recentTransactions}
-              showPagination={false}
-              compact={true}
-            />
-          )}
+          <TransactionList
+            filters={{ bankAccountId: id }}
+            showPagination={false}
+            compact={true}
+            limit={5}
+          />
         </CardContent>
       </Card>
 
@@ -361,9 +316,9 @@ export function BankAccountDetails({
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this bank account? This action cannot be undone.
-              Any transactions associated with this account will remain but will no longer be
-              linked to an account.
+              Are you sure you want to delete this bank account? This action
+              cannot be undone. Any transactions associated with this account
+              will remain but will no longer be linked to an account.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -373,10 +328,7 @@ export function BankAccountDetails({
             >
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteConfirm}
-            >
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
               Delete Account
             </Button>
           </DialogFooter>

@@ -192,6 +192,8 @@ This document outlines a step-by-step approach to implementing the Budget Tracke
   - [x] Group transactions
   - [x] Group budgets
   - [x] Activity feed
+- [x] Fix database relationship issues:
+  - [x] Resolve foreign key relationship between group_transactions and created_by
 
 ## Phase 4: Advanced Features (3-4 weeks)
 
@@ -477,6 +479,7 @@ This section tracks the progress of integrating shadcn/ui components throughout 
 - [x] GroupSettings
 - [x] GroupActivityFeed
 - [x] InviteMemberDialog
+- [x] Fixed group transactions database relationship issues
 
 #### Dashboard Components
 
@@ -785,11 +788,33 @@ We have successfully completed all planned features for the Budget Tracker appli
   - [x] Ensure consistent naming conventions
   - [x] Document complex type definitions
 
+### Step 2: Bug Fixes and Optimizations
+
+- [x] Fix database relationship issues
+  - [x] Resolve group_transactions and created_by relationship
+  - [x] Implement workaround for Supabase schema cache issues
+- [x] Optimize API calls
+  - [x] Improve data fetching for group transactions
+  - [x] Implement more efficient user profile data retrieval
+
+### Step 3: Group Transactions Fix
+
+- [x] Fix the "Could not find a relationship between 'group_transactions' and 'created_by'" error
+  - [x] Modify API queries to avoid relying on automatic foreign key relationships
+  - [x] Implement manual data joining for user profiles
+  - [x] Create migration file for future database schema updates
+  - [x] Document the solution for future reference
+
 ### Future Considerations
 
 While all planned features have been implemented, including the recently added toast notification system for user feedback and TypeScript/ESLint improvements, the following areas could be considered for future enhancements:
 
-1.
+1. **Enhanced Group Transactions**: Improve the group transactions functionality to better handle relationships between tables in the database schema cache.
+2. **Expense Splitting**: Add functionality to split expenses between group members.
+3. **Debt Tracking**: Track who owes what to whom within budget groups.
+4. **Recurring Group Expenses**: Allow setting up recurring bills for households.
+5. **Group Spending Analytics**: Add more detailed analytics for group spending patterns.
+6. **Group Notifications**: Alert group members about important financial events.
 
 ## Resources
 

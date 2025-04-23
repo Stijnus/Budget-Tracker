@@ -16,7 +16,7 @@ import {
 import { useTheme } from "../../providers/ThemeProvider";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
   const { t } = useLanguage();
 
   return (

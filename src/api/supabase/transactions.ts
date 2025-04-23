@@ -1,19 +1,20 @@
 import { supabase } from "./client";
 import type { Database } from "../../lib/database.types";
+import { PostgrestError } from "@supabase/supabase-js";
 
 export type Transaction =
   Database["public"]["Tables"]["transactions"]["Row"] & {
     category_name?: string;
     category_color?: string;
-    bank_account_name?: string;
+    bank_account_name?: string | null;
     categories?: {
       name?: string;
       color?: string;
-    };
+    } | null;
     bank_accounts?: {
       name?: string;
       account_type?: string;
-    };
+    } | null;
   };
 export type TransactionInsert =
   Database["public"]["Tables"]["transactions"]["Insert"];
@@ -70,7 +71,7 @@ export async function getRecentTransactions(limit = 10) {
         bank_account_name: null, // No bank account info available
       }));
 
-      return { data: transformedData, error: fallbackResult.error };
+      return { data: transformedData, error };
     }
 
     // Transform the data to include category_name, category_color, and bank_account_name
@@ -84,7 +85,7 @@ export async function getRecentTransactions(limit = 10) {
     return { data: transformedData, error };
   } catch (err) {
     console.error("Unexpected error in getRecentTransactions:", err);
-    return { data: null, error: err as any };
+    return { data: null, error: err as PostgrestError };
   }
 }
 
@@ -157,7 +158,7 @@ export async function getTransactionsByDateRange(
     return { data: transformedData, error };
   } catch (err) {
     console.error("Unexpected error in getTransactionsByDateRange:", err);
-    return { data: null, error: err as any };
+    return { data: null, error: err as PostgrestError };
   }
 }
 
@@ -332,7 +333,7 @@ export async function getTransactionsByBankAccount(
     return { data: transformedData, error };
   } catch (err) {
     console.error("Unexpected error in getTransactionsByBankAccount:", err);
-    return { data: null, error: err as any };
+    return { data: null, error: err as PostgrestError };
   }
 }
 
@@ -404,6 +405,6 @@ export async function getTransactionById(id: string) {
     return { data: transformedData, error };
   } catch (err) {
     console.error("Unexpected error in getTransactionById:", err);
-    return { data: null, error: err as any };
+    return { data: null, error: err as PostgrestError };
   }
 }

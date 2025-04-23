@@ -3,3 +3,100 @@ description:
 globs:
 alwaysApply: false
 ---
+# Data Management Patterns
+
+The Budget-Tracker application implements consistent patterns for managing data throughout the application.
+
+## Database Schema
+
+The database schema is defined in Supabase and includes tables for:
+
+1. **User Management**
+   - `user_profiles` - User profile information
+   - `user_settings` - User preferences and settings
+
+2. **Financial Data**
+   - `transactions` - Core expense and income records
+   - `categories` - Transaction categories
+   - `tags` - Transaction tags
+   - `transaction_tags` - Junction table for transactions and tags
+
+3. **Budget Management**
+   - `budgets` - Budget allocations and limits
+   - `bank_accounts` - Bank and credit account information
+
+4. **Goals and Bills**
+   - `financial_goals` - Savings goals
+   - `goal_contributions` - Contributions to financial goals
+   - `bills_subscriptions` - Recurring bills and subscriptions
+   - `bill_payments` - Payments made toward bills
+
+5. **Collaborative Features**
+   - `budget_groups` - Shared budget groups
+   - `group_members` - Group membership and roles
+   - `group_transactions` - Transactions within groups
+   - `group_budgets` - Budgets within groups
+   - `group_invitations` - Invitations to join groups
+   - `group_activity_log` - Activity tracking within groups
+
+## Data Access Patterns
+
+1. **API Functions**
+   - Organized by domain in `src/api/supabase`
+   - Follow CRUD pattern (Create, Read, Update, Delete)
+   - Include proper error handling and data validation
+   - Return strongly typed responses
+
+2. **Custom Hooks**
+   - Domain-specific hooks for data operations
+   - Custom hooks follow naming pattern `use[Resource][Operation]`
+   - Include loading, error, and data states
+
+3. **Data Transformation**
+   - Data normalization happens in API layer
+   - Utility functions for common transformations
+   - Date and currency formatting is consistent
+
+## Security Patterns
+
+1. **Row Level Security**
+   - Each table has RLS policies in place
+   - Users can only access their own data
+   - Group data is restricted by membership
+
+2. **Data Validation**
+   - Client-side validation with Zod schemas
+   - Server-side validation in database constraints
+   - All user inputs are validated before saving
+
+3. **Type Safety**
+   - Generated database types from Supabase schema
+   - Consistent use of TypeScript interfaces
+   - No use of `any` type in data operations
+
+## State Synchronization
+
+1. **Form State**
+   - Forms use react-hook-form for state management
+   - Validation with zod schema validators
+   - Consistent error handling and user feedback
+
+2. **UI State**
+   - Loading states during data operations
+   - Toast notifications for operation results
+   - Optimistic updates for better UX
+
+3. **Data Mutations**
+   - Consistent patterns for create, update, delete
+   - Proper handling of race conditions
+   - Cache invalidation strategies
+
+## Data Flow Architecture
+
+```
+User Interaction → Form/Component → Custom Hook → API Function → Supabase Client → Database
+      ↑                                                                                ↓
+      └───────────── UI Update ← State Update ← Data Transformation ← Database Response
+```
+
+This unidirectional data flow ensures consistency and makes the application easier to debug and maintain.
