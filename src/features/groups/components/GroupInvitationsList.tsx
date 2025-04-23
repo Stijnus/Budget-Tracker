@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import {
   Card,
@@ -54,7 +54,7 @@ export function GroupInvitationsList({
   invitations,
   onAccept,
 }: GroupInvitationsListProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { user } = useAuth();
   const [processingInvitations, setProcessingInvitations] = useState<
     Record<string, boolean>
@@ -137,7 +137,7 @@ export function GroupInvitationsList({
                     {invitation.group?.name}
                   </CardTitle>
                   <CardDescription>
-                    {t("groups.invitedBy")}:{" "}
+                    {"InvitedBy"}:{" "}
                     {invitation.inviter?.user_profiles?.full_name ||
                       invitation.inviter?.id}
                   </CardDescription>
@@ -145,21 +145,21 @@ export function GroupInvitationsList({
               </div>
               <Badge>
                 {invitation.role === "admin"
-                  ? t("groups.roleAdmin")
+                  ? "RoleAdmin"
                   : invitation.role === "member"
-                  ? t("groups.roleMember")
-                  : t("groups.roleViewer")}
+                  ? "RoleMember"
+                  : "RoleViewer"}
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="pb-2">
             <p className="text-sm">
-              {invitation.group?.description || t("groups.noDescription")}
+              {invitation.group?.description || "NoDescription"}
             </p>
             <div className="flex items-center mt-2 text-sm text-muted-foreground">
               <Clock className="mr-1 h-4 w-4" />
               <span>
-                {t("groups.expiresOn")}: {formatDate(invitation.expires_at)}
+                {"ExpiresOn"}: {formatDate(invitation.expires_at)}
               </span>
             </div>
             {errors[invitation.token] && (
@@ -176,7 +176,7 @@ export function GroupInvitationsList({
               disabled={processingInvitations[invitation.token]}
             >
               <X className="mr-1 h-4 w-4" />
-              {t("groups.decline")}
+              {"Decline"}
             </Button>
             <Button
               variant="default"
@@ -185,7 +185,7 @@ export function GroupInvitationsList({
               disabled={processingInvitations[invitation.token]}
             >
               <Check className="mr-1 h-4 w-4" />
-              {t("groups.accept")}
+              {"Accept"}
             </Button>
           </CardFooter>
         </Card>

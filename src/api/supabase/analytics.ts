@@ -68,7 +68,7 @@ export async function getSpendingTrend(
   // Get all transactions in the date range
   const { data: transactions, error } = await supabase
     .from("transactions")
-    .select("date, amount, type")
+    .select("Date, amount, type")
     .gte("date", startDate)
     .lte("date", endDate)
     .order("date", { ascending: true });
@@ -131,7 +131,7 @@ export async function getIncomeVsExpenses(
   // Get all transactions in the date range
   const { data: transactions, error } = await supabase
     .from("transactions")
-    .select("date, amount, type")
+    .select("Date, amount, type")
     .gte("date", startDate)
     .lte("date", endDate)
     .order("date", { ascending: true });
@@ -259,7 +259,7 @@ export async function getBudgetVsActual() {
       // Get transactions for this category in the date range
       const { data: transactions, error: transactionsError } = await supabase
         .from("transactions")
-        .select("amount")
+        .select("Amount")
         .eq("category_id", budget.category_id)
         .eq("type", "expense")
         .gte("date", startDate)

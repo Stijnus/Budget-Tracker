@@ -111,9 +111,9 @@ export function BankAccountForm({
 
       // Show success toast
       if (account) {
-        showItemUpdatedToast("bank account");
+        showItemUpdatedToast("Bank account");
       } else {
-        showItemCreatedToast("bank account");
+        showItemCreatedToast("Bank account");
       }
 
       // Success

@@ -1,5 +1,5 @@
 import { toast } from "@/hooks/use-toast";
-import { i18n } from "../i18n/translations-loader";
+// Translations loader import removed
 import { ToastActionElement } from "@/components/ui/toast";
 
 type ToastType = "success" | "error" | "info" | "warning";
@@ -51,12 +51,10 @@ export function showToast(options: ToastOptions) {
  * Show a success toast for item creation
  */
 export function showItemCreatedToast(itemType: string) {
-  const t = i18n.t.bind(i18n);
-
   return showToast({
     type: "success",
-    title: t("common.success"),
-    description: t("common.itemCreated", { item: t(`common.${itemType}`) }),
+    title: "Success",
+    description: `${itemType} created successfully`,
     duration: 3000,
   });
 }
@@ -65,12 +63,10 @@ export function showItemCreatedToast(itemType: string) {
  * Show a success toast for item update
  */
 export function showItemUpdatedToast(itemType: string) {
-  const t = i18n.t.bind(i18n);
-
   return showToast({
     type: "success",
-    title: t("common.success"),
-    description: t("common.itemUpdated", { item: t(`common.${itemType}`) }),
+    title: "Success",
+    description: `${itemType} updated successfully`,
     duration: 3000,
   });
 }
@@ -79,12 +75,10 @@ export function showItemUpdatedToast(itemType: string) {
  * Show a success toast for item deletion
  */
 export function showItemDeletedToast(itemType: string) {
-  const t = i18n.t.bind(i18n);
-
   return showToast({
     type: "success",
-    title: t("common.success"),
-    description: t("common.itemDeleted", { item: t(`common.${itemType}`) }),
+    title: "Success",
+    description: `${itemType} deleted successfully`,
     duration: 3000,
   });
 }
@@ -93,12 +87,10 @@ export function showItemDeletedToast(itemType: string) {
  * Show an error toast
  */
 export function showErrorToast(message?: string) {
-  const t = i18n.t.bind(i18n);
-
   return showToast({
     type: "error",
-    title: t("common.error"),
-    description: message || t("common.somethingWentWrong"),
+    title: "Error",
+    description: message || "Something went wrong",
     duration: 5000,
   });
 }

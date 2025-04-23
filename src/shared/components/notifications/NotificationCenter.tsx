@@ -16,12 +16,12 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { NotificationItem } from "./NotificationItem";
-import { useLanguage } from "../../../providers/LanguageProvider";
+// Language provider import removed
 
 export function NotificationCenter() {
   const { notifications, hasUnreadNotifications, markAllAsRead, clearAll } =
     useNotifications();
-  const { t } = useLanguage();
+  // Language hooks removed
 
   return (
     <TooltipProvider>
@@ -33,7 +33,7 @@ export function NotificationCenter() {
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground relative"
-                aria-label={t("common.notifications")}
+                aria-label="Notifications"
               >
                 <Bell size={18} />
                 {hasUnreadNotifications && (
@@ -43,7 +43,7 @@ export function NotificationCenter() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 max-h-[70vh]">
               <div className="flex items-center justify-between p-3">
-                <h3 className="font-medium">{t("common.notifications")}</h3>
+                <h3 className="font-medium">Notifications</h3>
                 <div className="flex gap-1.5">
                   {hasUnreadNotifications && (
                     <Button
@@ -52,7 +52,7 @@ export function NotificationCenter() {
                       className="h-auto px-2 py-1 text-xs text-muted-foreground"
                       onClick={markAllAsRead}
                     >
-                      {t("common.markAllAsRead")}
+                      Mark All as Read
                     </Button>
                   )}
                   {notifications.length > 0 && (
@@ -62,7 +62,7 @@ export function NotificationCenter() {
                       className="h-auto px-2 py-1 text-xs text-muted-foreground"
                       onClick={clearAll}
                     >
-                      {t("common.clear")}
+                      Clear
                     </Button>
                   )}
                 </div>
@@ -83,7 +83,7 @@ export function NotificationCenter() {
                       className="text-center text-sm text-muted-foreground p-8 opacity-70"
                       disabled
                     >
-                      {t("common.noNotifications")}
+                      No Notifications
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuGroup>
@@ -92,7 +92,7 @@ export function NotificationCenter() {
           </DropdownMenu>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{t("common.notifications")}</p>
+          <p>Notifications</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -27,7 +27,7 @@ interface GroupListProps {
 }
 
 export function GroupList({ groups }: GroupListProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const navigate = useNavigate();
 
   return (
@@ -49,20 +49,20 @@ export function GroupList({ groups }: GroupListProps) {
                   <CardTitle className="text-lg">{group.name}</CardTitle>
                   {!group.is_active && (
                     <Badge variant="outline" className="ml-2">
-                      {t("groups.inactive")}
+                      Inactive
                     </Badge>
                   )}
                 </div>
               </div>
             </div>
             <CardDescription className="line-clamp-2 mt-1">
-              {group.description || t("groups.noDescription")}
+              {group.description || "No description available"}
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-2">
             <div className="flex items-center text-sm text-muted-foreground">
               <Users className="mr-1 h-4 w-4" />
-              <span>{t("groups.membersCount", { count: 0 })}</span>
+              <span>0 members</span>
             </div>
           </CardContent>
           <CardFooter>
@@ -71,7 +71,7 @@ export function GroupList({ groups }: GroupListProps) {
               className="w-full"
               onClick={() => navigate(`/groups/${group.id}`)}
             >
-              {t("groups.viewGroup")}
+              View Group
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardFooter>

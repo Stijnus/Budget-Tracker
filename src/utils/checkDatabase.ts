@@ -24,55 +24,55 @@ export async function checkDatabaseTables(): Promise<DatabaseCheckResult> {
     // Check user_profiles table
     const { error: userProfilesError } = await supabase
       .from("user_profiles")
-      .select("id")
+      .select("Id")
       .limit(1);
 
     // Check user_settings table
     const { error: userSettingsError } = await supabase
       .from("user_settings")
-      .select("id")
+      .select("Id")
       .limit(1);
 
     // Check categories table
     const { error: categoriesError } = await supabase
       .from("categories")
-      .select("id")
+      .select("Id")
       .limit(1);
 
     // Check transactions table
     const { error: transactionsError } = await supabase
       .from("transactions")
-      .select("id")
+      .select("Id")
       .limit(1);
 
     // Check budgets table
     const { error: budgetsError } = await supabase
       .from("budgets")
-      .select("id")
+      .select("Id")
       .limit(1);
 
     // Check tags table
     const { error: tagsError } = await supabase
       .from("tags")
-      .select("id")
+      .select("Id")
       .limit(1);
 
     // Check transaction_tags table
     const { error: transactionTagsError } = await supabase
       .from("transaction_tags")
-      .select("transaction_id")
+      .select("Transaction Id")
       .limit(1);
 
     // Check bills_subscriptions table
     const { error: billsSubscriptionsError } = await supabase
       .from("bills_subscriptions")
-      .select("id")
+      .select("Id")
       .limit(1);
 
     // Check financial_goals table
     const { error: financialGoalsError } = await supabase
       .from("financial_goals")
-      .select("id")
+      .select("Id")
       .limit(1);
 
     // Return results

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -131,7 +131,7 @@ interface TransactionSummary {
 }
 
 export function GroupPage() {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -406,7 +406,7 @@ export function GroupPage() {
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="sm" onClick={() => navigate("/groups")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("common.back")}
+            {"Back"}
           </Button>
         </div>
         <div className="space-y-4">
@@ -424,16 +424,14 @@ export function GroupPage() {
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="sm" onClick={() => navigate("/groups")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("common.back")}
+            {"Back"}
           </Button>
         </div>
         <Alert variant="destructive">
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error || "Group not found"}</AlertDescription>
         </Alert>
-        <Button onClick={() => navigate("/groups")}>
-          {t("common.goBack")}
-        </Button>
+        <Button onClick={() => navigate("/groups")}>{"GoBack"}</Button>
       </div>
     );
   }
@@ -443,7 +441,7 @@ export function GroupPage() {
       <div className="flex items-center space-x-4">
         <Button variant="ghost" size="sm" onClick={() => navigate("/groups")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {t("common.back")}
+          {"Back"}
         </Button>
       </div>
 
@@ -462,7 +460,7 @@ export function GroupPage() {
               {group.name}
               {!group.is_active && (
                 <Badge variant="outline" className="ml-2">
-                  {t("groups.inactive") || "Inactive"}
+                  {"Inactive" || "Inactive"}
                 </Badge>
               )}
             </h1>
@@ -470,23 +468,13 @@ export function GroupPage() {
               <p className="text-muted-foreground">{group.description}</p>
               {userRole && (
                 <Badge variant="secondary" className="ml-1">
-                  {t(
-                    `groups.role${
-                      userRole.charAt(0).toUpperCase() + userRole.slice(1)
-                    }`
-                  ) || userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+                  {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
                 </Badge>
               )}
               {userFamilyRole && (
                 <Badge variant="outline" className="ml-1 bg-blue-50">
-                  {t(
-                    `groups.role${
-                      userFamilyRole.charAt(0).toUpperCase() +
-                      userFamilyRole.slice(1)
-                    }`
-                  ) ||
-                    userFamilyRole.charAt(0).toUpperCase() +
-                      userFamilyRole.slice(1)}
+                  {userFamilyRole.charAt(0).toUpperCase() +
+                    userFamilyRole.slice(1)}
                 </Badge>
               )}
             </div>
@@ -496,7 +484,7 @@ export function GroupPage() {
         {isAdmin && (
           <Button onClick={() => setIsInviteDialogOpen(true)}>
             <UserPlus className="mr-2 h-4 w-4" />
-            {t("groups.inviteMember")}
+            Invite Member
           </Button>
         )}
       </div>
@@ -506,7 +494,7 @@ export function GroupPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">
-                {t("groups.totalIncome")}
+                Total Income
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -518,7 +506,7 @@ export function GroupPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">
-                {t("groups.totalExpenses")}
+                Total Expenses
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -529,9 +517,7 @@ export function GroupPage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t("groups.balance")}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Balance</CardTitle>
             </CardHeader>
             <CardContent>
               <div
@@ -550,29 +536,29 @@ export function GroupPage() {
         <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
           <TabsTrigger value="transactions">
             <Receipt className="mr-2 h-4 w-4" />
-            <span className="hidden md:inline">{t("groups.transactions")}</span>
-            <span className="md:hidden">{t("groups.transactionsShort")}</span>
+            <span className="hidden md:inline">Transactions</span>
+            <span className="md:hidden">Trans</span>
           </TabsTrigger>
           <TabsTrigger value="budgets">
             <Calendar className="mr-2 h-4 w-4" />
-            <span className="hidden md:inline">{t("groups.budgets")}</span>
-            <span className="md:hidden">{t("groups.budgetsShort")}</span>
+            <span className="hidden md:inline">Budgets</span>
+            <span className="md:hidden">Budg</span>
           </TabsTrigger>
           <TabsTrigger value="members">
             <Users className="mr-2 h-4 w-4" />
-            <span className="hidden md:inline">{t("groups.members")}</span>
-            <span className="md:hidden">{t("groups.membersShort")}</span>
+            <span className="hidden md:inline">Members</span>
+            <span className="md:hidden">Memb</span>
           </TabsTrigger>
           <TabsTrigger value="activity">
             <Activity className="mr-2 h-4 w-4" />
-            <span className="hidden md:inline">{t("groups.activity")}</span>
-            <span className="md:hidden">{t("groups.activityShort")}</span>
+            <span className="hidden md:inline">Activity</span>
+            <span className="md:hidden">Act</span>
           </TabsTrigger>
           {isAdmin && (
             <TabsTrigger value="settings">
               <Settings className="mr-2 h-4 w-4" />
-              <span className="hidden md:inline">{t("groups.settings")}</span>
-              <span className="md:hidden">{t("groups.settingsShort")}</span>
+              <span className="hidden md:inline">Settings</span>
+              <span className="md:hidden">Set</span>
             </TabsTrigger>
           )}
         </TabsList>

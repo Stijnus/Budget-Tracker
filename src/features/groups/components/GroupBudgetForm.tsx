@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,7 +49,7 @@ export function GroupBudgetForm({
   budget,
   onSuccess,
 }: GroupBudgetFormProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { user } = useAuth();
   const [name, setName] = useState(budget?.name || "");
   const [amount, setAmount] = useState(budget ? budget.amount.toString() : "");
@@ -151,12 +151,12 @@ export function GroupBudgetForm({
       <div className="space-y-4">
         {/* Budget Name */}
         <div className="space-y-2">
-          <Label htmlFor="name">{t("groups.budgetName")}</Label>
+          <Label htmlFor="name">Budget Name</Label>
           <Input
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={t("groups.budgetNamePlaceholder")}
+            placeholder="Enter budget name"
             required
           />
         </div>
@@ -164,7 +164,7 @@ export function GroupBudgetForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount">{t("groups.amount")}</Label>
+            <Label htmlFor="amount">Amount</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2">
                 $
@@ -184,10 +184,10 @@ export function GroupBudgetForm({
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">{t("groups.category")}</Label>
+            <Label htmlFor="category">Category</Label>
             <Select value={categoryId} onValueChange={setCategoryId} required>
               <SelectTrigger id="category">
-                <SelectValue placeholder={t("groups.selectCategory")} />
+                <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -202,7 +202,7 @@ export function GroupBudgetForm({
 
         {/* Period */}
         <div className="space-y-2">
-          <Label htmlFor="period">{t("groups.period")}</Label>
+          <Label htmlFor="period">Period</Label>
           <Select
             value={period}
             onValueChange={(value) =>
@@ -210,13 +210,13 @@ export function GroupBudgetForm({
             }
           >
             <SelectTrigger id="period">
-              <SelectValue placeholder={t("groups.selectPeriod")} />
+              <SelectValue placeholder="Select a period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="daily">{t("groups.daily")}</SelectItem>
-              <SelectItem value="weekly">{t("groups.weekly")}</SelectItem>
-              <SelectItem value="monthly">{t("groups.monthly")}</SelectItem>
-              <SelectItem value="yearly">{t("groups.yearly")}</SelectItem>
+              <SelectItem value="daily">Daily</SelectItem>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="monthly">Monthly</SelectItem>
+              <SelectItem value="yearly">Yearly</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -224,7 +224,7 @@ export function GroupBudgetForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Start Date */}
           <div className="space-y-2">
-            <Label>{t("groups.startDate")}</Label>
+            <Label>Start Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -255,9 +255,7 @@ export function GroupBudgetForm({
 
           {/* End Date (Optional) */}
           <div className="space-y-2">
-            <Label>
-              {t("groups.endDate")} ({t("common.optional")})
-            </Label>
+            <Label>End Date (Optional)</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -268,11 +266,7 @@ export function GroupBudgetForm({
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? (
-                    format(endDate, "PPP")
-                  ) : (
-                    <span>{t("groups.noEndDate")}</span>
-                  )}
+                  {endDate ? format(endDate, "PPP") : <span>No End Date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
@@ -282,7 +276,7 @@ export function GroupBudgetForm({
                     className="w-full justify-start text-left mb-2"
                     onClick={() => setEndDate(undefined)}
                   >
-                    {t("groups.noEndDate")}
+                    No End Date
                   </Button>
                 </div>
                 <Calendar
@@ -302,11 +296,11 @@ export function GroupBudgetForm({
         <Button type="submit" disabled={isLoading}>
           {isLoading
             ? budget
-              ? t("common.saving")
-              : t("common.creating")
+              ? "Saving"
+              : "Creating"
             : budget
-            ? t("common.save")
-            : t("common.create")}
+            ? "Save"
+            : "Create"}
         </Button>
       </div>
     </form>

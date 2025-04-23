@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { updateUserSettings } from "../../../api/supabase/auth";
-import { useLanguage } from "../../../providers/LanguageProvider";
+// Language provider import removed
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -41,8 +41,8 @@ const LANGUAGE_OPTIONS = [
 
 export function LanguageSettingsForm() {
   const { user, userSettings, refreshUserData } = useAuth();
-  const { language: currentLanguage, changeLanguage } = useLanguage();
-  const [language, setLanguage] = useState(currentLanguage || "en");
+  // Language hooks removed
+  const [language, setLanguage] = useState("en");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
@@ -81,8 +81,7 @@ export function LanguageSettingsForm() {
           await refreshUserData();
         }
 
-        // Apply the language immediately
-        await changeLanguage(language);
+        // Language change removed
       }
     } catch (err) {
       setMessage({ text: "An unexpected error occurred", type: "error" });

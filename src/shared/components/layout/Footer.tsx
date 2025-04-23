@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Github, Twitter, Facebook, Instagram, HelpCircle } from "lucide-react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import {
   Tooltip,
   TooltipContent,
@@ -10,14 +10,14 @@ import {
 } from "@/components/ui/tooltip";
 
 export function Footer() {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-background border-t py-4 px-6 mt-auto">
       <div className="flex flex-col md:flex-row justify-between items-center">
         <div className="text-sm text-muted-foreground">
-          {t("footer.copyright", { year: currentYear })}
+          © {currentYear} Budget Tracker. All rights reserved.
         </div>
 
         {/* Links */}
@@ -27,7 +27,7 @@ export function Footer() {
             size="sm"
             className="text-muted-foreground p-0 h-auto"
           >
-            {t("footer.privacyPolicy")}
+            Privacy Policy
           </Button>
           <Separator orientation="vertical" className="h-4 hidden md:block" />
           <Button
@@ -35,7 +35,7 @@ export function Footer() {
             size="sm"
             className="text-muted-foreground p-0 h-auto"
           >
-            {t("footer.termsOfService")}
+            Terms of Service
           </Button>
           <Separator orientation="vertical" className="h-4 hidden md:block" />
           <Button
@@ -43,7 +43,7 @@ export function Footer() {
             size="sm"
             className="text-muted-foreground p-0 h-auto"
           >
-            {t("footer.contact")}
+            Contact
           </Button>
         </div>
       </div>
@@ -62,7 +62,7 @@ export function Footer() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{t("footer.github")}</p>
+              <p>Github</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -79,7 +79,7 @@ export function Footer() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{t("footer.twitter")}</p>
+              <p>Twitter</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -96,7 +96,7 @@ export function Footer() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{t("footer.facebook")}</p>
+              <p>Facebook</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -113,7 +113,7 @@ export function Footer() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{t("footer.instagram")}</p>
+              <p>Instagram</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -130,7 +130,7 @@ export function Footer() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{t("footer.helpSupport")}</p>
+              <p>Help & Support</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

@@ -152,9 +152,9 @@ export function BudgetForm({ budget, onClose, onSuccess }: BudgetFormProps) {
 
       // Show success toast
       if (budget) {
-        showItemUpdatedToast("budget");
+        showItemUpdatedToast("Budget");
       } else {
-        showItemCreatedToast("budget");
+        showItemCreatedToast("Budget");
       }
 
       // Success

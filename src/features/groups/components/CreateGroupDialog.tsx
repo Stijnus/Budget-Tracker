@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import {
   Dialog,
@@ -27,7 +27,7 @@ export function CreateGroupDialog({
   onOpenChange,
   onCreateGroup,
 }: CreateGroupDialogProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { user } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -98,9 +98,9 @@ export function CreateGroupDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t("groups.createGroup")}</DialogTitle>
+          <DialogTitle>{"CreateGroup"}</DialogTitle>
           <DialogDescription>
-            {t("groups.createGroupDescription")}
+            {"CreateGroupDescription"}
           </DialogDescription>
         </DialogHeader>
 
@@ -112,23 +112,23 @@ export function CreateGroupDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">{t("groups.groupName")}</Label>
+            <Label htmlFor="name">{"GroupName"}</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={t("groups.groupNamePlaceholder")}
+              placeholder={"GroupNamePlaceholder"}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">{t("groups.groupDescription")}</Label>
+            <Label htmlFor="description">{"GroupDescription"}</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("groups.groupDescriptionPlaceholder")}
+              placeholder={"GroupDescriptionPlaceholder"}
               rows={3}
             />
           </div>
@@ -140,7 +140,7 @@ export function CreateGroupDialog({
               onClick={() => handleOpenChange(false)}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              {"Cancel"}
             </Button>
             <Button type="submit" disabled={isLoading || !name}>
               {isLoading ? "Creating..." : "Create"}

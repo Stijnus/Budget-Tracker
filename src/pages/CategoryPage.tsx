@@ -17,7 +17,7 @@ export function CategoryPage() {
   
   // Determine if we're adding a category for a specific type
   const searchParams = new URLSearchParams(location.search);
-  const defaultType = searchParams.get("type") as "expense" | "income" | "both" || undefined;
+  const defaultType = searchParams.get("Type") as "expense" | "income" | "both" || undefined;
 
   // Fetch category if editing
   useEffect(() => {

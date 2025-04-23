@@ -567,6 +567,7 @@ export async function createInvitation(
     // Generate a token using the server function or create a random one if that fails
     let token: string;
     try {
+      // Try to use the database function to generate a token
       const { data: tokenData, error: tokenError } = await supabase.rpc<string>(
         "generate_invitation_token"
       );
@@ -574,18 +575,23 @@ export async function createInvitation(
       if (tokenError) {
         console.error("Error generating invitation token:", tokenError);
         // Generate a random token as fallback
-        token =
-          Math.random().toString(36).substring(2, 15) +
-          Math.random().toString(36).substring(2, 15);
+        token = generateRandomToken();
       } else {
-        token = tokenData || "";
+        token = tokenData || generateRandomToken();
       }
     } catch (tokenErr) {
       console.error("Exception generating invitation token:", tokenErr);
       // Generate a random token as fallback
-      token =
+      token = generateRandomToken();
+    }
+
+    // Helper function to generate a random token
+    function generateRandomToken() {
+      return (
         Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15);
+        Math.random().toString(36).substring(2, 15) +
+        Date.now().toString(36)
+      );
     }
 
     console.log("Using token:", token);
@@ -737,18 +743,7 @@ export async function getGroupActivity(groupId: string, limit = 20) {
     try {
       const { data, error } = await supabase
         .from("group_activity_log")
-        .select(
-          `
-          *,
-          user:user_id(
-            id,
-            user_profiles(
-              full_name,
-              avatar_url
-            )
-          )
-        `
-        )
+        .select("*")
         .eq("group_id", groupId)
         .order("created_at", { ascending: false })
         .limit(limit);
@@ -787,7 +782,7 @@ export async function getGroupActivity(groupId: string, limit = 20) {
           const { data: userData } = await supabase
             .from("user_profiles")
             .select("*")
-            .eq("user_id", activity.user_id)
+            .eq("id", activity.user_id)
             .single();
 
           return {

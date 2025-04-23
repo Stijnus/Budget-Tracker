@@ -109,7 +109,7 @@ export function BankAccountList({
       if (error) throw error;
 
       // Show success toast
-      showItemDeletedToast("bank account");
+      showItemDeletedToast("Bank account");
 
       // Reload accounts
       loadAccounts();

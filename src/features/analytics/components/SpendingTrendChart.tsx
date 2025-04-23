@@ -60,7 +60,7 @@ export function SpendingTrendChart({
 
           // Format date for display
           if (groupBy === "month") {
-            const [year, month] = item.date.split("-");
+            const [year, month] = item.date.split(" ");
             const date = new Date(parseInt(year), parseInt(month) - 1, 1);
             displayDate = date.toLocaleDateString("en-US", {
               month: "short",

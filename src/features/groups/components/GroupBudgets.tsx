@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import {
   Card,
@@ -72,7 +72,7 @@ export function GroupBudgets({
   userRole,
   onChange,
 }: GroupBudgetsProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { user } = useAuth();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -147,13 +147,13 @@ export function GroupBudgets({
   const formatPeriod = (period: string) => {
     switch (period) {
       case "daily":
-        return t("groups.daily");
+        return "Daily";
       case "weekly":
-        return t("groups.weekly");
+        return "Weekly";
       case "monthly":
-        return t("groups.monthly");
+        return "Monthly";
       case "yearly":
-        return t("groups.yearly");
+        return "Yearly";
       default:
         return period;
     }
@@ -171,11 +171,11 @@ export function GroupBudgets({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">{t("groups.budgets")}</h2>
+        <h2 className="text-xl font-semibold">Budgets</h2>
         {canCreateBudget && (
           <Button onClick={() => handleOpenForm()}>
             <Plus className="mr-2 h-4 w-4" />
-            {t("groups.addBudget")}
+            Add Budget
           </Button>
         )}
       </div>
@@ -189,13 +189,11 @@ export function GroupBudgets({
       {budgets.length === 0 ? (
         <Card>
           <CardContent className="p-6 text-center">
-            <p className="text-muted-foreground mb-4">
-              {t("groups.noBudgets")}
-            </p>
+            <p className="text-muted-foreground mb-4">No budgets found</p>
             {canCreateBudget && (
               <Button onClick={() => handleOpenForm()}>
                 <Plus className="mr-2 h-4 w-4" />
-                {t("groups.addBudget")}
+                Add Budget
               </Button>
             )}
           </CardContent>
@@ -234,7 +232,7 @@ export function GroupBudgets({
                             onClick={() => handleOpenForm(budget)}
                           >
                             <Edit className="mr-2 h-4 w-4" />
-                            {t("common.edit")}
+                            Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
@@ -244,7 +242,7 @@ export function GroupBudgets({
                             className="text-destructive focus:text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            {t("common.delete")}
+                            Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -301,7 +299,7 @@ export function GroupBudgets({
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-muted-foreground">
-                        {t("groups.createdBy")}{" "}
+                        Created by{" "}
                         {budget.creator?.user_profiles?.full_name ||
                           budget.creator?.id}
                       </span>
@@ -351,7 +349,7 @@ export function GroupBudgets({
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
-              {selectedBudget ? t("groups.editBudget") : t("groups.addBudget")}
+              {selectedBudget ? "Edit Budget" : "Add Budget"}
             </DialogTitle>
           </DialogHeader>
           <GroupBudgetForm
@@ -369,11 +367,10 @@ export function GroupBudgets({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("groups.deleteBudget")}</DialogTitle>
+            <DialogTitle>Delete Budget</DialogTitle>
             <DialogDescription>
-              {t("groups.deleteBudgetConfirmation", {
-                name: selectedBudget?.name,
-              })}
+              Are you sure you want to delete the budget "{selectedBudget?.name}
+              "? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
 
@@ -383,14 +380,14 @@ export function GroupBudgets({
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteBudget}
               disabled={isLoading}
             >
-              {isLoading ? t("common.deleting") : t("common.delete")}
+              {isLoading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

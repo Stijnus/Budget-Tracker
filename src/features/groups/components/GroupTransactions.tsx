@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -73,7 +73,7 @@ export function GroupTransactions({
   userRole,
   onChange,
 }: GroupTransactionsProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { user } = useAuth();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -141,11 +141,11 @@ export function GroupTransactions({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">{t("groups.transactions")}</h2>
+        <h2 className="text-xl font-semibold">Transactions</h2>
         {canCreateTransaction && (
           <Button onClick={() => handleOpenForm()}>
             <Plus className="mr-2 h-4 w-4" />
-            {t("groups.addTransaction")}
+            Add Transaction
           </Button>
         )}
       </div>
@@ -161,12 +161,12 @@ export function GroupTransactions({
           {transactions.length === 0 ? (
             <div className="p-6 text-center">
               <p className="text-muted-foreground mb-4">
-                {t("groups.noTransactions")}
+                No transactions found
               </p>
               {canCreateTransaction && (
                 <Button onClick={() => handleOpenForm()}>
                   <Plus className="mr-2 h-4 w-4" />
-                  {t("groups.addTransaction")}
+                  Add Transaction
                 </Button>
               )}
             </div>
@@ -174,14 +174,12 @@ export function GroupTransactions({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("groups.date")}</TableHead>
-                  <TableHead>{t("groups.description")}</TableHead>
-                  <TableHead>{t("groups.category")}</TableHead>
-                  <TableHead>{t("groups.amount")}</TableHead>
-                  <TableHead>{t("groups.createdBy")}</TableHead>
-                  <TableHead className="text-right">
-                    {t("common.actions")}
-                  </TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Created By</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -196,7 +194,7 @@ export function GroupTransactions({
                           <ArrowUpCircle className="h-4 w-4 text-green-500" />
                         )}
                         <span>
-                          {transaction.description || t("groups.noDescription")}
+                          {transaction.description || "No description"}
                         </span>
                       </div>
                     </TableCell>
@@ -216,7 +214,7 @@ export function GroupTransactions({
                         </Badge>
                       ) : (
                         <span className="text-muted-foreground">
-                          {t("groups.uncategorized")}
+                          Uncategorized
                         </span>
                       )}
                     </TableCell>
@@ -273,7 +271,7 @@ export function GroupTransactions({
                               onClick={() => handleOpenForm(transaction)}
                             >
                               <Edit className="mr-2 h-4 w-4" />
-                              {t("common.edit")}
+                              Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
@@ -283,7 +281,7 @@ export function GroupTransactions({
                               className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              {t("common.delete")}
+                              Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -302,9 +300,7 @@ export function GroupTransactions({
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
-              {selectedTransaction
-                ? t("groups.editTransaction")
-                : t("groups.addTransaction")}
+              {selectedTransaction ? "Edit Transaction" : "Add Transaction"}
             </DialogTitle>
           </DialogHeader>
           <GroupTransactionForm
@@ -322,9 +318,10 @@ export function GroupTransactions({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("groups.deleteTransaction")}</DialogTitle>
+            <DialogTitle>Delete Transaction</DialogTitle>
             <DialogDescription>
-              {t("groups.deleteTransactionConfirmation")}
+              Are you sure you want to delete this transaction? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
 
@@ -334,14 +331,14 @@ export function GroupTransactions({
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteTransaction}
               disabled={isLoading}
             >
-              {isLoading ? t("common.deleting") : t("common.delete")}
+              {isLoading ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

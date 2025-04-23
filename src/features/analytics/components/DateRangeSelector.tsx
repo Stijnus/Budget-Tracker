@@ -85,42 +85,42 @@ export function DateRangeSelector({
       <CardContent>
         <div className="flex flex-wrap gap-2 mb-4">
           <Button
-            onClick={() => handleRangeSelect("this-month")}
+            onClick={() => handleRangeSelect("This Month")}
             variant="outline"
             size="sm"
           >
             This Month
           </Button>
           <Button
-            onClick={() => handleRangeSelect("last-month")}
+            onClick={() => handleRangeSelect("Last Month")}
             variant="outline"
             size="sm"
           >
             Last Month
           </Button>
           <Button
-            onClick={() => handleRangeSelect("this-quarter")}
+            onClick={() => handleRangeSelect("This Quarter")}
             variant="outline"
             size="sm"
           >
             This Quarter
           </Button>
           <Button
-            onClick={() => handleRangeSelect("this-year")}
+            onClick={() => handleRangeSelect("This Year")}
             variant="outline"
             size="sm"
           >
             This Year
           </Button>
           <Button
-            onClick={() => handleRangeSelect("last-year")}
+            onClick={() => handleRangeSelect("Last Year")}
             variant="outline"
             size="sm"
           >
             Last Year
           </Button>
           <Button
-            onClick={() => handleRangeSelect("custom")}
+            onClick={() => handleRangeSelect("Custom")}
             variant="outline"
             size="sm"
           >

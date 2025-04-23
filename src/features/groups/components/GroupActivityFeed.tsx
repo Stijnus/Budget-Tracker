@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import {
   Card,
   CardContent,
@@ -43,7 +43,7 @@ interface GroupActivityFeedProps {
 export function GroupActivityFeed(props: GroupActivityFeedProps) {
   const { activity } = props;
   // groupId is not used but kept for API consistency
-  const { t } = useTranslation();
+  // Translation hooks removed
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -85,83 +85,61 @@ export function GroupActivityFeed(props: GroupActivityFeedProps) {
     // Format action based on entity type and action
     if (entity_type === "transaction") {
       if (action === "created") {
-        return t("groups.activityTransactionCreated", {
-          user: userName,
-          amount: details?.amount,
-          type: details?.type,
-        });
+        return `${userName} created a new ${
+          details?.type || "transaction"
+        } for $${details?.amount || 0}`;
       } else if (action === "updated") {
-        return t("groups.activityTransactionUpdated", {
-          user: userName,
-          amount: details?.amount,
-          type: details?.type,
-        });
+        return `${userName} updated a ${details?.type || "transaction"} for $${
+          details?.amount || 0
+        }`;
       } else if (action === "deleted") {
-        return t("groups.activityTransactionDeleted", {
-          user: userName,
-          amount: details?.amount,
-          type: details?.type,
-        });
+        return `${userName} deleted a ${details?.type || "transaction"} for $${
+          details?.amount || 0
+        }`;
       }
     } else if (entity_type === "budget") {
       if (action === "created") {
-        return t("groups.activityBudgetCreated", {
-          user: userName,
-          name: details?.name,
-          amount: details?.amount,
-        });
+        return `${userName} created a new budget "${
+          details?.name || ""
+        }" for $${details?.amount || 0}`;
       } else if (action === "updated") {
-        return t("groups.activityBudgetUpdated", {
-          user: userName,
-          name: details?.name,
-          amount: details?.amount,
-        });
+        return `${userName} updated budget "${details?.name || ""}" to $${
+          details?.amount || 0
+        }`;
       } else if (action === "deleted") {
-        return t("groups.activityBudgetDeleted", {
-          user: userName,
-          name: details?.name,
-        });
+        return `${userName} deleted budget "${details?.name || ""}"`;
       }
     } else if (entity_type === "member") {
       if (action === "added_member") {
-        return t("groups.activityMemberAdded", {
-          user: userName,
-          member: details?.user_id,
-          role: details?.role,
-        });
+        return `${userName} added a new member with role ${
+          details?.role || "member"
+        }`;
       } else if (action === "updated_member") {
-        return t("groups.activityMemberUpdated", {
-          user: userName,
-          member: details?.user_id,
-          role: details?.role,
-        });
+        return `${userName} updated a member's role to ${
+          details?.role || "member"
+        }`;
       } else if (action === "removed_member") {
-        return t("groups.activityMemberRemoved", {
-          user: userName,
-          member: details?.user_id,
-        });
+        return `${userName} removed a member from the group`;
       }
     }
 
     // Default message
-    return t("groups.activityGeneric", {
-      user: userName,
-      action,
-      type: entity_type,
-    });
+    return `${userName} performed action "${action}" on ${
+      entity_type || "item"
+    }`;
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("groups.activityFeed")}</CardTitle>
-        <CardDescription>{t("groups.activityFeedDescription")}</CardDescription>
+        <CardTitle>Activity Feed</CardTitle>
+        <CardDescription>Recent activity in this group</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-8">
           {!activity || activity.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
-              {t("groups.noActivity") || "No activity recorded yet"}
+              No activity recorded yet
             </p>
           ) : (
             activity.map((item) => (

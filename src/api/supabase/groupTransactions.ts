@@ -52,7 +52,7 @@ export async function getGroupTransactions(groupId: string) {
       // Fetch user profiles for these creators
       const { data: userProfiles, error: profilesError } = await supabase
         .from("user_profiles")
-        .select("id, full_name, avatar_url")
+        .select("*")
         .in("id", creatorIds);
 
       if (!profilesError && userProfiles) {
@@ -118,7 +118,7 @@ export async function getGroupTransaction(id: string) {
       // Fetch user profile for the creator
       const { data: userProfile, error: profileError } = await supabase
         .from("user_profiles")
-        .select("id, full_name, avatar_url")
+        .select("*")
         .eq("id", data.created_by)
         .single();
 
@@ -271,7 +271,7 @@ export async function getGroupTransactionsByDateRange(
       // Fetch user profiles for these creators
       const { data: userProfiles, error: profilesError } = await supabase
         .from("user_profiles")
-        .select("id, full_name, avatar_url")
+        .select("*")
         .in("id", creatorIds);
 
       if (!profilesError && userProfiles) {
@@ -344,7 +344,7 @@ export async function getGroupTransactionsByCategory(
       // Fetch user profiles for these creators
       const { data: userProfiles, error: profilesError } = await supabase
         .from("user_profiles")
-        .select("id, full_name, avatar_url")
+        .select("*")
         .in("id", creatorIds);
 
       if (!profilesError && userProfiles) {
@@ -413,7 +413,7 @@ export async function getGroupTransactionsByType(
       // Fetch user profiles for these creators
       const { data: userProfiles, error: profilesError } = await supabase
         .from("user_profiles")
-        .select("id, full_name, avatar_url")
+        .select("*")
         .in("id", creatorIds);
 
       if (!profilesError && userProfiles) {
@@ -482,7 +482,7 @@ export async function getGroupTransactionsByCreator(
       // Fetch user profile for the creator
       const { data: userProfile, error: profileError } = await supabase
         .from("user_profiles")
-        .select("id, full_name, avatar_url")
+        .select("*")
         .eq("id", creatorId)
         .single();
 

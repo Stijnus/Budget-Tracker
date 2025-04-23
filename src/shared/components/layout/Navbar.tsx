@@ -10,12 +10,12 @@ import {
   Menu,
 } from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
-import { useLanguage } from "../../../providers/LanguageProvider";
+// Language provider import removed
 import { useTheme } from "../../../providers/ThemeProvider";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { QuickAddMenu } from "../QuickAddMenu";
 import { ThemeToggle } from "../ThemeToggle";
-import { LanguageSelector } from "../LanguageSelector";
+// Language selector import removed
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -44,7 +44,7 @@ import { NotificationCenter } from "../notifications/NotificationCenter";
 
 export function Navbar() {
   const { user, logout } = useAuth();
-  const { t } = useLanguage();
+  // Language hooks removed
   const { theme, setTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,31 +56,31 @@ export function Navbar() {
   const getPageTitle = () => {
     const path = location.pathname;
 
-    if (path === "/dashboard") return t("nav.dashboard");
-    if (path === "/transactions") return t("nav.transactions");
-    if (path === "/expenses") return t("nav.expenses");
-    if (path === "/income") return t("nav.income");
-    if (path === "/categories") return t("nav.categories");
-    if (path === "/bills") return t("nav.bills");
-    if (path === "/budgets") return t("nav.budgets");
-    if (path === "/accounts") return t("nav.accounts");
-    if (path === "/groups") return t("nav.groups");
-    if (path === "/goals") return t("nav.goals");
-    if (path === "/analytics") return t("nav.analytics");
-    if (path === "/settings") return t("nav.settings");
-    if (path === "/tags") return t("nav.tags");
+    if (path === "/dashboard") return "Dashboard";
+    if (path === "/transactions") return "Transactions";
+    if (path === "/expenses") return "Expenses";
+    if (path === "/income") return "Income";
+    if (path === "/categories") return "Categories";
+    if (path === "/bills") return "Bills";
+    if (path === "/budgets") return "Budgets";
+    if (path === "/accounts") return "Accounts";
+    if (path === "/groups") return "Groups";
+    if (path === "/goals") return "Goals";
+    if (path === "/analytics") return "Analytics";
+    if (path === "/settings") return "Settings";
+    if (path === "/tags") return "Tags";
 
     // For detail pages
-    if (path.includes("/transactions/")) return t("nav.transactions");
-    if (path.includes("/expenses/")) return t("nav.expenses");
-    if (path.includes("/income/")) return t("nav.income");
-    if (path.includes("/categories/")) return t("nav.categories");
-    if (path.includes("/bills/")) return t("nav.bills");
-    if (path.includes("/budgets/")) return t("nav.budgets");
-    if (path.includes("/goals/")) return t("nav.goals");
-    if (path.includes("/tags/")) return t("nav.tags");
+    if (path.includes("/transactions/")) return "Transactions";
+    if (path.includes("/expenses/")) return "Expenses";
+    if (path.includes("/income/")) return "Income";
+    if (path.includes("/categories/")) return "Categories";
+    if (path.includes("/bills/")) return "Bills";
+    if (path.includes("/budgets/")) return "Budgets";
+    if (path.includes("/goals/")) return "Goals";
+    if (path.includes("/tags/")) return "Tags";
 
-    return t("app.name");
+    return "Name";
   };
 
   // Setup keyboard shortcuts
@@ -150,14 +150,14 @@ export function Navbar() {
                     onClick={() => setIsSearchOpen(true)}
                   >
                     <Search size={18} />
-                    <span className="sr-only">{t("common.search")}</span>
+                    <span className="sr-only">{"Search"}</span>
                     <kbd className="ml-2 hidden md:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
                       <span className="text-xs">⌘</span>K
                     </kbd>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{t("common.search")}</p>
+                  <p>{"Search"}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -178,7 +178,7 @@ export function Navbar() {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{t("common.help")}</p>
+                  <p>{"Help"}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -186,8 +186,7 @@ export function Navbar() {
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            {/* Language Selector */}
-            <LanguageSelector />
+            {/* Language Selector removed */}
 
             {/* Notifications - Updated to use the new component */}
             <NotificationCenter />
@@ -231,7 +230,7 @@ export function Navbar() {
                       className="flex w-full cursor-pointer items-center"
                     >
                       <User className="mr-2 h-4 w-4" />
-                      <span>{t("settings.profile")}</span>
+                      <span>{"Profile"}</span>
                     </Link>
                   </DropdownMenuItem>
 
@@ -242,7 +241,7 @@ export function Navbar() {
                       className="flex w-full cursor-pointer items-center"
                     >
                       <SettingsIcon className="mr-2 h-4 w-4" />
-                      <span>{t("nav.settings")}</span>
+                      <span>{"Settings"}</span>
                     </Link>
                   </DropdownMenuItem>
 
@@ -255,7 +254,7 @@ export function Navbar() {
                     }}
                   >
                     <Keyboard className="mr-2 h-4 w-4" />
-                    <span>{t("common.keyboardShortcuts")}</span>
+                    <span>{"KeyboardShortcuts"}</span>
                   </DropdownMenuItem>
 
                   {/* Theme Toggle */}
@@ -270,11 +269,7 @@ export function Navbar() {
                     ) : (
                       <Moon className="mr-2 h-4 w-4" />
                     )}
-                    <span>
-                      {theme === "dark"
-                        ? t("common.lightMode")
-                        : t("common.darkMode")}
-                    </span>
+                    <span>{theme === "dark" ? "LightMode" : "DarkMode"}</span>
                   </DropdownMenuItem>
 
                   <DropdownMenuSeparator />
@@ -285,13 +280,13 @@ export function Navbar() {
                     className="cursor-pointer text-destructive focus:text-destructive"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>{t("common.logout")}</span>
+                    <span>{"Logout"}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Button asChild variant="outline" size="sm">
-                <Link to="/login">{t("common.login")}</Link>
+                <Link to="/login">{"Login"}</Link>
               </Button>
             )}
           </div>
@@ -302,14 +297,14 @@ export function Navbar() {
       <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>{t("common.search")}</DialogTitle>
+            <DialogTitle>{"Search"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="flex items-center border rounded-md px-3 py-2">
               <Search className="h-4 w-4 text-muted-foreground mr-2" />
               <Input
                 type="text"
-                placeholder={t("common.searchPlaceholder")}
+                placeholder={"SearchPlaceholder"}
                 className="border-0 p-0 shadow-none focus-visible:ring-0"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -318,12 +313,12 @@ export function Navbar() {
             </div>
             <div className="flex justify-between">
               <div className="flex gap-2">
-                <Badge variant="outline">{t("common.transactions")}</Badge>
-                <Badge variant="outline">{t("common.categories")}</Badge>
-                <Badge variant="outline">{t("common.tags")}</Badge>
+                <Badge variant="outline">{"Transactions"}</Badge>
+                <Badge variant="outline">{"Categories"}</Badge>
+                <Badge variant="outline">{"Tags"}</Badge>
               </div>
               <Button type="submit" size="sm">
-                {t("common.search")}
+                {"Search"}
               </Button>
             </div>
           </form>

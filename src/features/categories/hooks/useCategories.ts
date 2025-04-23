@@ -16,7 +16,7 @@ export const useCategories = () => {
       try {
         const { data: categories, error } = await supabase
           .from("categories")
-          .select("id, name");
+          .select("Id, name");
 
         if (error) throw error;
         setData(categories);

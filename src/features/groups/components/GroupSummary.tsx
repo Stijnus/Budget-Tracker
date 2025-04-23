@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import {
   getBudgetGroups,
   getGroupActivity,
@@ -56,7 +56,7 @@ interface ActivityData {
 }
 
 export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const navigate = useNavigate();
   const [groups, setGroups] = useState<GroupData[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityData[]>([]);
@@ -139,13 +139,13 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
         <CardHeader>
           <CardTitle className="text-lg flex items-center">
             <Users className="mr-2 h-5 w-5" />
-            {t("groups.title")}
+            {"Title"}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center py-6">
-          <p className="text-muted-foreground mb-4">{t("groups.noGroups")}</p>
+          <p className="text-muted-foreground mb-4">{"NoGroups"}</p>
           <Button onClick={() => navigate("/groups")}>
-            {t("groups.createGroup")}
+            {"CreateGroup"}
           </Button>
         </CardContent>
       </Card>
@@ -157,7 +157,7 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium flex items-center">
           <Users className="mr-2 h-5 w-5" />
-          {t("groups.myGroups")}
+          {"MyGroups"}
         </h3>
         <Button
           variant="ghost"
@@ -165,7 +165,7 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
           className="gap-1"
           onClick={() => navigate("/groups")}
         >
-          {t("common.viewAll")}
+          {"ViewAll"}
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
@@ -188,12 +188,12 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
                     <h4 className="font-medium truncate">{group.name}</h4>
                     {!group.is_active && (
                       <Badge variant="outline" className="ml-1">
-                        {t("groups.inactive")}
+                        {"Inactive"}
                       </Badge>
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground truncate">
-                    {group.description || t("groups.noDescription")}
+                    {group.description || "NoDescription"}
                   </p>
                 </div>
                 <Button
@@ -214,7 +214,7 @@ export function GroupSummary({ limit = 3 }: GroupSummaryProps) {
         <div className="mt-6">
           <div className="flex items-center mb-2">
             <Activity className="mr-2 h-5 w-5" />
-            <h3 className="text-lg font-medium">{t("groups.activity")}</h3>
+            <h3 className="text-lg font-medium">{"Activity"}</h3>
           </div>
           <Card>
             <CardContent className="p-4 space-y-4">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import {
   Dialog,
@@ -36,7 +36,7 @@ export function InviteMemberDialog({
   groupId,
   onInvite,
 }: InviteMemberDialogProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"admin" | "member" | "viewer">("member");
@@ -81,7 +81,7 @@ export function InviteMemberDialog({
 
       if (error) throw error;
 
-      setSuccess(t("groups.invitationSent"));
+      setSuccess("Invitation sent successfully!");
       setEmail("");
       if (onInvite) onInvite();
 
@@ -117,9 +117,9 @@ export function InviteMemberDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t("groups.inviteMember")}</DialogTitle>
+          <DialogTitle>Invite Member</DialogTitle>
           <DialogDescription>
-            {t("groups.inviteMemberDescription")}
+            Invite someone to join this budget group
           </DialogDescription>
         </DialogHeader>
 
@@ -140,19 +140,19 @@ export function InviteMemberDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">{t("groups.email")}</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("groups.emailPlaceholder")}
+              placeholder="Enter email address"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">{t("groups.role")}</Label>
+            <Label htmlFor="role">Role</Label>
             <Select
               value={role}
               onValueChange={(value) =>
@@ -160,20 +160,20 @@ export function InviteMemberDialog({
               }
             >
               <SelectTrigger id="role">
-                <SelectValue placeholder={t("groups.selectRole")} />
+                <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="admin">{t("groups.roleAdmin")}</SelectItem>
-                <SelectItem value="member">{t("groups.roleMember")}</SelectItem>
-                <SelectItem value="viewer">{t("groups.roleViewer")}</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="viewer">Viewer</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground mt-1">
               {role === "admin"
-                ? t("groups.roleAdminDescription")
+                ? "Can manage group settings and members"
                 : role === "member"
-                ? t("groups.roleMemberDescription")
-                : t("groups.roleViewerDescription")}
+                ? "Can add transactions and view all data"
+                : "Can only view group data"}
             </p>
           </div>
 
@@ -184,16 +184,12 @@ export function InviteMemberDialog({
                 checked={isFamily}
                 onCheckedChange={(checked) => setIsFamily(checked === true)}
               />
-              <Label htmlFor="is-family">
-                {t("groups.isFamilyMember") || "This is a family member"}
-              </Label>
+              <Label htmlFor="is-family">This is a family member</Label>
             </div>
 
             {isFamily && (
               <div className="space-y-2 mt-4">
-                <Label htmlFor="family-role">
-                  {t("groups.familyRole") || "Family Role"}
-                </Label>
+                <Label htmlFor="family-role">Family Role</Label>
                 <Select
                   value={familyRole}
                   onValueChange={(value) =>
@@ -203,40 +199,24 @@ export function InviteMemberDialog({
                   }
                 >
                   <SelectTrigger id="family-role">
-                    <SelectValue
-                      placeholder={
-                        t("groups.selectFamilyRole") || "Select a family role"
-                      }
-                    />
+                    <SelectValue placeholder="Select a family role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="parent">
-                      {t("groups.roleParent") || "Parent"}
-                    </SelectItem>
-                    <SelectItem value="child">
-                      {t("groups.roleChild") || "Child"}
-                    </SelectItem>
-                    <SelectItem value="guardian">
-                      {t("groups.roleGuardian") || "Guardian"}
-                    </SelectItem>
-                    <SelectItem value="other">
-                      {t("groups.roleOther") || "Other"}
-                    </SelectItem>
+                    <SelectItem value="parent">Parent</SelectItem>
+                    <SelectItem value="child">Child</SelectItem>
+                    <SelectItem value="guardian">Guardian</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-1">
                   {familyRole === "parent"
-                    ? t("groups.roleParentDescription") ||
-                      "Full access to manage family finances and children's accounts"
+                    ? "Full access to manage family finances and children's accounts"
                     : familyRole === "child"
-                    ? t("groups.roleChildDescription") ||
-                      "Limited access based on parent settings"
+                    ? "Limited access based on parent settings"
                     : familyRole === "guardian"
-                    ? t("groups.roleGuardianDescription") ||
-                      "Similar to parent but with some restrictions"
+                    ? "Similar to parent but with some restrictions"
                     : familyRole === "other"
-                    ? t("groups.roleOtherDescription") ||
-                      "Custom role with specific permissions"
+                    ? "Custom role with specific permissions"
                     : ""}
                 </p>
               </div>
@@ -250,10 +230,10 @@ export function InviteMemberDialog({
               onClick={() => handleOpenChange(false)}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              Cancel
             </Button>
             <Button type="submit" disabled={isLoading || !email}>
-              {isLoading ? t("common.sending") : t("groups.sendInvitation")}
+              {isLoading ? "Sending..." : "Send Invitation"}
             </Button>
           </DialogFooter>
         </form>

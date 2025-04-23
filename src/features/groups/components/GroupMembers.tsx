@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import {
   Card,
   CardContent,
@@ -67,7 +67,7 @@ export function GroupMembers({
   userRole,
   currentUserId,
 }: GroupMembersProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isChangeRoleDialogOpen, setIsChangeRoleDialogOpen] = useState(false);
@@ -216,8 +216,10 @@ export function GroupMembers({
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>{t("groups.members")}</CardTitle>
-          <CardDescription>{t("groups.membersDescription")}</CardDescription>
+          <CardTitle>Members</CardTitle>
+          <CardDescription>
+            Manage group members and their roles
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
@@ -260,7 +262,7 @@ export function GroupMembers({
                         member.user?.email}
                       {member.user_id === currentUserId && (
                         <span className="ml-2 text-xs text-muted-foreground">
-                          ({t("groups.you")})
+                          (You)
                         </span>
                       )}
                     </div>
@@ -276,24 +278,14 @@ export function GroupMembers({
                       className="flex items-center"
                     >
                       {getRoleIcon(member.role)}
-                      {t(
-                        `groups.role${
-                          member.role.charAt(0).toUpperCase() +
-                          member.role.slice(1)
-                        }`
-                      )}
+                      {member.role.charAt(0).toUpperCase() +
+                        member.role.slice(1)}
                     </Badge>
 
                     {member.family_role && (
                       <Badge variant="outline" className="flex items-center">
-                        {t(
-                          `groups.role${
-                            member.family_role.charAt(0).toUpperCase() +
-                            member.family_role.slice(1)
-                          }`
-                        ) ||
-                          member.family_role.charAt(0).toUpperCase() +
-                            member.family_role.slice(1)}
+                        {member.family_role.charAt(0).toUpperCase() +
+                          member.family_role.slice(1)}
                       </Badge>
                     )}
                   </div>
@@ -315,7 +307,7 @@ export function GroupMembers({
                           }}
                         >
                           <UserCog className="mr-2 h-4 w-4" />
-                          {t("groups.changeRole")}
+                          Change Role
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
@@ -325,7 +317,7 @@ export function GroupMembers({
                           }}
                         >
                           <UserCog className="mr-2 h-4 w-4" />
-                          {t("groups.changeFamilyRole") || "Change Family Role"}
+                          Change Family Role
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
@@ -335,7 +327,7 @@ export function GroupMembers({
                           className="text-destructive focus:text-destructive"
                         >
                           <UserMinus className="mr-2 h-4 w-4" />
-                          {t("groups.removeMember")}
+                          Remove Member
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -354,37 +346,35 @@ export function GroupMembers({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("groups.changeRole")}</DialogTitle>
+            <DialogTitle>Change Role</DialogTitle>
             <DialogDescription>
-              {t("groups.changeRoleDescription", {
-                name:
-                  selectedMember?.user?.user_profiles?.full_name ||
-                  selectedMember?.user?.email,
-              })}
+              Change the role for{" "}
+              {selectedMember?.user?.user_profiles?.full_name ||
+                selectedMember?.user?.email}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <Select value={newRole} onValueChange={setNewRole}>
               <SelectTrigger>
-                <SelectValue placeholder={t("groups.selectRole")} />
+                <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
                 {userRole === "owner" && (
-                  <SelectItem value="admin">{t("groups.roleAdmin")}</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
                 )}
-                <SelectItem value="member">{t("groups.roleMember")}</SelectItem>
-                <SelectItem value="viewer">{t("groups.roleViewer")}</SelectItem>
+                <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="viewer">Viewer</SelectItem>
               </SelectContent>
             </Select>
 
             <p className="text-sm text-muted-foreground">
               {newRole === "admin"
-                ? t("groups.roleAdminDescription")
+                ? "Can manage group settings and members"
                 : newRole === "member"
-                ? t("groups.roleMemberDescription")
+                ? "Can add transactions and view all data"
                 : newRole === "viewer"
-                ? t("groups.roleViewerDescription")
+                ? "Can only view group data"
                 : ""}
             </p>
           </div>
@@ -395,7 +385,7 @@ export function GroupMembers({
               onClick={() => setIsChangeRoleDialogOpen(false)}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              Cancel
             </Button>
             <Button
               onClick={handleChangeRole}
@@ -403,7 +393,7 @@ export function GroupMembers({
                 isLoading || !newRole || newRole === selectedMember?.role
               }
             >
-              {isLoading ? t("common.saving") : t("common.save")}
+              {isLoading ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -413,13 +403,12 @@ export function GroupMembers({
       <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("groups.removeMember")}</DialogTitle>
+            <DialogTitle>Remove Member</DialogTitle>
             <DialogDescription>
-              {t("groups.removeMemberConfirmation", {
-                name:
-                  selectedMember?.user?.user_profiles?.full_name ||
-                  selectedMember?.user?.email,
-              })}
+              Are you sure you want to remove{" "}
+              {selectedMember?.user?.user_profiles?.full_name ||
+                selectedMember?.user?.email}{" "}
+              from this group?
             </DialogDescription>
           </DialogHeader>
 
@@ -429,14 +418,14 @@ export function GroupMembers({
               onClick={() => setIsRemoveDialogOpen(false)}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleRemoveMember}
               disabled={isLoading}
             >
-              {isLoading ? t("common.removing") : t("groups.removeMember")}
+              {isLoading ? "Removing..." : "Remove Member"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -449,66 +438,39 @@ export function GroupMembers({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("groups.changeFamilyRole") || "Change Family Role"}
-            </DialogTitle>
+            <DialogTitle>Change Family Role</DialogTitle>
             <DialogDescription>
-              {t("groups.changeFamilyRoleDescription", {
-                name:
-                  selectedMember?.user?.user_profiles?.full_name ||
-                  selectedMember?.user?.email,
-              }) ||
-                `Assign a family role to ${
-                  selectedMember?.user?.user_profiles?.full_name ||
-                  selectedMember?.user?.email ||
-                  "this member"
-                }`}
+              Assign a family role to{" "}
+              {selectedMember?.user?.user_profiles?.full_name ||
+                selectedMember?.user?.email ||
+                "this member"}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <Select value={newFamilyRole} onValueChange={setNewFamilyRole}>
               <SelectTrigger>
-                <SelectValue
-                  placeholder={
-                    t("groups.selectFamilyRole") || "Select a family role"
-                  }
-                />
+                <SelectValue placeholder="Select a family role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="parent">
-                  {t("groups.roleParent") || "Parent"}
-                </SelectItem>
-                <SelectItem value="child">
-                  {t("groups.roleChild") || "Child"}
-                </SelectItem>
-                <SelectItem value="guardian">
-                  {t("groups.roleGuardian") || "Guardian"}
-                </SelectItem>
-                <SelectItem value="other">
-                  {t("groups.roleOther") || "Other"}
-                </SelectItem>
-                <SelectItem value="">
-                  {t("groups.roleNone") || "None"}
-                </SelectItem>
+                <SelectItem value="parent">Parent</SelectItem>
+                <SelectItem value="child">Child</SelectItem>
+                <SelectItem value="guardian">Guardian</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="">None</SelectItem>
               </SelectContent>
             </Select>
 
             <p className="text-sm text-muted-foreground">
               {newFamilyRole === "parent"
-                ? t("groups.roleParentDescription") ||
-                  "Full access to manage family finances and children's accounts"
+                ? "Full access to manage family finances and children's accounts"
                 : newFamilyRole === "child"
-                ? t("groups.roleChildDescription") ||
-                  "Limited access based on parent settings"
+                ? "Limited access based on parent settings"
                 : newFamilyRole === "guardian"
-                ? t("groups.roleGuardianDescription") ||
-                  "Similar to parent but with some restrictions"
+                ? "Similar to parent but with some restrictions"
                 : newFamilyRole === "other"
-                ? t("groups.roleOtherDescription") ||
-                  "Custom role with specific permissions"
-                : t("groups.roleNoneDescription") ||
-                  "No specific family role assigned"}
+                ? "Custom role with specific permissions"
+                : "No specific family role assigned"}
             </p>
           </div>
 
@@ -518,7 +480,7 @@ export function GroupMembers({
               onClick={() => setIsFamilyRoleDialogOpen(false)}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              Cancel
             </Button>
             <Button
               onClick={handleChangeFamilyRole}
@@ -527,7 +489,7 @@ export function GroupMembers({
                 newFamilyRole === (selectedMember?.family_role || "")
               }
             >
-              {isLoading ? t("common.saving") : t("common.save")}
+              {isLoading ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>

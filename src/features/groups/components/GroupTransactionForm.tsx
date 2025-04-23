@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,7 +58,7 @@ export function GroupTransactionForm({
   transaction,
   onSuccess,
 }: GroupTransactionFormProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { user } = useAuth();
   const [amount, setAmount] = useState(
     transaction ? transaction.amount.toString() : ""
@@ -176,7 +176,7 @@ export function GroupTransactionForm({
       <div className="space-y-4">
         {/* Transaction Type */}
         <div className="space-y-2">
-          <Label>{t("groups.transactionType")}</Label>
+          <Label>{"TransactionType"}</Label>
           <RadioGroup
             value={type}
             onValueChange={(value) => setType(value as "expense" | "income")}
@@ -185,13 +185,13 @@ export function GroupTransactionForm({
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="expense" id="expense" />
               <Label htmlFor="expense" className="cursor-pointer">
-                {t("groups.expense")}
+                {"Expense"}
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="income" id="income" />
               <Label htmlFor="income" className="cursor-pointer">
-                {t("groups.income")}
+                {"Income"}
               </Label>
             </div>
           </RadioGroup>
@@ -200,7 +200,7 @@ export function GroupTransactionForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount">{t("groups.amount")}</Label>
+            <Label htmlFor="amount">{"Amount"}</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2">
                 $
@@ -220,7 +220,7 @@ export function GroupTransactionForm({
 
           {/* Date */}
           <div className="space-y-2">
-            <Label>{t("groups.date")}</Label>
+            <Label>{"Date"}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -248,25 +248,25 @@ export function GroupTransactionForm({
 
         {/* Description */}
         <div className="space-y-2">
-          <Label htmlFor="description">{t("groups.description")}</Label>
+          <Label htmlFor="description">{"Description"}</Label>
           <Input
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder={t("groups.descriptionPlaceholder")}
+            placeholder={"DescriptionPlaceholder"}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">{t("groups.category")}</Label>
+            <Label htmlFor="category">{"Category"}</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger id="category">
-                <SelectValue placeholder={t("groups.selectCategory")} />
+                <SelectValue placeholder={"SelectCategory"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">{t("groups.none")}</SelectItem>
+                <SelectItem value="none">{"None"}</SelectItem>
                 {filteredCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
@@ -278,27 +278,27 @@ export function GroupTransactionForm({
 
           {/* Payment Method */}
           <div className="space-y-2">
-            <Label htmlFor="paymentMethod">{t("groups.paymentMethod")}</Label>
+            <Label htmlFor="paymentMethod">{"PaymentMethod"}</Label>
             <Select value={paymentMethod} onValueChange={setPaymentMethod}>
               <SelectTrigger id="paymentMethod">
-                <SelectValue placeholder={t("groups.selectPaymentMethod")} />
+                <SelectValue placeholder={"SelectPaymentMethod"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">{t("groups.none")}</SelectItem>
-                <SelectItem value="cash">{t("groups.cash")}</SelectItem>
+                <SelectItem value="none">{"None"}</SelectItem>
+                <SelectItem value="cash">{"Cash"}</SelectItem>
                 <SelectItem value="credit_card">
-                  {t("groups.creditCard")}
+                  {"CreditCard"}
                 </SelectItem>
                 <SelectItem value="debit_card">
-                  {t("groups.debitCard")}
+                  {"DebitCard"}
                 </SelectItem>
                 <SelectItem value="bank_transfer">
-                  {t("groups.bankTransfer")}
+                  {"BankTransfer"}
                 </SelectItem>
                 <SelectItem value="mobile_payment">
-                  {t("groups.mobilePayment")}
+                  {"MobilePayment"}
                 </SelectItem>
-                <SelectItem value="other">{t("groups.other")}</SelectItem>
+                <SelectItem value="other">{"Other"}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -306,7 +306,7 @@ export function GroupTransactionForm({
 
         {/* Status */}
         <div className="space-y-2">
-          <Label htmlFor="status">{t("groups.status")}</Label>
+          <Label htmlFor="status">{"Status"}</Label>
           <Select
             value={status}
             onValueChange={(value) =>
@@ -314,24 +314,24 @@ export function GroupTransactionForm({
             }
           >
             <SelectTrigger id="status">
-              <SelectValue placeholder={t("groups.selectStatus")} />
+              <SelectValue placeholder={"SelectStatus"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="completed">{t("groups.completed")}</SelectItem>
-              <SelectItem value="pending">{t("groups.pending")}</SelectItem>
-              <SelectItem value="cancelled">{t("groups.cancelled")}</SelectItem>
+              <SelectItem value="completed">{"Completed"}</SelectItem>
+              <SelectItem value="pending">{"Pending"}</SelectItem>
+              <SelectItem value="cancelled">{"Cancelled"}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Notes */}
         <div className="space-y-2">
-          <Label htmlFor="notes">{t("groups.notes")}</Label>
+          <Label htmlFor="notes">{"Notes"}</Label>
           <Textarea
             id="notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder={t("groups.notesPlaceholder")}
+            placeholder={"NotesPlaceholder"}
             rows={3}
           />
         </div>
@@ -341,11 +341,11 @@ export function GroupTransactionForm({
         <Button type="submit" disabled={isLoading}>
           {isLoading
             ? transaction
-              ? t("common.saving")
-              : t("common.creating")
+              ? "Saving"
+              : "Creating"
             : transaction
-            ? t("common.save")
-            : t("common.create")}
+            ? "Save"
+            : "Create"}
         </Button>
       </div>
     </form>

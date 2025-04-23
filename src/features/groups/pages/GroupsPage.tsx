@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import { PageHeader } from "../../../shared/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ interface Invitation extends Omit<GroupInvitation, "role" | "status"> {
 }
 
 export function GroupsPage() {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const { user } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
@@ -179,12 +179,12 @@ export function GroupsPage() {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <PageHeader
-        title={t("groups.title")}
-        description={t("groups.description")}
+        title="Budget Groups"
+        description="Manage your shared budgets and expenses with family and friends"
         action={
           <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            {t("groups.createGroup")}
+            Create Group
           </Button>
         }
       />
@@ -200,11 +200,11 @@ export function GroupsPage() {
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="my-groups">
             <Users className="mr-2 h-4 w-4" />
-            {t("groups.myGroups")}
+            My Groups
           </TabsTrigger>
           <TabsTrigger value="invitations">
             <UserPlus className="mr-2 h-4 w-4" />
-            {t("groups.invitations")}
+            Invitations
             {invitations.length > 0 && (
               <span className="ml-2 rounded-full bg-primary text-primary-foreground px-2 py-0.5 text-xs">
                 {invitations.length}
@@ -225,20 +225,20 @@ export function GroupsPage() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>{t("groups.noGroups")}</CardTitle>
+                <CardTitle>No Groups</CardTitle>
                 <CardDescription>
-                  {t("groups.noGroupsDescription")}
+                  You haven't joined any budget groups yet
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  {t("groups.createGroupPrompt")}
+                  Create a new group to start managing shared finances
                 </p>
               </CardContent>
               <CardFooter>
                 <Button onClick={() => setIsCreateDialogOpen(true)}>
                   <Plus className="mr-2 h-4 w-4" />
-                  {t("groups.createGroup")}
+                  Create Group
                 </Button>
               </CardFooter>
             </Card>
@@ -259,14 +259,15 @@ export function GroupsPage() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>{t("groups.noInvitations")}</CardTitle>
+                <CardTitle>No Invitations</CardTitle>
                 <CardDescription>
-                  {t("groups.noInvitationsDescription")}
+                  You don't have any pending group invitations
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  {t("groups.invitationPrompt")}
+                  When someone invites you to join their group, it will appear
+                  here
                 </p>
               </CardContent>
             </Card>

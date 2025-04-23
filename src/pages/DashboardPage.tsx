@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../state/useAuth";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { AppLayout } from "../shared/components/layout";
 import { TransactionList } from "../features/transactions/components/TransactionList";
 import { BudgetSummary } from "../features/budgets/components/BudgetSummary";
@@ -26,7 +26,7 @@ import {
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  // Translation hooks removed
   const [activeTab, setActiveTab] = useState("overview");
 
   // Get the current date for the expense category chart
@@ -44,8 +44,7 @@ export function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {t("dashboard.welcome")},{" "}
-              {user?.user_metadata?.full_name || t("common.user")}
+              Welcome back, {user?.user_metadata?.full_name || "User"}
             </h1>
             <p className="text-muted-foreground">
               {formatDate(new Date(), "long")}
@@ -61,23 +60,19 @@ export function DashboardPage() {
             <TabsList className="grid grid-cols-4 w-full sm:w-auto">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
-                <span className="hidden sm:inline">
-                  {t("dashboard.overview")}
-                </span>
+                <span className="hidden sm:inline">Overview</span>
               </TabsTrigger>
               <TabsTrigger value="finances" className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
-                <span className="hidden sm:inline">
-                  {t("dashboard.finances")}
-                </span>
+                <span className="hidden sm:inline">Finances</span>
               </TabsTrigger>
               <TabsTrigger value="groups" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">{t("groups.title")}</span>
+                <span className="hidden sm:inline">Budget Groups</span>
               </TabsTrigger>
               <TabsTrigger value="goals" className="flex items-center gap-2">
                 <Target className="h-4 w-4" />
-                <span className="hidden sm:inline">{t("dashboard.goals")}</span>
+                <span className="hidden sm:inline">Goals</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -97,7 +92,7 @@ export function DashboardPage() {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
                       <Bell className="mr-2 h-5 w-5" />
-                      {t("dashboard.billReminders")}
+                      Bill Reminders
                     </CardTitle>
                     <Button
                       variant="ghost"
@@ -105,7 +100,7 @@ export function DashboardPage() {
                       className="gap-1"
                       onClick={() => (window.location.href = "/bills")}
                     >
-                      {t("common.viewAll")}
+                      View All
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </CardHeader>
@@ -119,7 +114,7 @@ export function DashboardPage() {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
                       <PiggyBank className="mr-2 h-5 w-5" />
-                      {t("dashboard.budgetProgress")}
+                      Budget Progress
                     </CardTitle>
                     <Button
                       variant="ghost"
@@ -127,7 +122,7 @@ export function DashboardPage() {
                       className="gap-1"
                       onClick={() => (window.location.href = "/budgets")}
                     >
-                      {t("common.viewAll")}
+                      View All
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </CardHeader>
@@ -141,7 +136,7 @@ export function DashboardPage() {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
                       <Users className="mr-2 h-5 w-5" />
-                      {t("groups.title")}
+                      Budget Groups
                     </CardTitle>
                     <Button
                       variant="ghost"
@@ -149,7 +144,7 @@ export function DashboardPage() {
                       className="gap-1"
                       onClick={() => (window.location.href = "/groups")}
                     >
-                      {t("common.viewAll")}
+                      View All
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </CardHeader>
@@ -163,7 +158,7 @@ export function DashboardPage() {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
                       <PieChart className="mr-2 h-5 w-5" />
-                      {t("dashboard.expenseCategories")}
+                      Expense Categories
                     </CardTitle>
                     <Button
                       variant="ghost"
@@ -171,7 +166,7 @@ export function DashboardPage() {
                       className="gap-1"
                       onClick={() => (window.location.href = "/analytics")}
                     >
-                      {t("common.viewAll")}
+                      View All
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </CardHeader>
@@ -189,7 +184,7 @@ export function DashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
                     <CreditCard className="mr-2 h-5 w-5" />
-                    {t("dashboard.recent")}
+                    Recent Transactions
                   </CardTitle>
                   <Button
                     variant="ghost"
@@ -197,7 +192,7 @@ export function DashboardPage() {
                     className="gap-1"
                     onClick={() => (window.location.href = "/transactions")}
                   >
-                    {t("common.viewAll")}
+                    View All
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </CardHeader>
@@ -220,7 +215,7 @@ export function DashboardPage() {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
                       <PiggyBank className="mr-2 h-5 w-5" />
-                      {t("dashboard.budgetProgress")}
+                      Budget Progress
                     </CardTitle>
                     <Button
                       variant="ghost"
@@ -228,7 +223,7 @@ export function DashboardPage() {
                       className="gap-1"
                       onClick={() => (window.location.href = "/budgets")}
                     >
-                      {t("common.viewAll")}
+                      View All
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </CardHeader>
@@ -242,7 +237,7 @@ export function DashboardPage() {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg flex items-center">
                       <PieChart className="mr-2 h-5 w-5" />
-                      {t("dashboard.expenseCategories")}
+                      Expense Categories
                     </CardTitle>
                     <Button
                       variant="ghost"
@@ -250,7 +245,7 @@ export function DashboardPage() {
                       className="gap-1"
                       onClick={() => (window.location.href = "/analytics")}
                     >
-                      {t("common.viewAll")}
+                      View All
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </CardHeader>
@@ -268,7 +263,7 @@ export function DashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
                     <CreditCard className="mr-2 h-5 w-5" />
-                    {t("dashboard.recent")}
+                    Recent Transactions
                   </CardTitle>
                   <Button
                     variant="ghost"
@@ -276,7 +271,7 @@ export function DashboardPage() {
                     className="gap-1"
                     onClick={() => (window.location.href = "/transactions")}
                   >
-                    {t("common.viewAll")}
+                    View All
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </CardHeader>
@@ -290,7 +285,7 @@ export function DashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
                     <Bell className="mr-2 h-5 w-5" />
-                    {t("dashboard.billReminders")}
+                    Bill Reminders
                   </CardTitle>
                   <Button
                     variant="ghost"
@@ -298,7 +293,7 @@ export function DashboardPage() {
                     className="gap-1"
                     onClick={() => (window.location.href = "/bills")}
                   >
-                    {t("common.viewAll")}
+                    View All
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </CardHeader>
@@ -317,7 +312,7 @@ export function DashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
                     <Users className="mr-2 h-5 w-5" />
-                    {t("groups.myGroups")}
+                    My Groups
                   </CardTitle>
                   <Button
                     variant="ghost"
@@ -325,7 +320,7 @@ export function DashboardPage() {
                     className="gap-1"
                     onClick={() => (window.location.href = "/groups")}
                   >
-                    {t("common.viewAll")}
+                    View All
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </CardHeader>
@@ -339,7 +334,7 @@ export function DashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
                     <CreditCard className="mr-2 h-5 w-5" />
-                    {t("dashboard.recent")}
+                    Recent Transactions
                   </CardTitle>
                   <Button
                     variant="ghost"
@@ -347,7 +342,7 @@ export function DashboardPage() {
                     className="gap-1"
                     onClick={() => (window.location.href = "/transactions")}
                   >
-                    {t("common.viewAll")}
+                    View All
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </CardHeader>
@@ -369,7 +364,7 @@ export function DashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg flex items-center">
                     <Bell className="mr-2 h-5 w-5" />
-                    {t("dashboard.billReminders")}
+                    Bill Reminders
                   </CardTitle>
                   <Button
                     variant="ghost"
@@ -377,7 +372,7 @@ export function DashboardPage() {
                     className="gap-1"
                     onClick={() => (window.location.href = "/bills")}
                   >
-                    {t("common.viewAll")}
+                    View All
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </CardHeader>

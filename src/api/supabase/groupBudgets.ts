@@ -18,19 +18,7 @@ export async function getGroupBudgets(groupId: string) {
     try {
       const { data, error } = await supabase
         .from("group_budgets")
-        .select(
-          `
-          *,
-          category:category_id(*),
-          creator:created_by(
-            id,
-            user_profiles(
-              full_name,
-              avatar_url
-            )
-          )
-        `
-        )
+        .select("*")
         .eq("group_id", groupId)
         .order("name");
 
@@ -76,19 +64,7 @@ export async function getGroupBudget(id: string) {
     try {
       const { data, error } = await supabase
         .from("group_budgets")
-        .select(
-          `
-          *,
-          category:category_id(*),
-          creator:created_by(
-            id,
-            user_profiles(
-              full_name,
-              avatar_url
-            )
-          )
-        `
-        )
+        .select("*")
         .eq("id", id)
         .single();
 
@@ -161,19 +137,7 @@ export async function getGroupBudgetsByCategory(
 ) {
   return supabase
     .from("group_budgets")
-    .select(
-      `
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
-        )
-      )
-    `
-    )
+    .select("*")
     .eq("group_id", groupId)
     .eq("category_id", categoryId);
 }
@@ -187,19 +151,7 @@ export async function getGroupBudgetsByPeriod(
 ) {
   return supabase
     .from("group_budgets")
-    .select(
-      `
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
-        )
-      )
-    `
-    )
+    .select("*")
     .eq("group_id", groupId)
     .eq("period", period);
 }
@@ -212,19 +164,7 @@ export async function getActiveGroupBudgets(groupId: string) {
 
   return supabase
     .from("group_budgets")
-    .select(
-      `
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
-        )
-      )
-    `
-    )
+    .select("*")
     .eq("group_id", groupId)
     .lte("start_date", today)
     .or(`end_date.gte.${today},end_date.is.null`);

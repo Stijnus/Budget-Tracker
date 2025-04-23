@@ -61,7 +61,7 @@ export async function deleteBankAccount(id: string) {
   // Check if this is the default account
   const { data } = await supabase
     .from("bank_accounts")
-    .select("is_default")
+    .select("Is Default")
     .eq("id", id)
     .single();
     
@@ -69,7 +69,7 @@ export async function deleteBankAccount(id: string) {
   if (data?.is_default) {
     const { data: otherAccounts } = await supabase
       .from("bank_accounts")
-      .select("id")
+      .select("Id")
       .neq("id", id)
       .limit(1);
       
@@ -139,7 +139,7 @@ export async function getBankAccountsByType(type: "checking" | "savings" | "cred
 export async function getTotalBalance() {
   const { data, error } = await supabase
     .from("bank_accounts")
-    .select("current_balance, account_type");
+    .select("Current Balance, account Type");
     
   if (error) {
     return { data: null, error };

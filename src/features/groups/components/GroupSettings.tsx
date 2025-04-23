@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -46,7 +46,7 @@ interface GroupSettingsProps {
 }
 
 export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
-  const { t } = useTranslation();
+  // Translation hooks removed
   const navigate = useNavigate();
   const [name, setName] = useState(group.name);
   const [description, setDescription] = useState(group.description || "");
@@ -84,7 +84,7 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
 
       console.log("Group updated successfully:", data);
       onUpdateGroup(data);
-      setSuccess(t("groups.settingsSaved"));
+      setSuccess("Settings saved successfully!");
 
       // Clear success message after a few seconds
       setTimeout(() => {
@@ -147,9 +147,9 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
       <Card>
         <form onSubmit={handleSubmit}>
           <CardHeader>
-            <CardTitle>{t("groups.generalSettings")}</CardTitle>
+            <CardTitle>General Settings</CardTitle>
             <CardDescription>
-              {t("groups.generalSettingsDescription")}
+              Manage your group's basic information and settings
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -169,7 +169,7 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">{t("groups.groupName")}</Label>
+              <Label htmlFor="name">Group Name</Label>
               <Input
                 id="name"
                 value={name}
@@ -179,9 +179,7 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">
-                {t("groups.groupDescription")}
-              </Label>
+              <Label htmlFor="description">Group Description</Label>
               <Textarea
                 id="description"
                 value={description}
@@ -192,9 +190,10 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="active">{t("groups.activeStatus")}</Label>
+                <Label htmlFor="active">Active Status</Label>
                 <p className="text-sm text-muted-foreground">
-                  {t("groups.activeStatusDescription")}
+                  When inactive, members won't be able to create new
+                  transactions
                 </p>
               </div>
               <Switch
@@ -206,7 +205,7 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? t("common.saving") : t("common.saveChanges")}
+              {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </CardFooter>
         </form>
@@ -214,19 +213,17 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
 
       <Card className="border-destructive">
         <CardHeader>
-          <CardTitle className="text-destructive">
-            {t("groups.dangerZone")}
-          </CardTitle>
-          <CardDescription>{t("groups.dangerZoneDescription")}</CardDescription>
+          <CardTitle className="text-destructive">Danger Zone</CardTitle>
+          <CardDescription>Actions that can't be undone</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            {t("groups.deleteGroupWarning") ||
-              "Deleting this group will permanently remove all associated data including transactions, budgets, and member information."}
+            Deleting this group will permanently remove all associated data
+            including transactions, budgets, and member information.
           </p>
           <Button variant="destructive" onClick={handleOpenDeleteDialog}>
             <Trash2 className="mr-2 h-4 w-4" />
-            {t("groups.deleteGroup") || "Delete Group"}
+            Delete Group
           </Button>
         </CardContent>
       </Card>
@@ -235,24 +232,22 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("groups.deleteGroup") || "Delete Group"}
-            </DialogTitle>
+            <DialogTitle>Delete Group</DialogTitle>
             <DialogDescription>
-              {t("groups.deleteGroupConfirmation", { name: group.name }) ||
-                `Are you sure you want to delete the group "${group.name}"? This action cannot be undone.`}
+              Are you sure you want to delete the group "{group.name}"? This
+              action cannot be undone.
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
             <p className="text-sm text-muted-foreground">
-              {t("groups.deleteGroupWarningDetailed") ||
-                "All group data including transactions, budgets, and member information will be permanently deleted. Members will lose access to all shared resources."}
+              All group data including transactions, budgets, and member
+              information will be permanently deleted. Members will lose access
+              to all shared resources.
             </p>
             <div className="mt-4 p-4 border border-destructive/20 bg-destructive/5 rounded-md">
               <p className="text-sm font-medium text-destructive">
-                {t("groups.typeToConfirm") ||
-                  "Type the group name to confirm deletion:"}
+                Type the group name to confirm deletion:
               </p>
               <Input
                 className="mt-2"
@@ -269,14 +264,14 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isLoading}
             >
-              {t("common.cancel")}
+              Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteGroup}
               disabled={isLoading || confirmText !== group.name}
             >
-              {isLoading ? t("common.deleting") : t("groups.confirmDelete")}
+              {isLoading ? "Deleting..." : "Delete Group"}
             </Button>
           </DialogFooter>
         </DialogContent>

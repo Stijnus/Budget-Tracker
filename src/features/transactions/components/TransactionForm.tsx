@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { X, AlertCircle } from "lucide-react";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 import {
   showItemCreatedToast,
   showItemUpdatedToast,
@@ -46,7 +46,7 @@ export function TransactionForm({
   defaultType,
 }: TransactionFormProps) {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  // Translation hooks removed
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<
@@ -140,7 +140,7 @@ export function TransactionForm({
         }
       } catch (err) {
         console.error("Error fetching data:", err);
-        setError(t("transactions.error.load"));
+        setError("Load");
       }
     }
 
@@ -162,12 +162,12 @@ export function TransactionForm({
 
       // Validate form
       if (!amount || isNaN(parseFloat(amount))) {
-        setError(t("transactions.error.amount"));
+        setError("Amount");
         return;
       }
 
       if (!date) {
-        setError(t("transactions.error.date"));
+        setError("Date");
         return;
       }
 
@@ -200,9 +200,9 @@ export function TransactionForm({
 
       // Show success toast
       if (transaction) {
-        showItemUpdatedToast("transaction");
+        showItemUpdatedToast("Transaction");
       } else {
-        showItemCreatedToast("transaction");
+        showItemCreatedToast("Transaction");
       }
 
       // Success
@@ -210,8 +210,8 @@ export function TransactionForm({
       onClose();
     } catch (err) {
       console.error("Error saving transaction:", err);
-      setError(t("transactions.error.save"));
-      showErrorToast(t("transactions.error.save"));
+      setError("Save");
+      showErrorToast("Save");
     } finally {
       setIsLoading(false);
     }
@@ -221,7 +221,7 @@ export function TransactionForm({
     <Card className="max-w-md w-full mx-auto">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl">
-          {transaction ? t("transactions.edit") : t("transactions.add")}
+          {transaction ? "Edit" : "Add"}
         </CardTitle>
         <Button
           variant="ghost"
@@ -253,20 +253,20 @@ export function TransactionForm({
                 value="expense"
                 className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700"
               >
-                {t("transactions.expense")}
+                {"Expense"}
               </TabsTrigger>
               <TabsTrigger
                 value="income"
                 className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
               >
-                {t("transactions.income")}
+                {"Income"}
               </TabsTrigger>
             </TabsList>
           </Tabs>
 
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount">{t("transactions.amount")}</Label>
+            <Label htmlFor="amount">{"Amount"}</Label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                 $
@@ -287,19 +287,19 @@ export function TransactionForm({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">{t("transactions.description")}</Label>
+            <Label htmlFor="description">{"Description"}</Label>
             <Input
               type="text"
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("transactions.description.placeholder")}
+              placeholder={"Placeholder"}
             />
           </div>
 
           {/* Date */}
           <div className="space-y-2">
-            <Label htmlFor="date">{t("transactions.date")}</Label>
+            <Label htmlFor="date">{"Date"}</Label>
             <Input
               type="date"
               id="date"
@@ -311,16 +311,16 @@ export function TransactionForm({
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">{t("transactions.category")}</Label>
+            <Label htmlFor="category">{"Category"}</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger id="category">
                 <SelectValue
-                  placeholder={t("transactions.category.placeholder")}
+                  placeholder={"Placeholder"}
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
-                  {t("transactions.category.none")}
+                  {"None"}
                 </SelectItem>
                 {filteredCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
@@ -333,22 +333,22 @@ export function TransactionForm({
 
           {/* Bank Account */}
           <div className="space-y-2">
-            <Label htmlFor="bankAccount">{t("transactions.bankAccount")}</Label>
+            <Label htmlFor="bankAccount">{"BankAccount"}</Label>
             <Select value={bankAccountId} onValueChange={setBankAccountId}>
               <SelectTrigger id="bankAccount">
                 <SelectValue
-                  placeholder={t("transactions.bankAccount.placeholder")}
+                  placeholder={"Placeholder"}
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
-                  {t("transactions.bankAccount.none")}
+                  {"None"}
                 </SelectItem>
                 {bankAccounts.map((account) => (
                   <SelectItem key={account.id} value={account.id}>
                     {account.name}{" "}
                     {account.is_default &&
-                      t("transactions.bankAccount.default")}
+                      "Default"}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -358,35 +358,35 @@ export function TransactionForm({
           {/* Payment Method */}
           <div className="space-y-2">
             <Label htmlFor="paymentMethod">
-              {t("transactions.paymentMethod")}
+              {"PaymentMethod"}
             </Label>
             <Select value={paymentMethod} onValueChange={setPaymentMethod}>
               <SelectTrigger id="paymentMethod">
                 <SelectValue
-                  placeholder={t("transactions.paymentMethod.placeholder")}
+                  placeholder={"Placeholder"}
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
-                  {t("transactions.paymentMethod.none")}
+                  {"None"}
                 </SelectItem>
                 <SelectItem value="cash">
-                  {t("transactions.paymentMethod.cash")}
+                  {"Cash"}
                 </SelectItem>
                 <SelectItem value="credit_card">
-                  {t("transactions.paymentMethod.creditCard")}
+                  {"CreditCard"}
                 </SelectItem>
                 <SelectItem value="debit_card">
-                  {t("transactions.paymentMethod.debitCard")}
+                  {"DebitCard"}
                 </SelectItem>
                 <SelectItem value="bank_transfer">
-                  {t("transactions.paymentMethod.bankTransfer")}
+                  {"BankTransfer"}
                 </SelectItem>
                 <SelectItem value="mobile_payment">
-                  {t("transactions.paymentMethod.mobilePayment")}
+                  {"MobilePayment"}
                 </SelectItem>
                 <SelectItem value="other">
-                  {t("transactions.paymentMethod.other")}
+                  {"Other"}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -394,7 +394,7 @@ export function TransactionForm({
 
           {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">{t("transactions.status")}</Label>
+            <Label htmlFor="status">{"Status"}</Label>
             <Select
               value={status}
               onValueChange={(value) =>
@@ -403,18 +403,18 @@ export function TransactionForm({
             >
               <SelectTrigger id="status">
                 <SelectValue
-                  placeholder={t("transactions.status.placeholder")}
+                  placeholder={"Placeholder"}
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="completed">
-                  {t("transactions.status.completed")}
+                  {"Completed"}
                 </SelectItem>
                 <SelectItem value="pending">
-                  {t("transactions.status.pending")}
+                  {"Pending"}
                 </SelectItem>
                 <SelectItem value="cancelled">
-                  {t("transactions.status.cancelled")}
+                  {"Cancelled"}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -422,19 +422,19 @@ export function TransactionForm({
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes">{t("transactions.notes")}</Label>
+            <Label htmlFor="notes">{"Notes"}</Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder={t("transactions.notes.placeholder")}
+              placeholder={"Placeholder"}
             />
           </div>
 
           {/* Tags */}
           <div className="space-y-2">
-            <Label htmlFor="tags">{t("transactions.tags")}</Label>
+            <Label htmlFor="tags">{"Tags"}</Label>
             <TagSelector
               transactionId={transaction?.id}
               selectedTagIds={selectedTagIds}
@@ -445,13 +445,13 @@ export function TransactionForm({
           {/* Submit Button */}
           <div className="flex justify-end space-x-3 pt-4">
             <Button type="button" onClick={onClose} variant="outline">
-              {t("transactions.cancel")}
+              {"Cancel"}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading
-                ? t("transactions.saving")
+                ? "Saving"
                 : transaction
-                ? t("transactions.update")
+                ? "Update"
                 : t("transactions.add")}
             </Button>
           </div>

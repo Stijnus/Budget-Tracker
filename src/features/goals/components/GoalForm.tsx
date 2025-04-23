@@ -110,9 +110,9 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
 
       // Show success toast
       if (goal) {
-        showItemUpdatedToast("goal");
+        showItemUpdatedToast("Goal");
       } else {
-        showItemCreatedToast("goal");
+        showItemCreatedToast("Goal");
       }
     } catch (err) {
       console.error("Error submitting goal:", err);

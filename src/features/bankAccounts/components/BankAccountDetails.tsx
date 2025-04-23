@@ -96,7 +96,7 @@ export function BankAccountDetails({
       if (error) throw error;
 
       // Show success toast
-      showItemDeletedToast("bank account");
+      showItemDeletedToast("Bank account");
 
       // Navigate back or call onDelete
       if (onDelete) {

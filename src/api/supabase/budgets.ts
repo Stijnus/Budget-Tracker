@@ -59,7 +59,7 @@ export async function getCurrentBudgets() {
       // Get transactions for this category in the date range
       const { data: transactions, error: transactionsError } = await supabase
         .from("transactions")
-        .select("amount")
+        .select("Amount")
         .eq("category_id", budget.category_id)
         .eq("type", "expense")
         .gte("date", formattedStartDate)

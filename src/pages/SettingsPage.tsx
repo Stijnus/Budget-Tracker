@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "../shared/components/layout";
 import {
   ProfileForm,
@@ -39,12 +40,57 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useMediaQuery } from "../hooks/useMediaQuery";
-import { useTranslation } from "react-i18next";
+// Translation imports removed
 
 export function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("profile");
+  const { tab } = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(tab || "profile");
+
+  // Settings tab items
+  const tabItems = [
+    { value: "profile", label: "Profile" },
+    { value: "password", label: "Password" },
+    { value: "preferences", label: "Preferences" },
+    { value: "notifications", label: "Notifications" },
+    { value: "currency", label: "Currency" },
+    { value: "theme", label: "Theme" },
+    { value: "language", label: "Language" },
+    { value: "account", label: "Account" },
+  ];
+
+  // Update active tab when URL parameter changes
+  useEffect(() => {
+    if (tab && tabItems.some((item) => item.value === tab)) {
+      setActiveTab(tab);
+    }
+  }, [tab, tabItems]);
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const { t } = useTranslation();
+  // Translation hooks removed
+
+  // Helper function to get the appropriate description based on tab value
+  const getSettingsDescription = (value: string) => {
+    switch (value) {
+      case "profile":
+        return "Manage your personal information and profile settings";
+      case "password":
+        return "Update your password and security settings";
+      case "preferences":
+        return "Customize your app experience and default settings";
+      case "notifications":
+        return "Control how and when you receive notifications";
+      case "currency":
+        return "Set your preferred currency and format options";
+      case "theme":
+        return "Choose your preferred theme and appearance settings";
+      case "language":
+        return "Select your preferred language for the application";
+      case "account":
+        return "Manage your account security and connected services";
+      default:
+        return "Manage your settings and preferences";
+    }
+  };
 
   // Helper function to get the appropriate icon based on tab value
   const getTabIcon = (value: string) => {
@@ -70,20 +116,9 @@ export function SettingsPage() {
     }
   };
 
-  // Settings tab items
-  const tabItems = [
-    { value: "profile", label: t("settings.profile") },
-    { value: "password", label: t("settings.password") },
-    { value: "preferences", label: t("settings.preferences") },
-    { value: "notifications", label: t("settings.notifications") },
-    { value: "currency", label: t("settings.currency") },
-    { value: "theme", label: t("settings.theme") },
-    { value: "language", label: t("settings.language") },
-    { value: "account", label: t("settings.account") },
-  ];
-
   const handleTabChange = (value: string) => {
     setActiveTab(value);
+    navigate(`/settings/${value}`);
   };
 
   return (
@@ -101,9 +136,11 @@ export function SettingsPage() {
             <Card className="shadow-sm border bg-card">
               <CardHeader className="px-5 py-4">
                 <CardTitle className="text-xl font-semibold">
-                  {t("settings.title")}
+                  Settings
                 </CardTitle>
-                <CardDescription>{t("settings.description")}</CardDescription>
+                <CardDescription>
+                  Manage your account settings and preferences
+                </CardDescription>
               </CardHeader>
               <Separator />
               <CardContent className="p-0">
@@ -153,7 +190,7 @@ export function SettingsPage() {
               <Separator />
               <CardFooter className="p-4">
                 <Button variant="outline" size="sm" className="w-full text-sm">
-                  {t("common.help")}
+                  Help & Support
                 </Button>
               </CardFooter>
             </Card>
@@ -172,10 +209,10 @@ export function SettingsPage() {
                 variant="ghost"
                 size="sm"
                 className="mb-4 items-center md:hidden"
-                onClick={() => setActiveTab("profile")}
+                onClick={() => navigate("/settings/profile")}
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                {t("common.goBack")}
+                Go Back
               </Button>
             )}
 
@@ -189,11 +226,8 @@ export function SettingsPage() {
                     {tabItems.find((item) => item.value === activeTab)?.label}
                   </h1>
                 </div>
-                <p
-                  className="text-muted-foreground mt-1"
-                  data-i18n-key={`settings.${activeTab}.description`}
-                >
-                  {t(`settings.${activeTab}.description`)}
+                <p className="text-muted-foreground mt-1">
+                  {getSettingsDescription(activeTab)}
                 </p>
               </div>
 
@@ -210,9 +244,9 @@ export function SettingsPage() {
                   <div className="space-y-6">
                     <Card className="border shadow-sm">
                       <CardHeader>
-                        <CardTitle>{t("settings.connectedServices")}</CardTitle>
+                        <CardTitle>Connected Services</CardTitle>
                         <CardDescription>
-                          {t("settings.connectedServicesDescription")}
+                          Manage your connected accounts and services
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -224,15 +258,16 @@ export function SettingsPage() {
                               </div>
                               <div>
                                 <p className="font-medium">
-                                  {t("settings.bankingIntegration")}
+                                  Banking Integration
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                  {t("settings.bankingIntegrationDescription")}
+                                  Connect your bank accounts for automatic
+                                  transaction import
                                 </p>
                               </div>
                             </div>
                             <Button variant="outline" size="sm">
-                              {t("settings.connect")}
+                              Connect
                             </Button>
                           </div>
 
@@ -243,15 +278,15 @@ export function SettingsPage() {
                               </div>
                               <div>
                                 <p className="font-medium">
-                                  {t("settings.twoFactorAuth")}
+                                  Two-Factor Authentication
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                  {t("settings.twoFactorAuthDescription")}
+                                  Add an extra layer of security to your account
                                 </p>
                               </div>
                             </div>
                             <Button variant="outline" size="sm">
-                              {t("settings.setup")}
+                              Setup
                             </Button>
                           </div>
 
@@ -262,18 +297,16 @@ export function SettingsPage() {
                               </div>
                               <div>
                                 <p className="font-medium">
-                                  {t("settings.dataSync")}
+                                  Data Synchronization
                                 </p>
                                 <div className="flex items-center text-sm text-muted-foreground">
                                   <CheckCircle className="w-3 h-3 mr-1 text-green-500" />{" "}
-                                  {t("settings.lastSynced", {
-                                    time: "5 minutes",
-                                  })}
+                                  Last synced 5 minutes ago
                                 </div>
                               </div>
                             </div>
                             <Button variant="outline" size="sm">
-                              {t("settings.syncNow")}
+                              Sync Now
                             </Button>
                           </div>
                         </div>
