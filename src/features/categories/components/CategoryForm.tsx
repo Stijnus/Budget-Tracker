@@ -312,7 +312,7 @@ export function CategoryForm({
 
   // Render as a dialog or as a page content
   return inPage ? (
-    <div className="bg-card rounded-md border shadow p-6">{formContent}</div>
+    <div>{formContent}</div>
   ) : (
     <Dialog open={true} onOpenChange={() => onClose()}>
       <DialogContent className="sm:max-w-md">

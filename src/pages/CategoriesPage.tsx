@@ -55,29 +55,37 @@ export function CategoriesPage() {
           </Button>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Category Management</CardTitle>
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <PieChartIcon className="h-5 w-5 text-primary" />
+              Category Management
+            </CardTitle>
             <CardDescription>
               Manage your expense and income categories. Categories help you
               organize your transactions and track your spending patterns.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <Tabs defaultValue="expense" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger
-                  value="expense"
-                  className="flex items-center gap-1"
-                >
-                  <ArrowDownCircle className="h-4 w-4 text-destructive" />
-                  <span>Expense Categories</span>
-                </TabsTrigger>
-                <TabsTrigger value="income" className="flex items-center gap-1">
-                  <ArrowUpCircle className="h-4 w-4 text-green-600" />
-                  <span>Income Categories</span>
-                </TabsTrigger>
-              </TabsList>
+              <div className="border-b mb-6">
+                <TabsList className="mb-0 w-full justify-start">
+                  <TabsTrigger
+                    value="expense"
+                    className="flex items-center gap-1 px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none"
+                  >
+                    <ArrowDownCircle className="h-4 w-4 text-destructive" />
+                    <span>Expense Categories</span>
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="income"
+                    className="flex items-center gap-1 px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none"
+                  >
+                    <ArrowUpCircle className="h-4 w-4 text-green-600" />
+                    <span>Income Categories</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
               <TabsContent value="expense">
                 <CategoryList
                   onEdit={handleEditCategory}

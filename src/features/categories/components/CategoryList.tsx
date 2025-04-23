@@ -7,6 +7,37 @@ import {
   Palette,
   ArrowUpDown,
   Tag,
+  ShoppingBag,
+  Home,
+  Car,
+  Utensils,
+  Coffee,
+  CreditCard,
+  Gift,
+  Briefcase,
+  Banknote,
+  Building,
+  Landmark,
+  Wallet,
+  Heart,
+  Plane,
+  Smartphone,
+  Wifi,
+  Droplet,
+  Zap,
+  Shirt,
+  Scissors,
+  Dumbbell,
+  BookOpen,
+  Gamepad2,
+  Music,
+  Film,
+  PiggyBank,
+  BarChart,
+  Percent,
+  BadgeDollarSign,
+  CircleDollarSign,
+  DollarSign,
 } from "lucide-react";
 import { getCategories, deleteCategory, Category } from "../../../api/supabase";
 import { Button } from "@/components/ui/button";
@@ -114,6 +145,53 @@ export function CategoryList({ onEdit, type = "expense" }: CategoryListProps) {
     setCategoryToDelete(null);
   };
 
+  // Icon map for rendering category icons
+  const ICON_MAP: Record<string, React.ReactNode> = {
+    ShoppingBag: <ShoppingBag size={20} />,
+    Home: <Home size={20} />,
+    Car: <Car size={20} />,
+    Utensils: <Utensils size={20} />,
+    Coffee: <Coffee size={20} />,
+    CreditCard: <CreditCard size={20} />,
+    Gift: <Gift size={20} />,
+    Briefcase: <Briefcase size={20} />,
+    Banknote: <Banknote size={20} />,
+    Building: <Building size={20} />,
+    Landmark: <Landmark size={20} />,
+    Wallet: <Wallet size={20} />,
+    Heart: <Heart size={20} />,
+    Plane: <Plane size={20} />,
+    Smartphone: <Smartphone size={20} />,
+    Wifi: <Wifi size={20} />,
+    Droplet: <Droplet size={20} />,
+    Zap: <Zap size={20} />,
+    Shirt: <Shirt size={20} />,
+    Scissors: <Scissors size={20} />,
+    Dumbbell: <Dumbbell size={20} />,
+    BookOpen: <BookOpen size={20} />,
+    Gamepad2: <Gamepad2 size={20} />,
+    Music: <Music size={20} />,
+    Film: <Film size={20} />,
+    PiggyBank: <PiggyBank size={20} />,
+    BarChart: <BarChart size={20} />,
+    Percent: <Percent size={20} />,
+    BadgeDollarSign: <BadgeDollarSign size={20} />,
+    CircleDollarSign: <CircleDollarSign size={20} />,
+    DollarSign: <DollarSign size={20} />,
+  };
+
+  // Render category icon
+  const renderCategoryIcon = (category: Category) => {
+    if (category.icon && ICON_MAP[category.icon]) {
+      return (
+        <div className="text-primary" style={{ color: category.color }}>
+          {ICON_MAP[category.icon]}
+        </div>
+      );
+    }
+    return <Tag size={20} className="text-muted-foreground" />;
+  };
+
   // Get category type badge
   const getCategoryTypeBadge = (type: string) => {
     switch (type) {
@@ -190,30 +268,41 @@ export function CategoryList({ onEdit, type = "expense" }: CategoryListProps) {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40%]">
+                  <TableHead className="w-[10%]">
+                    <div className="flex items-center gap-1">
+                      <Tag size={14} />
+                      <span>Icon</span>
+                    </div>
+                  </TableHead>
+                  <TableHead className="w-[30%]">
                     <div className="flex items-center gap-1">
                       <Tag size={14} />
                       <span>Name</span>
                     </div>
                   </TableHead>
-                  <TableHead className="w-[20%]">
+                  <TableHead className="w-[15%]">
                     <div className="flex items-center gap-1">
                       <ArrowUpDown size={14} />
                       <span>Type</span>
                     </div>
                   </TableHead>
-                  <TableHead className="w-[20%]">
+                  <TableHead className="w-[15%]">
                     <div className="flex items-center gap-1">
                       <Palette size={14} />
                       <span>Color</span>
                     </div>
                   </TableHead>
-                  <TableHead className="text-right w-[20%]">Actions</TableHead>
+                  <TableHead className="text-right w-[15%]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {categories.map((category) => (
                   <TableRow key={category.id}>
+                    <TableCell>
+                      <div className="flex items-center justify-center">
+                        {renderCategoryIcon(category)}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <div
@@ -225,8 +314,14 @@ export function CategoryList({ onEdit, type = "expense" }: CategoryListProps) {
                     </TableCell>
                     <TableCell>{getCategoryTypeBadge(category.type)}</TableCell>
                     <TableCell>
-                      <div className="text-muted-foreground text-sm">
-                        {category.color}
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-4 h-4 rounded-md"
+                          style={{ backgroundColor: category.color }}
+                        ></div>
+                        <span className="text-muted-foreground text-sm">
+                          {category.color}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
