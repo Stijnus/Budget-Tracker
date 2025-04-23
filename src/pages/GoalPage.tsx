@@ -8,6 +8,7 @@ import {
   createGoal,
   updateGoal,
   GoalInsert,
+  GoalWithCategory,
 } from "../api/supabase/goals";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -16,7 +17,7 @@ import { AlertCircle } from "lucide-react";
 export function GoalPage() {
   const { goalId } = useParams<{ goalId: string }>();
   const navigate = useNavigate();
-  const [goal, setGoal] = useState<any | null>(null);
+  const [goal, setGoal] = useState<GoalWithCategory | null>(null);
   const [isLoading, setIsLoading] = useState(goalId && goalId !== "new");
   const [error, setError] = useState<string | null>(null);
 

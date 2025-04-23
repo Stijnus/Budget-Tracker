@@ -1,40 +1,44 @@
-import { useEffect, useState, ReactNode } from "react";
-import { AuthContext } from "./authContext";
+import { useEffect, useState, ReactNode, useCallback } from "react";
+import { AuthContext, UserProfile, UserSettings } from "./authContext";
 import { User, AuthError } from "@supabase/supabase-js";
 import * as authApi from "../api/supabase/auth";
 import { useTheme } from "../providers/ThemeProvider";
+import type { Theme } from "../providers/ThemeProvider";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [userSettings, setUserSettings] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { setTheme } = useTheme();
 
   // Function to fetch user profile and settings
-  const fetchUserData = async (userId: string) => {
-    try {
-      // Fetch user profile
-      const { data: profileData } = await authApi.getUserProfile(userId);
-      setUserProfile(profileData);
+  const fetchUserData = useCallback(
+    async (userId: string) => {
+      try {
+        // Fetch user profile
+        const { data: profileData } = await authApi.getUserProfile(userId);
+        setUserProfile(profileData);
 
-      // Fetch user settings
-      const { data: settingsData } = await authApi.getUserSettings(userId);
-      setUserSettings(settingsData);
+        // Fetch user settings
+        const { data: settingsData } = await authApi.getUserSettings(userId);
+        setUserSettings(settingsData);
 
-      // Apply theme if available
-      if (settingsData?.theme) {
-        setTheme(settingsData.theme as "light" | "dark" | "system");
+        // Apply theme if available
+        if (settingsData?.theme) {
+          setTheme(settingsData.theme as Theme);
+        }
+
+        // Store user settings in localStorage for formatters to use
+        if (settingsData) {
+          localStorage.setItem("userSettings", JSON.stringify(settingsData));
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
       }
-
-      // Store user settings in localStorage for formatters to use
-      if (settingsData) {
-        localStorage.setItem("userSettings", JSON.stringify(settingsData));
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
+    },
+    [setTheme]
+  );
 
   // Function to refresh user data
   const refreshUserData = async () => {
@@ -81,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserProfile(null);
         setUserSettings(null);
         // Reset theme to default
-        setTheme("light" as "light" | "dark" | "system");
+        setTheme("light" as Theme);
         // Clear user settings from localStorage
         localStorage.removeItem("userSettings");
       } else if (event === "USER_UPDATED" && session) {
@@ -101,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       data.subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchUserData, setTheme]);
 
   const login = async (email: string, password: string) => {
     try {

@@ -59,7 +59,7 @@ export function GroupActivityFeed({
     }).format(date);
   };
 
-  const getActivityIcon = (action: string, entityType: string) => {
+  const getActivityIcon = (action: string, entityType: string = "") => {
     if (entityType === "transaction") {
       return <Receipt className="h-4 w-4" />;
     } else if (entityType === "budget") {
@@ -79,10 +79,11 @@ export function GroupActivityFeed({
   };
 
   const getActivityMessage = (item: GroupActivity) => {
-    const { action, entity_type, details } = item;
+    const { action, entity_type = "", details = {} } = item;
 
     // Format user name
-    const userName = item.user?.user_profiles?.full_name || item.user?.id;
+    const userName =
+      item.user?.user_profiles?.full_name || item.user?.id || "Unknown user";
 
     // Format action based on entity type and action
     if (entity_type === "transaction") {
@@ -161,9 +162,9 @@ export function GroupActivityFeed({
       </CardHeader>
       <CardContent>
         <div className="space-y-8">
-          {activity.length === 0 ? (
+          {!activity || activity.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
-              {t("groups.noActivity")}
+              {t("groups.noActivity") || "No activity recorded yet"}
             </p>
           ) : (
             activity.map((item) => (

@@ -586,18 +586,21 @@ export interface Database {
           group_id: string;
           user_id: string;
           role: "owner" | "admin" | "member" | "viewer";
+          family_role?: "parent" | "child" | "guardian" | "other" | null;
           joined_at: string;
         };
         Insert: {
           group_id: string;
           user_id: string;
           role: "owner" | "admin" | "member" | "viewer";
+          family_role?: "parent" | "child" | "guardian" | "other" | null;
           joined_at?: string;
         };
         Update: {
           group_id?: string;
           user_id?: string;
           role?: "owner" | "admin" | "member" | "viewer";
+          family_role?: "parent" | "child" | "guardian" | "other" | null;
           joined_at?: string;
         };
         Relationships: [
@@ -629,6 +632,7 @@ export interface Database {
           expires_at: string;
           created_at: string;
           updated_at: string;
+          metadata?: Json | null;
         };
         Insert: {
           id?: string;
@@ -641,6 +645,7 @@ export interface Database {
           expires_at: string;
           created_at?: string;
           updated_at?: string;
+          metadata?: Json | null;
         };
         Update: {
           id?: string;
@@ -653,6 +658,7 @@ export interface Database {
           expires_at?: string;
           created_at?: string;
           updated_at?: string;
+          metadata?: Json | null;
         };
         Relationships: [
           {

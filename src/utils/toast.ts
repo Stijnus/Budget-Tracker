@@ -1,18 +1,20 @@
 import { toast } from "@/hooks/use-toast";
 import { i18n } from "../i18n";
+import { ToastActionElement } from "@/components/ui/toast";
 
 type ToastType = "success" | "error" | "info" | "warning";
+type ToastVariant = "default" | "destructive"; // Match the actual variants from toast component
 
 interface ToastOptions {
   type?: ToastType;
   title?: string;
   description?: string;
-  action?: React.ReactNode;
+  action?: ToastActionElement;
   duration?: number;
 }
 
 // Map toast types to variants
-const typeToVariant = {
+const typeToVariant: Record<ToastType, ToastVariant> = {
   success: "default",
   error: "destructive",
   info: "default",
@@ -20,11 +22,13 @@ const typeToVariant = {
 };
 
 // Map toast types to CSS classes for custom styling
-const typeToClassName = {
-  success: "bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800",
+const typeToClassName: Record<ToastType, string> = {
+  success:
+    "bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800",
   error: "", // Uses the destructive variant
   info: "bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800",
-  warning: "bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800",
+  warning:
+    "bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800",
 };
 
 /**
@@ -32,9 +36,9 @@ const typeToClassName = {
  */
 export function showToast(options: ToastOptions) {
   const { type = "success", title, description, action, duration } = options;
-  
+
   return toast({
-    variant: typeToVariant[type] as any,
+    variant: typeToVariant[type],
     className: typeToClassName[type],
     title: title,
     description: description,
@@ -48,7 +52,7 @@ export function showToast(options: ToastOptions) {
  */
 export function showItemCreatedToast(itemType: string) {
   const t = i18n.t.bind(i18n);
-  
+
   return showToast({
     type: "success",
     title: t("common.success"),
@@ -62,7 +66,7 @@ export function showItemCreatedToast(itemType: string) {
  */
 export function showItemUpdatedToast(itemType: string) {
   const t = i18n.t.bind(i18n);
-  
+
   return showToast({
     type: "success",
     title: t("common.success"),
@@ -76,7 +80,7 @@ export function showItemUpdatedToast(itemType: string) {
  */
 export function showItemDeletedToast(itemType: string) {
   const t = i18n.t.bind(i18n);
-  
+
   return showToast({
     type: "success",
     title: t("common.success"),
@@ -90,7 +94,7 @@ export function showItemDeletedToast(itemType: string) {
  */
 export function showErrorToast(message?: string) {
   const t = i18n.t.bind(i18n);
-  
+
   return showToast({
     type: "error",
     title: t("common.error"),

@@ -55,6 +55,7 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,14 +65,24 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
     setSuccess(null);
 
     try {
+      console.log("Updating group with ID:", group.id, {
+        name,
+        description,
+        is_active: isActive,
+      });
+
       const { data, error } = await updateBudgetGroup(group.id, {
         name,
         description,
         is_active: isActive,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error from updateBudgetGroup:", error);
+        throw error;
+      }
 
+      console.log("Group updated successfully:", data);
       onUpdateGroup(data);
       setSuccess(t("groups.settingsSaved"));
 
@@ -81,28 +92,54 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
       }, 3000);
     } catch (err) {
       console.error("Error updating group:", err);
-      setError("Failed to update group. Please try again.");
+      setError(
+        `Failed to update group: ${
+          (err as Error).message || "Please try again."
+        }`
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteGroup = async () => {
+    // Verify that the user has typed the correct group name
+    if (confirmText !== group.name) {
+      setError("Please type the exact group name to confirm deletion.");
+      return;
+    }
+
     setIsLoading(true);
+    setError(null);
 
     try {
+      console.log("Deleting group with ID:", group.id);
       const { error } = await deleteBudgetGroup(group.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error from deleteBudgetGroup:", error);
+        throw error;
+      }
 
+      console.log("Group deleted successfully");
       // Navigate back to groups page
       navigate("/groups");
     } catch (err) {
       console.error("Error deleting group:", err);
-      setError("Failed to delete group. Please try again.");
+      setError(
+        `Failed to delete group: ${
+          (err as Error).message || "Please try again."
+        }`
+      );
       setIsDeleteDialogOpen(false);
       setIsLoading(false);
     }
+  };
+
+  const handleOpenDeleteDialog = () => {
+    setConfirmText("");
+    setError(null);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -184,14 +221,12 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            {t("groups.deleteGroupWarning")}
+            {t("groups.deleteGroupWarning") ||
+              "Deleting this group will permanently remove all associated data including transactions, budgets, and member information."}
           </p>
-          <Button
-            variant="destructive"
-            onClick={() => setIsDeleteDialogOpen(true)}
-          >
+          <Button variant="destructive" onClick={handleOpenDeleteDialog}>
             <Trash2 className="mr-2 h-4 w-4" />
-            {t("groups.deleteGroup")}
+            {t("groups.deleteGroup") || "Delete Group"}
           </Button>
         </CardContent>
       </Card>
@@ -200,16 +235,32 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("groups.deleteGroup")}</DialogTitle>
+            <DialogTitle>
+              {t("groups.deleteGroup") || "Delete Group"}
+            </DialogTitle>
             <DialogDescription>
-              {t("groups.deleteGroupConfirmation", { name: group.name })}
+              {t("groups.deleteGroupConfirmation", { name: group.name }) ||
+                `Are you sure you want to delete the group "${group.name}"? This action cannot be undone.`}
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
             <p className="text-sm text-muted-foreground">
-              {t("groups.deleteGroupWarningDetailed")}
+              {t("groups.deleteGroupWarningDetailed") ||
+                "All group data including transactions, budgets, and member information will be permanently deleted. Members will lose access to all shared resources."}
             </p>
+            <div className="mt-4 p-4 border border-destructive/20 bg-destructive/5 rounded-md">
+              <p className="text-sm font-medium text-destructive">
+                {t("groups.typeToConfirm") ||
+                  "Type the group name to confirm deletion:"}
+              </p>
+              <Input
+                className="mt-2"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder={group.name}
+              />
+            </div>
           </div>
 
           <DialogFooter>
@@ -223,7 +274,7 @@ export function GroupSettings({ group, onUpdateGroup }: GroupSettingsProps) {
             <Button
               variant="destructive"
               onClick={handleDeleteGroup}
-              disabled={isLoading}
+              disabled={isLoading || confirmText !== group.name}
             >
               {isLoading ? t("common.deleting") : t("groups.confirmDelete")}
             </Button>

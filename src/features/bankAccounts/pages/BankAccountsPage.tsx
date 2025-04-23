@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { BankAccountList } from "../components/BankAccountList";
 import { BankAccountForm } from "../components/BankAccountForm";
 import { BankAccount } from "../../../api/supabase/bankAccounts";
@@ -9,12 +8,13 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "../../../shared/components/PageHeader";
 
+type AccountType = "checking" | "savings" | "credit" | "investment" | "other";
+
 export function BankAccountsPage() {
-  const navigate = useNavigate();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState<BankAccount | undefined>(
-    undefined
-  );
+  const [selectedAccount, setSelectedAccount] = useState<
+    BankAccount | undefined
+  >(undefined);
   const [activeTab, setActiveTab] = useState<string>("all");
 
   const handleAddAccount = () => {
@@ -76,40 +76,32 @@ export function BankAccountsPage() {
           <TabsContent value="checking" className="mt-0">
             <BankAccountList
               onEdit={handleEditAccount}
-              onAdd={() => {
-                setSelectedAccount(undefined);
-                setIsFormOpen(true);
-              }}
+              onAdd={handleAddAccount}
+              accountType="checking"
             />
           </TabsContent>
 
           <TabsContent value="savings" className="mt-0">
             <BankAccountList
               onEdit={handleEditAccount}
-              onAdd={() => {
-                setSelectedAccount(undefined);
-                setIsFormOpen(true);
-              }}
+              onAdd={handleAddAccount}
+              accountType="savings"
             />
           </TabsContent>
 
           <TabsContent value="credit" className="mt-0">
             <BankAccountList
               onEdit={handleEditAccount}
-              onAdd={() => {
-                setSelectedAccount(undefined);
-                setIsFormOpen(true);
-              }}
+              onAdd={handleAddAccount}
+              accountType="credit"
             />
           </TabsContent>
 
           <TabsContent value="investment" className="mt-0">
             <BankAccountList
               onEdit={handleEditAccount}
-              onAdd={() => {
-                setSelectedAccount(undefined);
-                setIsFormOpen(true);
-              }}
+              onAdd={handleAddAccount}
+              accountType="investment"
             />
           </TabsContent>
         </Tabs>
@@ -122,7 +114,9 @@ export function BankAccountsPage() {
             account={selectedAccount}
             onClose={handleFormClose}
             onSuccess={handleFormSuccess}
-            defaultType={activeTab === "all" ? "checking" : activeTab as any}
+            defaultType={
+              activeTab === "all" ? "checking" : (activeTab as AccountType)
+            }
           />
         </SheetContent>
       </Sheet>

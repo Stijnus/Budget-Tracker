@@ -28,9 +28,13 @@ export type GroupMemberUpdate =
   Database["public"]["Tables"]["group_members"]["Update"];
 
 export type GroupInvitation =
-  Database["public"]["Tables"]["group_invitations"]["Row"];
+  Database["public"]["Tables"]["group_invitations"]["Row"] & {
+    metadata?: { family_role?: string } | null;
+  };
 export type GroupInvitationInsert =
-  Database["public"]["Tables"]["group_invitations"]["Insert"];
+  Database["public"]["Tables"]["group_invitations"]["Insert"] & {
+    metadata?: { family_role?: string } | null;
+  };
 export type GroupInvitationUpdate =
   Database["public"]["Tables"]["group_invitations"]["Update"];
 
@@ -210,15 +214,36 @@ export async function createBudgetGroup(group: BudgetGroupInsert) {
 
     try {
       // Add an activity log entry
-      await supabase.from("group_activity_log").insert({
-        group_id: newGroup.id,
-        user_id: group.created_by,
-        action: "created_group",
-        entity_type: "group",
-        entity_id: newGroup.id,
-        details: { group_name: group.name },
-      });
-      console.log("Group activity logged successfully");
+      // Try with the full schema first
+      try {
+        await supabase.from("group_activity_log").insert({
+          group_id: newGroup.id,
+          user_id: group.created_by,
+          action: "created_group",
+          entity_type: "group",
+          entity_id: newGroup.id,
+          details: { group_name: group.name },
+        });
+        console.log("Group activity logged successfully");
+      } catch (fullSchemaError) {
+        console.warn(
+          "Error with full schema logging, trying fallback:",
+          fullSchemaError
+        );
+
+        // Fallback to minimal schema if the full schema fails
+        await supabase.from("group_activity_log").insert({
+          group_id: newGroup.id,
+          user_id: group.created_by,
+          action: "created_group",
+          entity_type: "group", // Required by the type system
+          entity_id: newGroup.id, // Required by the type system
+          details: {
+            group_name: group.name,
+          },
+        });
+        console.log("Group activity logged successfully with fallback");
+      }
     } catch (logError) {
       // Don't fail if activity logging fails
       console.warn("Error logging group activity:", logError);
@@ -644,11 +669,31 @@ export async function acceptInvitation(token: string, userId: string) {
     };
   }
 
+  // Check for family role in metadata
+  let familyRole: "parent" | "child" | "guardian" | "other" | null = null;
+  // Cast the invitation to include metadata
+  const invitationWithMeta = invitation as unknown as {
+    metadata?: Record<string, string>;
+  };
+
+  if (invitationWithMeta.metadata) {
+    const metadata = invitationWithMeta.metadata;
+    if (metadata && typeof metadata === "object" && "family_role" in metadata) {
+      const role = metadata.family_role;
+      // Validate that the role is one of the allowed values
+      if (["parent", "child", "guardian", "other"].includes(role)) {
+        familyRole = role as "parent" | "child" | "guardian" | "other";
+        console.log("Found family role in invitation:", familyRole);
+      }
+    }
+  }
+
   // Add user to group
   const { error: memberError } = await addGroupMember({
     group_id: invitation.group_id,
     user_id: userId,
     role: invitation.role,
+    family_role: familyRole,
   });
 
   if (memberError) return { data: null, error: memberError };
@@ -688,31 +733,79 @@ export async function getGroupActivity(groupId: string, limit = 20) {
   try {
     console.log(`Getting activity for group ${groupId}`);
 
+    // Try with the full join first
+    try {
+      const { data, error } = await supabase
+        .from("group_activity_log")
+        .select(
+          `
+          *,
+          user:user_id(
+            id,
+            user_profiles(
+              full_name,
+              avatar_url
+            )
+          )
+        `
+        )
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      if (!error) {
+        console.log("Group activity data:", data);
+        return { data, error: null };
+      }
+
+      // If there's an error with the join, log it but continue to fallback
+      console.warn("Error with full join, trying fallback:", error);
+    } catch (joinErr) {
+      console.warn("Exception with full join, trying fallback:", joinErr);
+    }
+
+    // Fallback: just get the basic data without the joins
     const { data, error } = await supabase
       .from("group_activity_log")
-      .select(
-        `
-        *,
-        user:user_id(
-          id,
-          user_profiles(
-            full_name,
-            avatar_url
-          )
-        )
-      `
-      )
+      .select("*")
       .eq("group_id", groupId)
       .order("created_at", { ascending: false })
       .limit(limit);
 
     if (error) {
-      console.error("Error getting group activity:", error);
+      console.error("Error getting group activity (fallback):", error);
       return { data: [], error };
     }
 
-    console.log("Group activity data:", data);
-    return { data, error: null };
+    // Manually enrich the data with user information if needed
+    const enrichedData = await Promise.all(
+      (data || []).map(async (activity) => {
+        if (!activity.user_id) return activity;
+
+        try {
+          // Get user profile information
+          const { data: userData } = await supabase
+            .from("user_profiles")
+            .select("*")
+            .eq("user_id", activity.user_id)
+            .single();
+
+          return {
+            ...activity,
+            user: {
+              id: activity.user_id,
+              user_profiles: userData || null,
+            },
+          };
+        } catch (userErr) {
+          console.warn("Error enriching user data:", userErr);
+          return activity;
+        }
+      })
+    );
+
+    console.log("Group activity data (fallback method):", enrichedData);
+    return { data: enrichedData, error: null };
   } catch (err) {
     console.error("Unexpected error in getGroupActivity:", err);
     return { data: [], error: err as Error };

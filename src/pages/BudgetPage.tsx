@@ -3,15 +3,25 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, PiggyBank } from "lucide-react";
 import { AppLayout } from "../shared/components/layout";
 import { BudgetForm } from "../features/budgets/components/BudgetForm";
-import { getBudgetById } from "../api/supabase/budgets";
+import { getBudgetById, Budget } from "../api/supabase/budgets";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
+// Create extended budget interface with category info
+interface BudgetWithCategory extends Budget {
+  category_name?: string;
+  category_color?: string;
+  categories?: {
+    name: string;
+    color: string;
+  } | null;
+}
+
 export function BudgetPage() {
   const { budgetId } = useParams<{ budgetId: string }>();
   const navigate = useNavigate();
-  const [budget, setBudget] = useState<any | null>(null);
+  const [budget, setBudget] = useState<BudgetWithCategory | null>(null);
   const [isLoading, setIsLoading] = useState(budgetId && budgetId !== "new");
   const [error, setError] = useState<string | null>(null);
 

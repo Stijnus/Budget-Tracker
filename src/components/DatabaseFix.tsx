@@ -1,43 +1,47 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../api/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { supabase } from "../api/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 
 export function DatabaseFix() {
   const [isChecking, setIsChecking] = useState(false);
   const [isFixing, setIsFixing] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'checking' | 'fixing' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<
+    "idle" | "checking" | "fixing" | "success" | "error"
+  >("idle");
   const [error, setError] = useState<string | null>(null);
 
   const checkDatabase = async () => {
     setIsChecking(true);
-    setStatus('checking');
+    setStatus("checking");
     setError(null);
 
     try {
-      // Check if budget_groups table exists
-      const { data: tableExists, error: tableError } = await supabase
-        .from('information_schema.tables')
-        .select('table_name')
-        .eq('table_schema', 'public')
-        .eq('table_name', 'budget_groups')
-        .single();
+      // Check if budget_groups table exists using RPC instead of direct information_schema query
+      const { data: tableExists, error: tableError } = await supabase.rpc(
+        "check_table_exists",
+        { table_name: "budget_groups" }
+      );
 
       if (tableError) {
         throw tableError;
       }
 
       if (!tableExists) {
-        setStatus('error');
-        setError('Budget groups tables are missing. Click "Fix Database" to create them.');
+        setStatus("error");
+        setError(
+          'Budget groups tables are missing. Click "Fix Database" to create them.'
+        );
       } else {
-        setStatus('success');
+        setStatus("success");
       }
-    } catch (err: any) {
-      console.error('Error checking database:', err);
-      setStatus('error');
-      setError(err.message || 'Failed to check database tables');
+    } catch (err: unknown) {
+      console.error("Error checking database:", err);
+      setStatus("error");
+      setError(
+        err instanceof Error ? err.message : "Failed to check database tables"
+      );
     } finally {
       setIsChecking(false);
     }
@@ -45,18 +49,20 @@ export function DatabaseFix() {
 
   const fixDatabase = async () => {
     setIsFixing(true);
-    setStatus('fixing');
+    setStatus("fixing");
     setError(null);
 
     try {
       // Create budget_groups table
-      await supabase.rpc('create_budget_groups_tables');
-      
-      setStatus('success');
-    } catch (err: any) {
-      console.error('Error fixing database:', err);
-      setStatus('error');
-      setError(err.message || 'Failed to fix database tables');
+      await supabase.rpc("create_budget_groups_tables");
+
+      setStatus("success");
+    } catch (err: unknown) {
+      console.error("Error fixing database:", err);
+      setStatus("error");
+      setError(
+        err instanceof Error ? err.message : "Failed to fix database tables"
+      );
     } finally {
       setIsFixing(false);
     }
@@ -68,17 +74,19 @@ export function DatabaseFix() {
 
   return (
     <div className="space-y-4">
-      {status === 'error' && (
+      {status === "error" && (
         <Alert variant="destructive">
           <AlertTitle>Database Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      {status === 'success' && (
+      {status === "success" && (
         <Alert>
           <AlertTitle>Database Check</AlertTitle>
-          <AlertDescription>Database tables are properly set up.</AlertDescription>
+          <AlertDescription>
+            Database tables are properly set up.
+          </AlertDescription>
         </Alert>
       )}
 
@@ -90,18 +98,21 @@ export function DatabaseFix() {
               Checking...
             </>
           ) : (
-            'Check Database'
+            "Check Database"
           )}
         </Button>
 
-        <Button onClick={fixDatabase} disabled={isChecking || isFixing || status === 'success'}>
+        <Button
+          onClick={fixDatabase}
+          disabled={isChecking || isFixing || status === "success"}
+        >
           {isFixing ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Fixing...
             </>
           ) : (
-            'Fix Database'
+            "Fix Database"
           )}
         </Button>
       </div>

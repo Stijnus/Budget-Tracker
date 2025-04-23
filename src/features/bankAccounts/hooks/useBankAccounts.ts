@@ -19,7 +19,14 @@ interface BankAccount {
   updated_at: string;
 }
 
-export const useBankAccounts = () => {
+export type AccountType =
+  | "checking"
+  | "savings"
+  | "credit"
+  | "investment"
+  | "other";
+
+export const useBankAccounts = (accountType?: AccountType) => {
   const [data, setData] = useState<BankAccount[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,9 +34,14 @@ export const useBankAccounts = () => {
   useEffect(() => {
     const fetchBankAccounts = async () => {
       try {
-        const { data: accounts, error } = await supabase
-          .from("bank_accounts")
-          .select("*");
+        const query = supabase.from("bank_accounts").select("*");
+
+        // Add filter if account type is specified
+        if (accountType) {
+          query.eq("account_type", accountType);
+        }
+
+        const { data: accounts, error } = await query;
 
         if (error) throw error;
         setData(accounts);
@@ -45,7 +57,7 @@ export const useBankAccounts = () => {
     };
 
     fetchBankAccounts();
-  }, []);
+  }, [accountType]);
 
   return { data, error, loading };
 };

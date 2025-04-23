@@ -8,6 +8,7 @@ import {
   createBill,
   updateBill,
   BillInsert,
+  BillWithCategory,
 } from "../api/supabase/bills";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -16,7 +17,7 @@ import { AlertCircle } from "lucide-react";
 export function BillPage() {
   const { billId } = useParams<{ billId: string }>();
   const navigate = useNavigate();
-  const [bill, setBill] = useState<any | null>(null);
+  const [bill, setBill] = useState<BillWithCategory | null>(null);
   const [isLoading, setIsLoading] = useState(billId && billId !== "new");
   const [error, setError] = useState<string | null>(null);
 

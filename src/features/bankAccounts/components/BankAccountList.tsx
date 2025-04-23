@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getBankAccounts,
+  getBankAccountsByType,
   deleteBankAccount,
   setDefaultBankAccount,
   BankAccount,
@@ -38,12 +39,14 @@ interface BankAccountListProps {
   onEdit: (account: BankAccount) => void;
   showAddButton?: boolean;
   onAdd?: () => void;
+  accountType?: "checking" | "savings" | "credit" | "investment" | "other";
 }
 
 export function BankAccountList({
   onEdit,
   showAddButton = true,
   onAdd,
+  accountType,
 }: BankAccountListProps) {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
@@ -54,24 +57,30 @@ export function BankAccountList({
   const [totalBalance, setTotalBalance] = useState(0);
 
   // Load accounts
-  const loadAccounts = async () => {
+  const loadAccounts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data, error } = await getBankAccounts();
+      // Use filtered query if accountType is provided
+      const { data, error } = accountType
+        ? await getBankAccountsByType(accountType)
+        : await getBankAccounts();
+
       if (error) throw error;
 
       setAccounts(data || []);
 
       // Calculate total balance (credit accounts are negative)
-      const total = data?.reduce((sum, account) => {
-        const balance = account.account_type === "credit" 
-          ? -Math.abs(account.current_balance) 
-          : account.current_balance;
-        return sum + balance;
-      }, 0) || 0;
-      
+      const total =
+        data?.reduce((sum, account) => {
+          const balance =
+            account.account_type === "credit"
+              ? -Math.abs(account.current_balance)
+              : account.current_balance;
+          return sum + balance;
+        }, 0) || 0;
+
       setTotalBalance(total);
     } catch (err) {
       console.error("Error loading bank accounts:", err);
@@ -79,12 +88,12 @@ export function BankAccountList({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [accountType]);
 
-  // Load accounts on component mount
+  // Load accounts on component mount or when accountType changes
   useEffect(() => {
     loadAccounts();
-  }, []);
+  }, [accountType, loadAccounts]);
 
   // Handle account deletion
   const handleDeleteClick = (id: string) => {
@@ -101,7 +110,7 @@ export function BankAccountList({
 
       // Show success toast
       showItemDeletedToast("bank account");
-      
+
       // Reload accounts
       loadAccounts();
     } catch (err) {
@@ -118,7 +127,7 @@ export function BankAccountList({
     try {
       const { error } = await setDefaultBankAccount(id);
       if (error) throw error;
-      
+
       // Reload accounts
       loadAccounts();
     } catch (err) {
@@ -174,7 +183,13 @@ export function BankAccountList({
       {/* Total Balance Card */}
       <Card className="bg-primary text-primary-foreground">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Total Balance</CardTitle>
+          <CardTitle className="text-lg">
+            {accountType
+              ? `Total ${
+                  accountType.charAt(0).toUpperCase() + accountType.slice(1)
+                } Balance`
+              : "Total Balance"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-bold">
@@ -189,7 +204,13 @@ export function BankAccountList({
       {/* Accounts List */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between py-4">
-          <CardTitle className="text-xl">Your Accounts</CardTitle>
+          <CardTitle className="text-xl">
+            {accountType
+              ? `Your ${
+                  accountType.charAt(0).toUpperCase() + accountType.slice(1)
+                } Accounts`
+              : "Your Accounts"}
+          </CardTitle>
           {showAddButton && (
             <Button onClick={handleAddAccount} size="sm">
               <Plus className="h-4 w-4 mr-1" />
@@ -200,7 +221,7 @@ export function BankAccountList({
         <CardContent>
           {accounts.length === 0 ? (
             <div className="p-6 text-center text-muted-foreground">
-              No bank accounts found.{" "}
+              No {accountType || "bank"} accounts found.{" "}
               {showAddButton && (
                 <Button
                   onClick={handleAddAccount}
@@ -226,7 +247,9 @@ export function BankAccountList({
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-md font-medium">{account.name}</h3>
+                          <h3 className="text-md font-medium">
+                            {account.name}
+                          </h3>
                           {account.is_default && (
                             <Badge variant="outline" className="text-xs">
                               <Star className="h-3 w-3 mr-1 fill-yellow-400 text-yellow-400" />
@@ -240,19 +263,22 @@ export function BankAccountList({
                             ? `****${account.account_number}`
                             : "No account number"}
                         </p>
-                        <Badge
-                          variant="outline"
-                          className="mt-1 capitalize"
-                        >
+                        <Badge variant="outline" className="mt-1 capitalize">
                           {account.account_type}
                         </Badge>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-lg font-semibold ${
-                        account.account_type === "credit" ? "text-red-500" : ""
-                      }`}>
-                        {formatCurrency(account.current_balance, account.currency)}
+                      <div
+                        className={`text-lg font-semibold ${
+                          account.account_type === "credit"
+                            ? "text-red-500"
+                            : ""
+                        }`}
+                      >
+                        {formatCurrency(account.current_balance, {
+                          currency: account.currency,
+                        })}
                       </div>
                       <div className="flex mt-2 space-x-1">
                         {!account.is_default && (
@@ -298,9 +324,9 @@ export function BankAccountList({
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this bank account? This action cannot be undone.
-              Any transactions associated with this account will remain but will no longer be
-              linked to an account.
+              Are you sure you want to delete this bank account? This action
+              cannot be undone. Any transactions associated with this account
+              will remain but will no longer be linked to an account.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -310,10 +336,7 @@ export function BankAccountList({
             >
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteConfirm}
-            >
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
               Delete Account
             </Button>
           </DialogFooter>

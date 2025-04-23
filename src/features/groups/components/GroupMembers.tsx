@@ -42,6 +42,7 @@ interface GroupMember {
   group_id: string;
   user_id: string;
   role: "owner" | "admin" | "member" | "viewer";
+  family_role?: "parent" | "child" | "guardian" | "other" | null;
   joined_at: string;
   user?: {
     id: string;
@@ -75,6 +76,8 @@ export function GroupMembers({
     null
   );
   const [newRole, setNewRole] = useState<string>("");
+  const [newFamilyRole, setNewFamilyRole] = useState<string>("");
+  const [isFamilyRoleDialogOpen, setIsFamilyRoleDialogOpen] = useState(false);
 
   const isAdmin = userRole === "owner" || userRole === "admin";
 
@@ -85,6 +88,12 @@ export function GroupMembers({
     setError(null);
 
     try {
+      console.log("Updating member role:", {
+        groupId,
+        userId: selectedMember.user_id,
+        role: newRole,
+      });
+
       await updateGroupMember(groupId, selectedMember.user_id, {
         role: newRole as "owner" | "admin" | "member" | "viewer",
       });
@@ -98,7 +107,49 @@ export function GroupMembers({
       setNewRole("");
     } catch (err) {
       console.error("Error changing role:", err);
-      setError("Failed to change role. Please try again.");
+      setError(
+        `Failed to change role: ${
+          (err as Error).message || "Please try again."
+        }`
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangeFamilyRole = async () => {
+    if (!selectedMember || !newFamilyRole) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      console.log("Updating member family role:", {
+        groupId,
+        userId: selectedMember.user_id,
+        familyRole: newFamilyRole,
+      });
+
+      await updateGroupMember(groupId, selectedMember.user_id, {
+        family_role: newFamilyRole as
+          | "parent"
+          | "child"
+          | "guardian"
+          | "other"
+          | null,
+      });
+
+      // Close dialog
+      setIsFamilyRoleDialogOpen(false);
+      setSelectedMember(null);
+      setNewFamilyRole("");
+    } catch (err) {
+      console.error("Error changing family role:", err);
+      setError(
+        `Failed to change family role: ${
+          (err as Error).message || "Please try again."
+        }`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -219,18 +270,33 @@ export function GroupMembers({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant={getRoleBadgeVariant(member.role)}
-                    className="flex items-center"
-                  >
-                    {getRoleIcon(member.role)}
-                    {t(
-                      `groups.role${
-                        member.role.charAt(0).toUpperCase() +
-                        member.role.slice(1)
-                      }`
+                  <div className="flex flex-col gap-1">
+                    <Badge
+                      variant={getRoleBadgeVariant(member.role)}
+                      className="flex items-center"
+                    >
+                      {getRoleIcon(member.role)}
+                      {t(
+                        `groups.role${
+                          member.role.charAt(0).toUpperCase() +
+                          member.role.slice(1)
+                        }`
+                      )}
+                    </Badge>
+
+                    {member.family_role && (
+                      <Badge variant="outline" className="flex items-center">
+                        {t(
+                          `groups.role${
+                            member.family_role.charAt(0).toUpperCase() +
+                            member.family_role.slice(1)
+                          }`
+                        ) ||
+                          member.family_role.charAt(0).toUpperCase() +
+                            member.family_role.slice(1)}
+                      </Badge>
                     )}
-                  </Badge>
+                  </div>
 
                   {isAdmin && canManageMember(member) && (
                     <DropdownMenu>
@@ -250,6 +316,16 @@ export function GroupMembers({
                         >
                           <UserCog className="mr-2 h-4 w-4" />
                           {t("groups.changeRole")}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedMember(member);
+                            setNewFamilyRole(member.family_role || "");
+                            setIsFamilyRoleDialogOpen(true);
+                          }}
+                        >
+                          <UserCog className="mr-2 h-4 w-4" />
+                          {t("groups.changeFamilyRole") || "Change Family Role"}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
@@ -361,6 +437,97 @@ export function GroupMembers({
               disabled={isLoading}
             >
               {isLoading ? t("common.removing") : t("groups.removeMember")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Family Role Dialog */}
+      <Dialog
+        open={isFamilyRoleDialogOpen}
+        onOpenChange={setIsFamilyRoleDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t("groups.changeFamilyRole") || "Change Family Role"}
+            </DialogTitle>
+            <DialogDescription>
+              {t("groups.changeFamilyRoleDescription", {
+                name:
+                  selectedMember?.user?.user_profiles?.full_name ||
+                  selectedMember?.user?.email,
+              }) ||
+                `Assign a family role to ${
+                  selectedMember?.user?.user_profiles?.full_name ||
+                  selectedMember?.user?.email ||
+                  "this member"
+                }`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <Select value={newFamilyRole} onValueChange={setNewFamilyRole}>
+              <SelectTrigger>
+                <SelectValue
+                  placeholder={
+                    t("groups.selectFamilyRole") || "Select a family role"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="parent">
+                  {t("groups.roleParent") || "Parent"}
+                </SelectItem>
+                <SelectItem value="child">
+                  {t("groups.roleChild") || "Child"}
+                </SelectItem>
+                <SelectItem value="guardian">
+                  {t("groups.roleGuardian") || "Guardian"}
+                </SelectItem>
+                <SelectItem value="other">
+                  {t("groups.roleOther") || "Other"}
+                </SelectItem>
+                <SelectItem value="">
+                  {t("groups.roleNone") || "None"}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <p className="text-sm text-muted-foreground">
+              {newFamilyRole === "parent"
+                ? t("groups.roleParentDescription") ||
+                  "Full access to manage family finances and children's accounts"
+                : newFamilyRole === "child"
+                ? t("groups.roleChildDescription") ||
+                  "Limited access based on parent settings"
+                : newFamilyRole === "guardian"
+                ? t("groups.roleGuardianDescription") ||
+                  "Similar to parent but with some restrictions"
+                : newFamilyRole === "other"
+                ? t("groups.roleOtherDescription") ||
+                  "Custom role with specific permissions"
+                : t("groups.roleNoneDescription") ||
+                  "No specific family role assigned"}
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsFamilyRoleDialogOpen(false)}
+              disabled={isLoading}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={handleChangeFamilyRole}
+              disabled={
+                isLoading ||
+                newFamilyRole === (selectedMember?.family_role || "")
+              }
+            >
+              {isLoading ? t("common.saving") : t("common.save")}
             </Button>
           </DialogFooter>
         </DialogContent>

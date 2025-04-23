@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -39,6 +40,10 @@ export function InviteMemberDialog({
   const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"admin" | "member" | "viewer">("member");
+  const [familyRole, setFamilyRole] = useState<
+    "parent" | "child" | "guardian" | "other" | ""
+  >("");
+  const [isFamily, setIsFamily] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -57,14 +62,22 @@ export function InviteMemberDialog({
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
 
-      const { error } = await createInvitation({
+      // Prepare invitation data
+      const invitationData = {
         group_id: groupId,
         invited_by: user.id,
         email,
         role,
         status: "pending",
         expires_at: expiresAt.toISOString(),
-      });
+        // Include family role metadata if this is a family invitation
+        metadata:
+          isFamily && familyRole ? { family_role: familyRole } : undefined,
+      };
+
+      console.log("Creating invitation:", invitationData);
+
+      const { error } = await createInvitation(invitationData);
 
       if (error) throw error;
 
@@ -87,6 +100,8 @@ export function InviteMemberDialog({
   const resetForm = () => {
     setEmail("");
     setRole("member");
+    setFamilyRole("");
+    setIsFamily(false);
     setError(null);
     setSuccess(null);
   };
@@ -160,6 +175,72 @@ export function InviteMemberDialog({
                 ? t("groups.roleMemberDescription")
                 : t("groups.roleViewerDescription")}
             </p>
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="is-family"
+                checked={isFamily}
+                onCheckedChange={(checked) => setIsFamily(checked === true)}
+              />
+              <Label htmlFor="is-family">
+                {t("groups.isFamilyMember") || "This is a family member"}
+              </Label>
+            </div>
+
+            {isFamily && (
+              <div className="space-y-2 mt-4">
+                <Label htmlFor="family-role">
+                  {t("groups.familyRole") || "Family Role"}
+                </Label>
+                <Select
+                  value={familyRole}
+                  onValueChange={(value) =>
+                    setFamilyRole(
+                      value as "parent" | "child" | "guardian" | "other" | ""
+                    )
+                  }
+                >
+                  <SelectTrigger id="family-role">
+                    <SelectValue
+                      placeholder={
+                        t("groups.selectFamilyRole") || "Select a family role"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="parent">
+                      {t("groups.roleParent") || "Parent"}
+                    </SelectItem>
+                    <SelectItem value="child">
+                      {t("groups.roleChild") || "Child"}
+                    </SelectItem>
+                    <SelectItem value="guardian">
+                      {t("groups.roleGuardian") || "Guardian"}
+                    </SelectItem>
+                    <SelectItem value="other">
+                      {t("groups.roleOther") || "Other"}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {familyRole === "parent"
+                    ? t("groups.roleParentDescription") ||
+                      "Full access to manage family finances and children's accounts"
+                    : familyRole === "child"
+                    ? t("groups.roleChildDescription") ||
+                      "Limited access based on parent settings"
+                    : familyRole === "guardian"
+                    ? t("groups.roleGuardianDescription") ||
+                      "Similar to parent but with some restrictions"
+                    : familyRole === "other"
+                    ? t("groups.roleOtherDescription") ||
+                      "Custom role with specific permissions"
+                    : ""}
+                </p>
+              </div>
+            )}
           </div>
 
           <DialogFooter>

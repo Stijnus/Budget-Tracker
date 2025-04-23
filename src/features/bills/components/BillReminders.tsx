@@ -14,11 +14,19 @@ interface BillRemindersProps {
   className?: string;
 }
 
+interface Bill {
+  id: string;
+  name: string;
+  amount: number;
+  next_due_date: string | null;
+  status: string;
+}
+
 export function BillReminders({
   limit = 5,
   className = "",
 }: BillRemindersProps) {
-  const [bills, setBills] = useState<any[]>([]);
+  const [bills, setBills] = useState<Bill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -154,7 +162,12 @@ export function BillReminders({
                 </div>
                 <div className="flex items-center text-sm text-muted-foreground mt-1">
                   <Calendar size={14} className="mr-1" />
-                  <span>Due: {formatDate(bill.next_due_date, "medium")}</span>
+                  <span>
+                    Due:{" "}
+                    {bill.next_due_date
+                      ? formatDate(bill.next_due_date, "medium")
+                      : "N/A"}
+                  </span>
                 </div>
                 <p className="text-sm font-medium mt-1">
                   {formatCurrency(bill.amount)}

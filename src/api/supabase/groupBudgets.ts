@@ -14,30 +14,50 @@ export async function getGroupBudgets(groupId: string) {
   try {
     console.log(`Fetching budgets for group ID: ${groupId}`);
 
+    // Try with the full join first
+    try {
+      const { data, error } = await supabase
+        .from("group_budgets")
+        .select(
+          `
+          *,
+          category:category_id(*),
+          creator:created_by(
+            id,
+            user_profiles(
+              full_name,
+              avatar_url
+            )
+          )
+        `
+        )
+        .eq("group_id", groupId)
+        .order("name");
+
+      if (!error) {
+        console.log(`Retrieved ${data?.length || 0} budgets`);
+        return { data, error: null };
+      }
+
+      // If there's an error with the join, log it but continue to fallback
+      console.warn("Error with full join, trying fallback:", error);
+    } catch (joinErr) {
+      console.warn("Exception with full join, trying fallback:", joinErr);
+    }
+
+    // Fallback: just get the basic data without the joins
     const { data, error } = await supabase
       .from("group_budgets")
-      .select(
-        `
-        *,
-        category:category_id(*),
-        creator:created_by(
-          id,
-          user_profiles(
-            full_name,
-            avatar_url
-          )
-        )
-      `
-      )
+      .select("*")
       .eq("group_id", groupId)
       .order("name");
 
     if (error) {
-      console.error("Error fetching group budgets:", error);
+      console.error("Error fetching group budgets (fallback):", error);
       return { data: [], error };
     }
 
-    console.log(`Retrieved ${data?.length || 0} budgets`);
+    console.log(`Retrieved ${data?.length || 0} budgets (fallback method)`);
     return { data, error: null };
   } catch (err) {
     console.error("Unexpected error in getGroupBudgets:", err);
@@ -52,30 +72,50 @@ export async function getGroupBudget(id: string) {
   try {
     console.log(`Fetching budget with ID: ${id}`);
 
+    // Try with the full join first
+    try {
+      const { data, error } = await supabase
+        .from("group_budgets")
+        .select(
+          `
+          *,
+          category:category_id(*),
+          creator:created_by(
+            id,
+            user_profiles(
+              full_name,
+              avatar_url
+            )
+          )
+        `
+        )
+        .eq("id", id)
+        .single();
+
+      if (!error) {
+        console.log("Budget data:", data);
+        return { data, error: null };
+      }
+
+      // If there's an error with the join, log it but continue to fallback
+      console.warn("Error with full join, trying fallback:", error);
+    } catch (joinErr) {
+      console.warn("Exception with full join, trying fallback:", joinErr);
+    }
+
+    // Fallback: just get the basic data without the joins
     const { data, error } = await supabase
       .from("group_budgets")
-      .select(
-        `
-        *,
-        category:category_id(*),
-        creator:created_by(
-          id,
-          user_profiles(
-            full_name,
-            avatar_url
-          )
-        )
-      `
-      )
+      .select("*")
       .eq("id", id)
       .single();
 
     if (error) {
-      console.error("Error fetching group budget:", error);
+      console.error("Error fetching group budget (fallback):", error);
       return { data: null, error };
     }
 
-    console.log("Budget data:", data);
+    console.log("Budget data (fallback method):", data);
     return { data, error: null };
   } catch (err) {
     console.error("Unexpected error in getGroupBudget:", err);
@@ -194,44 +234,50 @@ export async function getActiveGroupBudgets(groupId: string) {
  * Calculate budget progress (spent amount vs budget amount)
  */
 export async function calculateGroupBudgetProgress(budgetId: string) {
-  // Get the budget
-  const { data: budget, error: budgetError } = await getGroupBudget(budgetId);
+  try {
+    // Get the budget
+    const { data: budget, error: budgetError } = await getGroupBudget(budgetId);
 
-  if (budgetError) return { data: null, error: budgetError };
+    if (budgetError) return { data: null, error: budgetError };
+    if (!budget) return { data: null, error: new Error("Budget not found") };
 
-  // Get transactions for this category in the budget period
-  const startDate = budget.start_date;
-  const endDate = budget.end_date || new Date().toISOString().split("T")[0];
+    // Get transactions for this category in the budget period
+    const startDate = budget.start_date;
+    const endDate = budget.end_date || new Date().toISOString().split("T")[0];
 
-  const { data: transactions, error: transactionsError } = await supabase
-    .from("group_transactions")
-    .select("amount")
-    .eq("group_id", budget.group_id)
-    .eq("category_id", budget.category_id)
-    .eq("type", "expense")
-    .gte("date", startDate)
-    .lte("date", endDate);
+    const { data: transactions, error: transactionsError } = await supabase
+      .from("group_transactions")
+      .select("amount")
+      .eq("group_id", budget.group_id)
+      .eq("category_id", budget.category_id)
+      .eq("type", "expense")
+      .gte("date", startDate)
+      .lte("date", endDate);
 
-  if (transactionsError) return { data: null, error: transactionsError };
+    if (transactionsError) return { data: null, error: transactionsError };
 
-  // Calculate total spent
-  const totalSpent = transactions.reduce(
-    (sum, transaction) => sum + transaction.amount,
-    0
-  );
+    // Calculate total spent
+    const totalSpent = transactions.reduce(
+      (sum, transaction) => sum + Number(transaction.amount),
+      0
+    );
 
-  // Calculate progress percentage
-  const progressPercentage = (totalSpent / budget.amount) * 100;
+    // Calculate progress percentage
+    const progressPercentage = (totalSpent / Number(budget.amount)) * 100;
 
-  return {
-    data: {
-      budgetId: budget.id,
-      budgetAmount: budget.amount,
-      spentAmount: totalSpent,
-      remainingAmount: budget.amount - totalSpent,
-      progressPercentage: Math.min(progressPercentage, 100),
-      isOverBudget: totalSpent > budget.amount,
-    },
-    error: null,
-  };
+    return {
+      data: {
+        budgetId: budget.id,
+        budgetAmount: Number(budget.amount),
+        spentAmount: totalSpent,
+        remainingAmount: Number(budget.amount) - totalSpent,
+        progressPercentage: Math.min(progressPercentage, 100),
+        isOverBudget: totalSpent > Number(budget.amount),
+      },
+      error: null,
+    };
+  } catch (err) {
+    console.error("Error calculating budget progress:", err);
+    return { data: null, error: err as Error };
+  }
 }
