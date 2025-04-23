@@ -27,7 +27,7 @@ export const NAMESPACES = [
   "settings",
   "groups",
   "nav",
-  "errors"
+  "errors",
 ];
 
 // Import translations
@@ -39,17 +39,17 @@ import de_common from "./locales/de/common.json";
 // Initialize resources with common namespace (others will be loaded on demand)
 const resources = {
   en: {
-    common: en_common
+    common: en_common,
   },
   nl: {
-    common: nl_common
+    common: nl_common,
   },
   fr: {
-    common: fr_common
+    common: fr_common,
   },
   de: {
-    common: de_common
-  }
+    common: de_common,
+  },
 };
 
 // Initialize i18next
@@ -85,7 +85,7 @@ export { i18n };
 // Helper function to change language
 export const changeLanguage = async (lang: string): Promise<void> => {
   await i18n.changeLanguage(lang);
-  
+
   // Update localStorage
   try {
     const userSettings = localStorage.getItem("userSettings");
@@ -102,7 +102,7 @@ export const changeLanguage = async (lang: string): Promise<void> => {
 };
 
 // Export a type-safe translation function
-export const t = (key: string, options?: Record<string, any>): string => {
+export const t = (key: string, options?: Record<string, unknown>): string => {
   return i18n.t(key, options);
 };
 

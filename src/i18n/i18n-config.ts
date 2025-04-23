@@ -49,7 +49,7 @@ i18n
     },
     // Handle missing keys
     saveMissing: true,
-    missingKeyHandler: (lng, ns, key, fallbackValue) => {
+    missingKeyHandler: (lng, ns, key) => {
       console.warn(
         `Missing translation key: ${key} in namespace: ${ns} for language: ${lng}`
       );
@@ -83,7 +83,7 @@ export const changeLanguage = async (lang: string): Promise<void> => {
 };
 
 // Export a type-safe translation function
-export const t = (key: string, options?: Record<string, any>): string => {
+export const t = (key: string, options?: Record<string, unknown>): string => {
   return i18n.t(key, options);
 };
 

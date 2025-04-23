@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../providers/LanguageProvider";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+// Card components not used in this file
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardFooter,
+//   CardHeader,
+//   CardTitle,
+// } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -16,11 +17,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  // DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bug, X } from "lucide-react";
+import { Bug } from "lucide-react";
 
 /**
  * TranslationDebugger Component
@@ -59,7 +60,7 @@ export function TranslationDebugger() {
         `
             : ""
         }
-        
+
         ${
           highlightMissing
             ? `
@@ -76,7 +77,7 @@ export function TranslationDebugger() {
       document.head.appendChild(style);
 
       // Find and mark missing translations
-      const observer = new MutationObserver((mutations) => {
+      const observer = new MutationObserver(() => {
         scanForMissingTranslations();
       });
 

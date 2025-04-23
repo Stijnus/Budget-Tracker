@@ -145,7 +145,7 @@ export function TransactionForm({
     }
 
     fetchData();
-  }, [user, bankAccountId, transaction?.bank_account_id]);
+  }, [user, bankAccountId, transaction?.bank_account_id, t]);
 
   // Filter categories based on transaction type
   const filteredCategories = categories.filter(

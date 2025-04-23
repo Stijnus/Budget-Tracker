@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import Backend from "i18next-http-backend";
+// import Backend from "i18next-http-backend";
 
 // Import translations (for now, we'll keep using the existing translations)
 import { translations } from "./translations";
@@ -52,7 +52,7 @@ export { i18n };
 // Helper function to change language
 export const changeLanguage = async (lang: string): Promise<void> => {
   await i18n.changeLanguage(lang);
-  
+
   // Update localStorage
   try {
     const userSettings = localStorage.getItem("userSettings");
@@ -69,7 +69,7 @@ export const changeLanguage = async (lang: string): Promise<void> => {
 };
 
 // Export a type-safe translation function
-export const t = (key: string, options?: Record<string, any>): string => {
+export const t = (key: string, options?: Record<string, unknown>): string => {
   return i18n.t(key, options);
 };
 

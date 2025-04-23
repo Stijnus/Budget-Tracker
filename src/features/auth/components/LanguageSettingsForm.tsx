@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { updateUserSettings } from "../../../api/supabase/auth";
-import { useLanguage, LANGUAGES } from "../../../providers/LanguageProvider";
+import { useLanguage } from "../../../providers/LanguageProvider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
