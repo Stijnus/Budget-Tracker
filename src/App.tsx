@@ -23,6 +23,10 @@ import { BillPage } from "./pages/BillPage";
 import { GoalsPage } from "./pages/GoalsPage";
 import { GoalPage } from "./pages/GoalPage";
 import { BudgetPage } from "./pages/BudgetPage";
+import { BankAccountsPage } from "./pages/BankAccountsPage";
+import { BankAccountPage } from "./pages/BankAccountPage";
+import { GroupsPage } from "./pages/GroupsPage";
+import { GroupPage } from "./pages/GroupPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { AuthProvider } from "./state/auth"; // Using the AuthProvider from auth.tsx
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -287,6 +291,48 @@ function App() {
                         <ProtectedRoute>
                           <ErrorBoundary>
                             <BudgetPage />
+                          </ErrorBoundary>
+                        </ProtectedRoute>
+                      }
+                    />
+                    {/* Bank Accounts routes */}
+                    <Route
+                      path="/accounts"
+                      element={
+                        <ProtectedRoute>
+                          <ErrorBoundary>
+                            <BankAccountsPage />
+                          </ErrorBoundary>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/accounts/:id"
+                      element={
+                        <ProtectedRoute>
+                          <ErrorBoundary>
+                            <BankAccountPage />
+                          </ErrorBoundary>
+                        </ProtectedRoute>
+                      }
+                    />
+                    {/* Groups routes */}
+                    <Route
+                      path="/groups"
+                      element={
+                        <ProtectedRoute>
+                          <ErrorBoundary>
+                            <GroupsPage />
+                          </ErrorBoundary>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/groups/:id"
+                      element={
+                        <ProtectedRoute>
+                          <ErrorBoundary>
+                            <GroupPage />
                           </ErrorBoundary>
                         </ProtectedRoute>
                       }

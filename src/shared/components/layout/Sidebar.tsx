@@ -17,6 +17,8 @@ import {
   Settings,
   Menu,
   Tag,
+  CreditCard,
+  Users,
 } from "lucide-react";
 
 export function Sidebar() {
@@ -51,6 +53,16 @@ export function Sidebar() {
       icon: <PieChart size={20} />,
     },
     { name: t("nav.budgets"), path: "/budgets", icon: <Calendar size={20} /> },
+    {
+      name: t("nav.accounts"),
+      path: "/accounts",
+      icon: <CreditCard size={20} />,
+    },
+    {
+      name: t("nav.groups"),
+      path: "/groups",
+      icon: <Users size={20} />,
+    },
     { name: t("nav.tags"), path: "/tags", icon: <Tag size={20} /> },
     { name: t("nav.goals"), path: "/goals", icon: <Target size={20} /> },
     {

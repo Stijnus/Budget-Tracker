@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { X, AlertCircle } from "lucide-react";
+import {
+  showItemCreatedToast,
+  showItemUpdatedToast,
+  showErrorToast,
+} from "../../../utils/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +29,7 @@ import {
 import { getCategories } from "../../../api/supabase/categories";
 import { TagSelector } from "../../tags/components/TagSelector";
 import { getTagsForTransaction } from "../../../api/supabase/tags";
+import { getBankAccounts } from "../../../api/supabase/bankAccounts";
 
 interface TransactionFormProps {
   transaction?: Transaction;
@@ -43,6 +49,9 @@ export function TransactionForm({
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<
     { id: string; name: string; type: string }[]
+  >([]);
+  const [bankAccounts, setBankAccounts] = useState<
+    { id: string; name: string; account_type: string; is_default: boolean }[]
   >([]);
 
   // Form state
@@ -66,6 +75,9 @@ export function TransactionForm({
     transaction?.status || "completed"
   );
   const [notes, setNotes] = useState(transaction?.notes || "");
+  const [bankAccountId, setBankAccountId] = useState(
+    transaction?.bank_account_id || "none"
+  );
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   // Fetch transaction tags if editing
@@ -91,23 +103,47 @@ export function TransactionForm({
     }
   }, [transaction]);
 
-  // Fetch categories on mount
+  // Fetch categories and bank accounts on mount
   useEffect(() => {
-    async function fetchCategories() {
+    async function fetchData() {
       if (!user) return;
 
       try {
-        const { data, error } = await getCategories();
-        if (error) throw error;
-        setCategories(data || []);
+        // Fetch categories
+        const { data: categoriesData, error: categoriesError } =
+          await getCategories();
+        if (categoriesError) throw categoriesError;
+        setCategories(categoriesData || []);
+
+        try {
+          // Fetch bank accounts
+          const { data: accountsData, error: accountsError } =
+            await getBankAccounts();
+          if (accountsError) throw accountsError;
+          setBankAccounts(accountsData || []);
+
+          // If no bank account is selected and there's a default account, select it
+          if (bankAccountId === "none" && !transaction?.bank_account_id) {
+            const defaultAccount = accountsData?.find(
+              (account) => account.is_default
+            );
+            if (defaultAccount) {
+              setBankAccountId(defaultAccount.id);
+            }
+          }
+        } catch (accountErr) {
+          console.warn("Error fetching bank accounts:", accountErr);
+          // Continue without bank accounts
+          setBankAccounts([]);
+        }
       } catch (err) {
-        console.error("Error fetching categories:", err);
-        setError("Failed to load categories");
+        console.error("Error fetching data:", err);
+        setError("Failed to load data");
       }
     }
 
-    fetchCategories();
-  }, [user]);
+    fetchData();
+  }, [user, bankAccountId, transaction?.bank_account_id]);
 
   // Filter categories based on transaction type
   const filteredCategories = categories.filter(
@@ -141,6 +177,7 @@ export function TransactionForm({
         date,
         type,
         category_id: categoryId === "none" ? null : categoryId,
+        bank_account_id: bankAccountId === "none" ? null : bankAccountId,
         payment_method: paymentMethod === "none" ? null : paymentMethod,
         status,
         notes: notes || null,
@@ -159,12 +196,20 @@ export function TransactionForm({
         throw result.error;
       }
 
+      // Show success toast
+      if (transaction) {
+        showItemUpdatedToast("transaction");
+      } else {
+        showItemCreatedToast("transaction");
+      }
+
       // Success
       onSuccess();
       onClose();
     } catch (err) {
       console.error("Error saving transaction:", err);
       setError("Failed to save transaction");
+      showErrorToast("Failed to save transaction");
     } finally {
       setIsLoading(false);
     }
@@ -274,6 +319,24 @@ export function TransactionForm({
                 {filteredCategories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Bank Account */}
+          <div className="space-y-2">
+            <Label htmlFor="bankAccount">Bank Account</Label>
+            <Select value={bankAccountId} onValueChange={setBankAccountId}>
+              <SelectTrigger id="bankAccount">
+                <SelectValue placeholder="Select a bank account" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                {bankAccounts.map((account) => (
+                  <SelectItem key={account.id} value={account.id}>
+                    {account.name} {account.is_default && "(Default)"}
                   </SelectItem>
                 ))}
               </SelectContent>

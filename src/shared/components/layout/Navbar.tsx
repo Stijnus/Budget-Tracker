@@ -48,6 +48,8 @@ export function Navbar() {
     if (path === "/categories") return t("nav.categories");
     if (path === "/bills") return t("nav.bills");
     if (path === "/budgets") return t("nav.budgets");
+    if (path === "/accounts") return t("nav.accounts");
+    if (path === "/groups") return t("nav.groups");
     if (path === "/goals") return t("nav.goals");
     if (path === "/analytics") return t("nav.analytics");
     if (path === "/settings") return t("nav.settings");

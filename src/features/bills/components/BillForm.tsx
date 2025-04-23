@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { BillWithCategory, BillInsert } from "../../../api/supabase/bills";
+import {
+  showItemCreatedToast,
+  showItemUpdatedToast,
+  showErrorToast,
+} from "../../../utils/toast";
 import { getCategories } from "../../../api/supabase/categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -120,9 +125,17 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
       };
 
       await onSubmit(billData);
+
+      // Show success toast
+      if (bill) {
+        showItemUpdatedToast(itemType);
+      } else {
+        showItemCreatedToast(itemType);
+      }
     } catch (err) {
       console.error("Error submitting bill:", err);
       setError("Failed to save bill");
+      showErrorToast(`Failed to save ${itemType}`);
     } finally {
       setIsLoading(false);
     }

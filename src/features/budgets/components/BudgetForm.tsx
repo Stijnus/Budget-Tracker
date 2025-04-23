@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { AlertCircle } from "lucide-react";
+import {
+  showItemCreatedToast,
+  showItemUpdatedToast,
+  showErrorToast,
+} from "../../../utils/toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -145,12 +150,20 @@ export function BudgetForm({ budget, onClose, onSuccess }: BudgetFormProps) {
         throw result.error;
       }
 
+      // Show success toast
+      if (budget) {
+        showItemUpdatedToast("budget");
+      } else {
+        showItemCreatedToast("budget");
+      }
+
       // Success
       onSuccess();
       onClose();
     } catch (err) {
       console.error("Error saving budget:", err);
       setError("Failed to save budget");
+      showErrorToast("Failed to save budget");
     } finally {
       setIsLoading(false);
     }

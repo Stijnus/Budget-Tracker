@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../state/useAuth";
 import { GoalWithCategory, GoalInsert } from "../../../api/supabase/goals";
+import {
+  showItemCreatedToast,
+  showItemUpdatedToast,
+  showErrorToast,
+} from "../../../utils/toast";
 import { getCategories } from "../../../api/supabase/categories";
 import { AlertCircle, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -102,9 +107,17 @@ export function GoalForm({ goal, onSubmit, onCancel }: GoalFormProps) {
       };
 
       await onSubmit(goalData);
+
+      // Show success toast
+      if (goal) {
+        showItemUpdatedToast("goal");
+      } else {
+        showItemCreatedToast("goal");
+      }
     } catch (err) {
       console.error("Error submitting goal:", err);
       setError("Failed to save goal");
+      showErrorToast("Failed to save goal");
     } finally {
       setIsLoading(false);
     }

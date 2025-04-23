@@ -94,6 +94,12 @@ export function TransactionList({
           );
         }
 
+        if (filters.bankAccountId) {
+          filteredData = filteredData.filter(
+            (t) => t.bank_account_id === filters.bankAccountId
+          );
+        }
+
         if (filters.minAmount !== undefined) {
           filteredData = filteredData.filter(
             (t) => t.amount >= filters.minAmount!
@@ -267,6 +273,15 @@ export function TransactionList({
                   <p className="text-sm text-muted-foreground truncate">
                     {formatDate(transaction.date, "short")} •{" "}
                     {transaction.category_name || "Uncategorized"}
+                    {transaction.bank_account_name && (
+                      <>
+                        {" "}
+                        •{" "}
+                        <span className="text-primary/70">
+                          {transaction.bank_account_name}
+                        </span>
+                      </>
+                    )}
                   </p>
                 </div>
                 <div

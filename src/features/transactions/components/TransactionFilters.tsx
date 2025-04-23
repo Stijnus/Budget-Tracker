@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getCategories } from "../../../api/supabase/categories";
+import { getBankAccounts } from "../../../api/supabase/bankAccounts";
 import { useAuth } from "../../../state/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,9 +21,17 @@ interface Category {
   type: string;
 }
 
+interface BankAccount {
+  id: string;
+  name: string;
+  account_type: string;
+  is_default: boolean;
+}
+
 export interface TransactionFilters {
   type?: "expense" | "income" | "all";
   categoryId?: string;
+  bankAccountId?: string;
   startDate?: string;
   endDate?: string;
   minAmount?: number;
@@ -41,23 +50,38 @@ export function TransactionFilters({
 }: TransactionFiltersProps) {
   const { user } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Fetch categories on mount
+  // Fetch categories and bank accounts on mount
   useEffect(() => {
-    async function fetchCategories() {
+    async function fetchData() {
       if (!user) return;
 
       try {
-        const { data, error } = await getCategories();
-        if (error) throw error;
-        setCategories(data || []);
+        // Fetch categories
+        const { data: categoriesData, error: categoriesError } =
+          await getCategories();
+        if (categoriesError) throw categoriesError;
+        setCategories(categoriesData || []);
+
+        try {
+          // Fetch bank accounts
+          const { data: accountsData, error: accountsError } =
+            await getBankAccounts();
+          if (accountsError) throw accountsError;
+          setBankAccounts(accountsData || []);
+        } catch (accountErr) {
+          console.warn("Error fetching bank accounts:", accountErr);
+          // Continue without bank accounts
+          setBankAccounts([]);
+        }
       } catch (err) {
-        console.error("Error fetching categories:", err);
+        console.error("Error fetching data:", err);
       }
     }
 
-    fetchCategories();
+    fetchData();
   }, [user]);
 
   // Handle filter changes
@@ -69,6 +93,13 @@ export function TransactionFilters({
     onFilterChange({
       ...filters,
       categoryId: value === "all" ? undefined : value,
+    });
+  };
+
+  const handleBankAccountChange = (value: string) => {
+    onFilterChange({
+      ...filters,
+      bankAccountId: value === "all" ? undefined : value,
     });
   };
 
@@ -202,6 +233,29 @@ export function TransactionFilters({
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Bank Account */}
+            <div className="space-y-2">
+              <Label htmlFor="bankAccount" className="text-xs">
+                Bank Account
+              </Label>
+              <Select
+                value={filters.bankAccountId || "all"}
+                onValueChange={handleBankAccountChange}
+              >
+                <SelectTrigger id="bankAccount">
+                  <SelectValue placeholder="All Accounts" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Accounts</SelectItem>
+                  {bankAccounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name} {account.is_default && "(Default)"}
                     </SelectItem>
                   ))}
                 </SelectContent>

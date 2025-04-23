@@ -5,9 +5,14 @@ export type Transaction =
   Database["public"]["Tables"]["transactions"]["Row"] & {
     category_name?: string;
     category_color?: string;
+    bank_account_name?: string;
     categories?: {
       name?: string;
       color?: string;
+    };
+    bank_accounts?: {
+      name?: string;
+      account_type?: string;
     };
   };
 export type TransactionInsert =
@@ -19,28 +24,68 @@ export type TransactionUpdate =
  * Get recent transactions with category information
  */
 export async function getRecentTransactions(limit = 10) {
-  const { data, error } = await supabase
-    .from("transactions")
-    .select(
+  try {
+    // First try with bank_accounts relationship
+    const { data, error } = await supabase
+      .from("transactions")
+      .select(
+        `
+        *,
+        categories (
+          name,
+          color
+        ),
+        bank_accounts (
+          name,
+          account_type
+        )
       `
-      *,
-      categories (
-        name,
-        color
       )
-    `
-    )
-    .order("date", { ascending: false })
-    .limit(limit);
+      .order("date", { ascending: false })
+      .limit(limit);
 
-  // Transform the data to include category_name and category_color
-  const transformedData = data?.map((transaction) => ({
-    ...transaction,
-    category_name: transaction.categories?.name,
-    category_color: transaction.categories?.color,
-  }));
+    if (error) {
+      // If there's an error with the bank_accounts relationship, try without it
+      console.warn("Error fetching transactions with bank_accounts:", error);
 
-  return { data: transformedData, error };
+      const fallbackResult = await supabase
+        .from("transactions")
+        .select(
+          `
+          *,
+          categories (
+            name,
+            color
+          )
+        `
+        )
+        .order("date", { ascending: false })
+        .limit(limit);
+
+      // Transform the data to include category_name and category_color
+      const transformedData = fallbackResult.data?.map((transaction) => ({
+        ...transaction,
+        category_name: transaction.categories?.name,
+        category_color: transaction.categories?.color,
+        bank_account_name: null, // No bank account info available
+      }));
+
+      return { data: transformedData, error: fallbackResult.error };
+    }
+
+    // Transform the data to include category_name, category_color, and bank_account_name
+    const transformedData = data?.map((transaction) => ({
+      ...transaction,
+      category_name: transaction.categories?.name,
+      category_color: transaction.categories?.color,
+      bank_account_name: transaction.bank_accounts?.name,
+    }));
+
+    return { data: transformedData, error };
+  } catch (err) {
+    console.error("Unexpected error in getRecentTransactions:", err);
+    return { data: null, error: err as any };
+  }
 }
 
 /**
@@ -50,29 +95,70 @@ export async function getTransactionsByDateRange(
   startDate: string,
   endDate: string
 ) {
-  const { data, error } = await supabase
-    .from("transactions")
-    .select(
+  try {
+    // First try with bank_accounts relationship
+    const { data, error } = await supabase
+      .from("transactions")
+      .select(
+        `
+        *,
+        categories (
+          name,
+          color
+        ),
+        bank_accounts (
+          name,
+          account_type
+        )
       `
-      *,
-      categories (
-        name,
-        color
       )
-    `
-    )
-    .gte("date", startDate)
-    .lte("date", endDate)
-    .order("date", { ascending: false });
+      .gte("date", startDate)
+      .lte("date", endDate)
+      .order("date", { ascending: false });
 
-  // Transform the data to include category_name and category_color
-  const transformedData = data?.map((transaction) => ({
-    ...transaction,
-    category_name: transaction.categories?.name,
-    category_color: transaction.categories?.color,
-  }));
+    if (error) {
+      // If there's an error with the bank_accounts relationship, try without it
+      console.warn("Error fetching transactions with bank_accounts:", error);
 
-  return { data: transformedData, error };
+      const fallbackResult = await supabase
+        .from("transactions")
+        .select(
+          `
+          *,
+          categories (
+            name,
+            color
+          )
+        `
+        )
+        .gte("date", startDate)
+        .lte("date", endDate)
+        .order("date", { ascending: false });
+
+      // Transform the data to include category_name and category_color
+      const transformedData = fallbackResult.data?.map((transaction) => ({
+        ...transaction,
+        category_name: transaction.categories?.name,
+        category_color: transaction.categories?.color,
+        bank_account_name: null, // No bank account info available
+      }));
+
+      return { data: transformedData, error: fallbackResult.error };
+    }
+
+    // Transform the data to include category_name, category_color, and bank_account_name
+    const transformedData = data?.map((transaction) => ({
+      ...transaction,
+      category_name: transaction.categories?.name,
+      category_color: transaction.categories?.color,
+      bank_account_name: transaction.bank_accounts?.name,
+    }));
+
+    return { data: transformedData, error };
+  } catch (err) {
+    console.error("Unexpected error in getTransactionsByDateRange:", err);
+    return { data: null, error: err as any };
+  }
 }
 
 /**
@@ -168,31 +254,156 @@ export async function deleteTransaction(id: string) {
 }
 
 /**
+ * Get transactions by bank account
+ */
+export async function getTransactionsByBankAccount(
+  bankAccountId: string,
+  limit?: number
+) {
+  try {
+    // First try with bank_accounts relationship
+    let query = supabase
+      .from("transactions")
+      .select(
+        `
+        *,
+        categories (
+          name,
+          color
+        ),
+        bank_accounts (
+          name,
+          account_type
+        )
+      `
+      )
+      .eq("bank_account_id", bankAccountId)
+      .order("date", { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      // If there's an error with the bank_accounts relationship, try without it
+      console.warn("Error fetching transactions with bank_accounts:", error);
+
+      let fallbackQuery = supabase
+        .from("transactions")
+        .select(
+          `
+          *,
+          categories (
+            name,
+            color
+          )
+        `
+        )
+        .eq("bank_account_id", bankAccountId)
+        .order("date", { ascending: false });
+
+      if (limit) {
+        fallbackQuery = fallbackQuery.limit(limit);
+      }
+
+      const fallbackResult = await fallbackQuery;
+
+      // Transform the data to include category_name and category_color
+      const transformedData = fallbackResult.data?.map((transaction) => ({
+        ...transaction,
+        category_name: transaction.categories?.name,
+        category_color: transaction.categories?.color,
+        bank_account_name: null, // No bank account info available
+      }));
+
+      return { data: transformedData, error: fallbackResult.error };
+    }
+
+    // Transform the data to include category_name, category_color, and bank_account_name
+    const transformedData = data?.map((transaction) => ({
+      ...transaction,
+      category_name: transaction.categories?.name,
+      category_color: transaction.categories?.color,
+      bank_account_name: transaction.bank_accounts?.name,
+    }));
+
+    return { data: transformedData, error };
+  } catch (err) {
+    console.error("Unexpected error in getTransactionsByBankAccount:", err);
+    return { data: null, error: err as any };
+  }
+}
+
+/**
  * Get transaction by ID with category information
  */
 export async function getTransactionById(id: string) {
-  const { data, error } = await supabase
-    .from("transactions")
-    .select(
+  try {
+    // First try with bank_accounts relationship
+    const { data, error } = await supabase
+      .from("transactions")
+      .select(
+        `
+        *,
+        categories (
+          name,
+          color
+        ),
+        bank_accounts (
+          name,
+          account_type
+        )
       `
-      *,
-      categories (
-        name,
-        color
       )
-    `
-    )
-    .eq("id", id)
-    .single();
+      .eq("id", id)
+      .single();
 
-  // Transform the data to include category_name and category_color
-  const transformedData = data
-    ? {
-        ...data,
-        category_name: data.categories?.name,
-        category_color: data.categories?.color,
-      }
-    : null;
+    if (error) {
+      // If there's an error with the bank_accounts relationship, try without it
+      console.warn("Error fetching transaction with bank_accounts:", error);
 
-  return { data: transformedData, error };
+      const fallbackResult = await supabase
+        .from("transactions")
+        .select(
+          `
+          *,
+          categories (
+            name,
+            color
+          )
+        `
+        )
+        .eq("id", id)
+        .single();
+
+      // Transform the data to include category_name and category_color
+      const transformedData = fallbackResult.data
+        ? {
+            ...fallbackResult.data,
+            category_name: fallbackResult.data.categories?.name,
+            category_color: fallbackResult.data.categories?.color,
+            bank_account_name: null, // No bank account info available
+          }
+        : null;
+
+      return { data: transformedData, error: fallbackResult.error };
+    }
+
+    // Transform the data to include category_name, category_color, and bank_account_name
+    const transformedData = data
+      ? {
+          ...data,
+          category_name: data.categories?.name,
+          category_color: data.categories?.color,
+          bank_account_name: data.bank_accounts?.name,
+        }
+      : null;
+
+    return { data: transformedData, error };
+  } catch (err) {
+    console.error("Unexpected error in getTransactionById:", err);
+    return { data: null, error: err as any };
+  }
 }
