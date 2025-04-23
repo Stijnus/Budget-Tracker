@@ -178,16 +178,24 @@ export function GroupsPage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <PageHeader
-        title="Budget Groups"
-        description="Manage your shared budgets and expenses with family and friends"
-        action={
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Group
-          </Button>
-        }
-      />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <Users className="h-6 w-6 text-blue-500" />
+          <div>
+            <h2 className="text-2xl font-bold">Budget Groups</h2>
+            <p className="text-muted-foreground">
+              Manage your shared budgets and expenses with family and friends
+            </p>
+          </div>
+        </div>
+        <Button
+          onClick={() => setIsCreateDialogOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Create Group
+        </Button>
+      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -198,15 +206,21 @@ export function GroupsPage() {
 
       <Tabs defaultValue="my-groups">
         <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="my-groups">
+          <TabsTrigger
+            value="my-groups"
+            className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+          >
             <Users className="mr-2 h-4 w-4" />
             My Groups
           </TabsTrigger>
-          <TabsTrigger value="invitations">
+          <TabsTrigger
+            value="invitations"
+            className="data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700"
+          >
             <UserPlus className="mr-2 h-4 w-4" />
             Invitations
             {invitations.length > 0 && (
-              <span className="ml-2 rounded-full bg-primary text-primary-foreground px-2 py-0.5 text-xs">
+              <span className="ml-2 rounded-full bg-purple-600 text-white px-2 py-0.5 text-xs">
                 {invitations.length}
               </span>
             )}

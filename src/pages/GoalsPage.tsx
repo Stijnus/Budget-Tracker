@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, Target } from "lucide-react";
+import { ChevronLeft, Target, Plus } from "lucide-react";
 import { GoalsList } from "../features/goals/components/GoalsList";
 import { GoalDetails } from "../features/goals/components/GoalDetails";
 import { AppLayout } from "../shared/components/layout";
@@ -36,15 +36,27 @@ export function GoalsPage() {
           </div>
         </div>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Financial Goals</CardTitle>
+        <Card className="border-t-4 border-t-purple-500">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
+            <CardTitle className="text-lg flex items-center">
+              <Target className="mr-2 h-5 w-5 text-purple-500" />
+              Financial Goals
+            </CardTitle>
+            {!goalId && (
+              <Button
+                onClick={() => (window.location.href = "/goals/new")}
+                className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700"
+              >
+                <Plus size={16} />
+                Add Goal
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             {goalId ? (
               <GoalDetails goalId={goalId} />
             ) : (
-              <GoalsList showAddButton={true} />
+              <GoalsList showAddButton={false} />
             )}
           </CardContent>
         </Card>

@@ -117,18 +117,21 @@ export function GroupInvitationsList({
   return (
     <div className="space-y-4">
       {invitations.map((invitation) => (
-        <Card key={invitation.id}>
+        <Card
+          key={invitation.id}
+          className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow"
+        >
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-2">
-                <Avatar>
+                <Avatar className="border-2 border-purple-100">
                   {invitation.group?.avatar_url && (
                     <AvatarImage
                       src={invitation.group.avatar_url}
                       alt={invitation.group?.name || ""}
                     />
                   )}
-                  <AvatarFallback>
+                  <AvatarFallback className="bg-purple-50 text-purple-700">
                     {invitation.group?.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -143,7 +146,7 @@ export function GroupInvitationsList({
                   </CardDescription>
                 </div>
               </div>
-              <Badge>
+              <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-none">
                 {invitation.role === "admin"
                   ? "RoleAdmin"
                   : invitation.role === "member"
@@ -157,7 +160,7 @@ export function GroupInvitationsList({
               {invitation.group?.description || "NoDescription"}
             </p>
             <div className="flex items-center mt-2 text-sm text-muted-foreground">
-              <Clock className="mr-1 h-4 w-4" />
+              <Clock className="mr-1 h-4 w-4 text-purple-500" />
               <span>
                 {"ExpiresOn"}: {formatDate(invitation.expires_at)}
               </span>
@@ -174,6 +177,7 @@ export function GroupInvitationsList({
               size="sm"
               onClick={() => handleReject(invitation.token)}
               disabled={processingInvitations[invitation.token]}
+              className="border-red-200 text-red-700 hover:bg-red-50"
             >
               <X className="mr-1 h-4 w-4" />
               {"Decline"}
@@ -183,6 +187,7 @@ export function GroupInvitationsList({
               size="sm"
               onClick={() => handleAccept(invitation.token)}
               disabled={processingInvitations[invitation.token]}
+              className="bg-purple-600 hover:bg-purple-700"
             >
               <Check className="mr-1 h-4 w-4" />
               {"Accept"}

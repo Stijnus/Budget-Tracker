@@ -29,9 +29,21 @@ export function IncomePage() {
           </Badge>
         </div>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Income Transactions</CardTitle>
+        <Card className="border-t-4 border-t-green-500">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between">
+            <CardTitle className="text-lg flex items-center">
+              <ArrowUpCircle className="mr-2 h-5 w-5 text-green-500" />
+              Income Transactions
+            </CardTitle>
+            <Button
+              onClick={() =>
+                (window.location.href = "/transactions/new?type=income")
+              }
+              className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
+            >
+              <Plus size={16} />
+              Add Income
+            </Button>
           </CardHeader>
           <CardContent>
             <TransactionFilters
@@ -47,7 +59,11 @@ export function IncomePage() {
             />
 
             <div className="mt-6">
-              <TransactionList showAddButton={true} />
+              <TransactionList
+                filters={filters}
+                showFilters={false}
+                showAddButton={false}
+              />
             </div>
           </CardContent>
         </Card>

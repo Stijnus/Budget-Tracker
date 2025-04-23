@@ -36,12 +36,15 @@ export function ExpensesPage() {
           </Badge>
         </div>
 
-        <Card>
+        <Card className="border-t-4 border-t-red-500">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Expense Transactions</CardTitle>
+            <CardTitle className="text-lg flex items-center">
+              <ArrowDownCircle className="mr-2 h-5 w-5 text-red-500" />
+              Expense Transactions
+            </CardTitle>
             <Button
               onClick={handleAddExpense}
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 bg-red-600 hover:bg-red-700"
             >
               <Plus size={16} />
               Add Expense
