@@ -1,5 +1,19 @@
 import { supabase } from "./client";
 import type { Database } from "../../lib/database.types";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+// Extend the SupabaseClient type to include our custom RPC functions
+declare module "@supabase/supabase-js" {
+  interface SupabaseClient {
+    rpc<T = unknown>(
+      fn: string,
+      params?: object
+    ): Promise<{
+      data: T;
+      error: Error | null;
+    }>;
+  }
+}
 
 export type BudgetGroup = Database["public"]["Tables"]["budget_groups"]["Row"];
 export type BudgetGroupInsert =
@@ -157,7 +171,8 @@ export async function createBudgetGroup(group: BudgetGroupInsert) {
             console.error("Error with add_group_owner RPC:", rpcError);
             throw rpcError;
           }
-        } catch (rpcErr) {
+        } catch (rpcErr: unknown) {
+          console.error("Error executing RPC:", rpcErr);
           // If the RPC function doesn't exist, try a direct approach
           console.log("RPC function not available, trying direct SQL...");
 
@@ -247,32 +262,67 @@ export async function getGroupMembers(groupId: string) {
   try {
     console.log(`Fetching members for group ID: ${groupId}`);
 
-    // Get the group members
-    const { data, error } = await supabase
+    // First, get the basic group members data
+    const { data: membersData, error: membersError } = await supabase
       .from("group_members")
-      .select(
-        `
-        *,
-        user:user_id(
-          id,
-          email,
-          user_profiles(
-            full_name,
-            avatar_url
-          )
-        )
-      `
-      )
+      .select("*")
       .eq("group_id", groupId)
       .order("role");
 
-    if (error) {
-      console.error("Error fetching group members:", error);
-      return { data: [], error };
+    if (membersError) {
+      console.error("Error fetching group members:", membersError);
+      return { data: [], error: membersError };
     }
 
-    console.log("Group members data:", data);
-    return { data, error: null };
+    // If we have members, fetch the user details separately
+    if (membersData && membersData.length > 0) {
+      // Get all user IDs
+      const userIds = membersData.map((member) => member.user_id);
+
+      // Fetch user profiles
+      const { data: usersData, error: usersError } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .in("id", userIds);
+
+      if (usersError) {
+        console.error("Error fetching user profiles:", usersError);
+        // Still return the members data even if profiles fetch fails
+        return {
+          data: membersData.map((member) => ({
+            ...member,
+            user: { id: member.user_id },
+          })),
+          error: null,
+        };
+      }
+
+      // Combine the data
+      const enrichedMembers = membersData.map((member) => {
+        const userProfile = usersData?.find(
+          (profile) => profile.id === member.user_id
+        );
+        return {
+          ...member,
+          user: {
+            id: member.user_id,
+            user_profiles: userProfile
+              ? {
+                  full_name: userProfile.full_name,
+                  avatar_url: userProfile.avatar_url,
+                }
+              : null,
+          },
+        };
+      });
+
+      console.log("Enriched group members data:", enrichedMembers);
+      return { data: enrichedMembers, error: null };
+    }
+
+    // If no members, return empty array
+    console.log("No group members found");
+    return { data: [], error: null };
   } catch (err) {
     console.error("Unexpected error in getGroupMembers:", err);
     return { data: [], error: err as Error };
@@ -490,9 +540,9 @@ export async function createInvitation(
     console.log("Creating invitation with data:", invitation);
 
     // Generate a token using the server function or create a random one if that fails
-    let token;
+    let token: string;
     try {
-      const { data: tokenData, error: tokenError } = await supabase.rpc(
+      const { data: tokenData, error: tokenError } = await supabase.rpc<string>(
         "generate_invitation_token"
       );
 
@@ -503,7 +553,7 @@ export async function createInvitation(
           Math.random().toString(36).substring(2, 15) +
           Math.random().toString(36).substring(2, 15);
       } else {
-        token = tokenData;
+        token = tokenData || "";
       }
     } catch (tokenErr) {
       console.error("Exception generating invitation token:", tokenErr);
@@ -579,7 +629,7 @@ export async function acceptInvitation(token: string, userId: string) {
   if (invitation.status !== "pending") {
     return {
       data: null,
-      error: { message: "Invitation is no longer valid" } as any,
+      error: { message: "Invitation is no longer valid" } as Error,
     };
   }
 
@@ -590,7 +640,7 @@ export async function acceptInvitation(token: string, userId: string) {
 
     return {
       data: null,
-      error: { message: "Invitation has expired" } as any,
+      error: { message: "Invitation has expired" } as Error,
     };
   }
 
