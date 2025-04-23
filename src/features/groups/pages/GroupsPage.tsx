@@ -47,7 +47,13 @@ interface Invitation {
     description: string | null;
     avatar_url: string | null;
   };
-  inviter?: any; // Using any for now due to Supabase query error
+  inviter?: {
+    id: string;
+    user_profiles?: {
+      full_name: string | null;
+      avatar_url: string | null;
+    } | null;
+  } | null;
 }
 
 export function GroupsPage() {
@@ -89,7 +95,8 @@ export function GroupsPage() {
           // Don't set error here, just log it and continue
           setInvitations([]);
         } else {
-          setInvitations(invitationsData || []);
+          // Type assertion to handle API response
+          setInvitations((invitationsData || []) as unknown as Invitation[]);
         }
       } catch (err) {
         console.error("Error fetching groups data:", err);
@@ -104,7 +111,8 @@ export function GroupsPage() {
     fetchData();
   }, [user]);
 
-  const handleCreateGroup = async (_newGroup: Group) => {
+  // The newGroup parameter is not used because we refresh from the server
+  const handleCreateGroup = async () => {
     try {
       // Refresh the groups list after creating a new group
       const { data, error } = await getBudgetGroups();
@@ -131,7 +139,8 @@ export function GroupsPage() {
 
       if (invitationsError) throw invitationsError;
 
-      setInvitations(invitationsData || []);
+      // Type assertion to handle API response
+      setInvitations((invitationsData || []) as unknown as Invitation[]);
 
       // Refresh groups
       const { data: groupsData, error: groupsError } = await getBudgetGroups();

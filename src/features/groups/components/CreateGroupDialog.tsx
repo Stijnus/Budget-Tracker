@@ -19,7 +19,7 @@ import { createBudgetGroup } from "../../../api/supabase/budgetGroups";
 interface CreateGroupDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreateGroup: (group: any) => void;
+  onCreateGroup: () => void;
 }
 
 export function CreateGroupDialog({
@@ -43,7 +43,7 @@ export function CreateGroupDialog({
     setError(null);
 
     try {
-      const { data, error } = await createBudgetGroup({
+      const { error } = await createBudgetGroup({
         name,
         description,
         created_by: user.id,
@@ -52,7 +52,7 @@ export function CreateGroupDialog({
 
       if (error) throw error;
 
-      onCreateGroup(data);
+      onCreateGroup();
       resetForm();
     } catch (err) {
       console.error("Error creating group:", err);
