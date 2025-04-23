@@ -47,6 +47,7 @@ export function InviteMemberDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [invitedEmail, setInvitedEmail] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +83,7 @@ export function InviteMemberDialog({
       if (error) throw error;
 
       setSuccess("Invitation sent successfully!");
+      setInvitedEmail(email);
       setEmail("");
       if (onInvite) onInvite();
 
@@ -104,6 +106,7 @@ export function InviteMemberDialog({
     setIsFamily(false);
     setError(null);
     setSuccess(null);
+    setInvitedEmail(null);
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -135,7 +138,18 @@ export function InviteMemberDialog({
               variant="default"
               className="bg-green-50 border-green-200 text-green-800"
             >
-              <AlertDescription>{success}</AlertDescription>
+              <AlertDescription className="space-y-2">
+                <p>{success}</p>
+                {invitedEmail && (
+                  <div className="text-sm">
+                    <p>
+                      An invitation email has been sent to:{" "}
+                      <strong>{invitedEmail}</strong>
+                    </p>
+                    <p>The invitation will expire in 7 days.</p>
+                  </div>
+                )}
+              </AlertDescription>
             </Alert>
           )}
 

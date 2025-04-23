@@ -84,6 +84,8 @@ export function GroupBudgets({
   >({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [newBudgetName, setNewBudgetName] = useState<string | null>(null);
 
   const canCreateBudget =
     userRole === "owner" || userRole === "admin" || userRole === "member";
@@ -183,6 +185,22 @@ export function GroupBudgets({
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {successMessage && (
+        <Alert className="bg-green-50 border-green-200 text-green-800">
+          <AlertDescription className="flex items-center space-x-2">
+            <span>{successMessage}</span>
+            {newBudgetName && (
+              <Badge
+                variant="outline"
+                className="ml-2 bg-green-100 text-green-800 border-green-300"
+              >
+                {newBudgetName}
+              </Badge>
+            )}
+          </AlertDescription>
         </Alert>
       )}
 
@@ -358,6 +376,16 @@ export function GroupBudgets({
             onSuccess={() => {
               setIsFormDialogOpen(false);
               onChange();
+              // Show success message
+              if (!selectedBudget) {
+                setSuccessMessage("Budget created successfully!");
+                setNewBudgetName(budget?.name || null);
+                // Clear success message after 5 seconds
+                setTimeout(() => {
+                  setSuccessMessage(null);
+                  setNewBudgetName(null);
+                }, 5000);
+              }
             }}
           />
         </DialogContent>

@@ -41,7 +41,7 @@ type GroupBudget = ApiGroupBudget & {
 interface GroupBudgetFormProps {
   groupId: string;
   budget?: GroupBudget;
-  onSuccess: () => void;
+  onSuccess: (budget?: { name: string }) => void;
 }
 
 export function GroupBudgetForm({
@@ -127,7 +127,7 @@ export function GroupBudgetForm({
         if (error) throw error;
       }
 
-      onSuccess();
+      onSuccess({ name });
     } catch (err) {
       console.error("Error saving budget:", err);
       setError(
