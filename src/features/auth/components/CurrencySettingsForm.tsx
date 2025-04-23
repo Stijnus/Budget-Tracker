@@ -100,9 +100,12 @@ export function CurrencySettingsForm() {
     CURRENCIES.find((c) => c.code === currency) || CURRENCIES[0];
 
   return (
-    <Card>
+    <Card className="border-t-4 border-t-violet-500">
       <CardHeader>
-        <CardTitle>Currency Settings</CardTitle>
+        <CardTitle className="flex items-center">
+          <CreditCard className="mr-2 h-5 w-5 text-violet-500" />
+          Currency Settings
+        </CardTitle>
         <CardDescription>
           Choose your preferred currency for the application
         </CardDescription>
@@ -192,7 +195,11 @@ export function CurrencySettingsForm() {
             </Table>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full bg-violet-600 hover:bg-violet-700"
+            disabled={isLoading}
+          >
             {isLoading ? "Saving..." : "Save Currency Settings"}
           </Button>
         </form>

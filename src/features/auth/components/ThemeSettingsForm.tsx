@@ -93,9 +93,12 @@ export function ThemeSettingsForm() {
   };
 
   return (
-    <Card>
+    <Card className="border-t-4 border-t-violet-500">
       <CardHeader>
-        <CardTitle>Theme Settings</CardTitle>
+        <CardTitle className="flex items-center">
+          <Palette className="mr-2 h-5 w-5 text-violet-500" />
+          Theme Settings
+        </CardTitle>
         <CardDescription>
           Customize the appearance of the application
         </CardDescription>
@@ -150,7 +153,11 @@ export function ThemeSettingsForm() {
             </RadioGroup>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full bg-violet-600 hover:bg-violet-700"
+            disabled={isLoading}
+          >
             {isLoading ? "Saving..." : "Save Theme Settings"}
           </Button>
         </form>

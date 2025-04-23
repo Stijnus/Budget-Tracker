@@ -4,7 +4,7 @@ import { updateUserProfile } from "../../../api/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Info } from "lucide-react";
+import { X, Info, User } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -80,9 +80,10 @@ export function ProfileForm() {
   };
 
   return (
-    <Card className="border rounded-lg shadow-sm">
+    <Card className="border-t-4 border-t-violet-500 shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold">
+        <CardTitle className="text-xl font-semibold flex items-center">
+          <User className="mr-2 h-5 w-5 text-violet-500" />
           Profile Information
         </CardTitle>
         <CardDescription>Update your personal information</CardDescription>
@@ -195,7 +196,7 @@ export function ProfileForm() {
           type="submit"
           onClick={handleSubmit}
           disabled={isLoading}
-          className="w-full md:w-auto"
+          className="w-full md:w-auto bg-violet-600 hover:bg-violet-700"
         >
           {isLoading ? "Saving..." : "Save Changes"}
         </Button>

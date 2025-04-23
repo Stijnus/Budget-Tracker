@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "../shared/components/layout";
+import { formatDate } from "../utils/formatters";
 import {
   ProfileForm,
   PasswordChangeForm,
@@ -27,7 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   User,
   Shield,
-  Settings,
+  Settings as SettingsIcon,
   Bell,
   Palette,
   Languages,
@@ -38,6 +39,8 @@ import {
   ShieldAlert,
   RefreshCw,
   CheckCircle,
+  CalendarIcon,
+  Cog,
 } from "lucide-react";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 // Translation imports removed
@@ -100,7 +103,7 @@ export function SettingsPage() {
       case "password":
         return <KeyRound className="w-4 h-4 mr-2" />;
       case "preferences":
-        return <Settings className="w-4 h-4 mr-2" />;
+        return <SettingsIcon className="w-4 h-4 mr-2" />;
       case "notifications":
         return <Bell className="w-4 h-4 mr-2" />;
       case "currency":
@@ -112,7 +115,7 @@ export function SettingsPage() {
       case "account":
         return <Shield className="w-4 h-4 mr-2" />;
       default:
-        return <Settings className="w-4 h-4 mr-2" />;
+        return <SettingsIcon className="w-4 h-4 mr-2" />;
     }
   };
 
@@ -123,9 +126,24 @@ export function SettingsPage() {
 
   return (
     <AppLayout>
-      <div className="container max-w-7xl py-6 px-4 md:px-6 bg-background">
+      <div className="container mx-auto py-6 max-w-5xl">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Cog className="h-6 w-6 text-violet-500" />
+            <h2 className="text-2xl font-bold">Settings</h2>
+          </div>
+          <Badge
+            variant="outline"
+            className="flex items-center gap-2 px-3 py-1"
+          >
+            <CalendarIcon className="h-4 w-4" />
+            <span>{formatDate(new Date(), "long")}</span>
+          </Badge>
+        </div>
+
         {/* Main container */}
-        <div className="flex flex-col md:flex-row gap-6 max-w-[1400px] mx-auto">
+        <div className="flex flex-col md:flex-row gap-6">
           {/* Left column - Settings menu */}
           <div
             className={cn(
@@ -133,9 +151,10 @@ export function SettingsPage() {
               isMobile && activeTab !== "profile" ? "hidden" : "block"
             )}
           >
-            <Card className="shadow-sm border bg-card">
+            <Card className="border-l-4 border-l-violet-500 shadow-sm">
               <CardHeader className="px-5 py-4">
-                <CardTitle className="text-xl font-semibold">
+                <CardTitle className="text-xl font-semibold flex items-center">
+                  <SettingsIcon className="mr-2 h-5 w-5 text-violet-500" />
                   Settings
                 </CardTitle>
                 <CardDescription>
@@ -154,7 +173,7 @@ export function SettingsPage() {
                           "justify-start rounded-none relative text-muted-foreground h-auto py-3",
                           "border-l-2 border-transparent px-5",
                           activeTab === item.value &&
-                            "bg-muted/50 border-l-primary text-primary font-medium"
+                            "bg-violet-50 border-l-violet-500 text-violet-700 font-medium"
                         )}
                         onClick={() => handleTabChange(item.value)}
                       >
@@ -176,7 +195,7 @@ export function SettingsPage() {
                               className={cn(
                                 "w-4 h-4 opacity-50",
                                 activeTab === item.value
-                                  ? "rotate-90 text-primary"
+                                  ? "rotate-90 text-violet-700"
                                   : ""
                               )}
                             />
@@ -189,7 +208,11 @@ export function SettingsPage() {
               </CardContent>
               <Separator />
               <CardFooter className="p-4">
-                <Button variant="outline" size="sm" className="w-full text-sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-sm border-violet-200 text-violet-700 hover:bg-violet-50"
+                >
                   Help & Support
                 </Button>
               </CardFooter>
@@ -219,17 +242,26 @@ export function SettingsPage() {
             {/* Content */}
             <div className="space-y-6">
               {/* Page header */}
-              <div className="border-b pb-4">
-                <div className="flex items-center space-x-2">
-                  {getTabIcon(activeTab)}
-                  <h1 className="text-2xl font-bold tracking-tight">
-                    {tabItems.find((item) => item.value === activeTab)?.label}
-                  </h1>
-                </div>
-                <p className="text-muted-foreground mt-1">
-                  {getSettingsDescription(activeTab)}
-                </p>
-              </div>
+              <Card className="border-t-4 border-t-violet-500 mb-6">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="bg-violet-100 p-2 rounded-full">
+                      {getTabIcon(activeTab)}
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">
+                        {
+                          tabItems.find((item) => item.value === activeTab)
+                            ?.label
+                        }
+                      </CardTitle>
+                      <CardDescription>
+                        {getSettingsDescription(activeTab)}
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
 
               {/* Tabs content */}
               <div>
@@ -242,9 +274,12 @@ export function SettingsPage() {
                 {activeTab === "language" && <LanguageSettingsForm />}
                 {activeTab === "account" && (
                   <div className="space-y-6">
-                    <Card className="border shadow-sm">
+                    <Card className="border-t-4 border-t-violet-500 shadow-sm">
                       <CardHeader>
-                        <CardTitle>Connected Services</CardTitle>
+                        <CardTitle className="flex items-center">
+                          <Shield className="mr-2 h-5 w-5 text-violet-500" />
+                          Connected Services
+                        </CardTitle>
                         <CardDescription>
                           Manage your connected accounts and services
                         </CardDescription>
@@ -253,8 +288,8 @@ export function SettingsPage() {
                         <div className="flex flex-col divide-y">
                           <div className="flex items-center justify-between py-3">
                             <div className="flex items-center space-x-4">
-                              <div className="bg-muted rounded-full p-2">
-                                <CreditCard className="w-5 h-5" />
+                              <div className="bg-violet-100 rounded-full p-2">
+                                <CreditCard className="w-5 h-5 text-violet-500" />
                               </div>
                               <div>
                                 <p className="font-medium">
@@ -266,15 +301,19 @@ export function SettingsPage() {
                                 </p>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-violet-200 text-violet-700 hover:bg-violet-50"
+                            >
                               Connect
                             </Button>
                           </div>
 
                           <div className="flex items-center justify-between py-3">
                             <div className="flex items-center space-x-4">
-                              <div className="bg-muted rounded-full p-2">
-                                <ShieldAlert className="w-5 h-5" />
+                              <div className="bg-violet-100 rounded-full p-2">
+                                <ShieldAlert className="w-5 h-5 text-violet-500" />
                               </div>
                               <div>
                                 <p className="font-medium">
@@ -285,15 +324,19 @@ export function SettingsPage() {
                                 </p>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-violet-200 text-violet-700 hover:bg-violet-50"
+                            >
                               Setup
                             </Button>
                           </div>
 
                           <div className="flex items-center justify-between py-3">
                             <div className="flex items-center space-x-4">
-                              <div className="bg-muted rounded-full p-2">
-                                <RefreshCw className="w-5 h-5" />
+                              <div className="bg-violet-100 rounded-full p-2">
+                                <RefreshCw className="w-5 h-5 text-violet-500" />
                               </div>
                               <div>
                                 <p className="font-medium">
@@ -305,7 +348,11 @@ export function SettingsPage() {
                                 </div>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-violet-200 text-violet-700 hover:bg-violet-50"
+                            >
                               Sync Now
                             </Button>
                           </div>
