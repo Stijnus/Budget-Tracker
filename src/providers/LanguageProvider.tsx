@@ -1,28 +1,9 @@
-import { ReactNode, createContext, useContext, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { LanguageContext } from "./languageUtils";
 
-// Define the supported languages
-export const LANGUAGES = {
-  en: { nativeName: "English", flag: "🇬🇧" },
-  nl: { nativeName: "Nederlands", flag: "🇳🇱" },
-  fr: { nativeName: "Français", flag: "🇫🇷" },
-  de: { nativeName: "Deutsch", flag: "🇩🇪" },
-};
-
-// Create a context for the language provider
-type TranslationOptions = {
-  [key: string]: string | number | boolean | Date | TranslationOptions;
-};
-
-type LanguageContextType = {
-  language: string;
-  changeLanguage: (lang: string) => Promise<void>;
-  t: (key: string, options?: TranslationOptions) => string;
-};
-
-const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined
-);
+// Re-export for convenience
+export { useLanguage, LANGUAGES } from "./languageUtils";
 
 // Create the language provider component
 export function LanguageProvider({ children }: { children: ReactNode }) {
@@ -73,13 +54,4 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Create a hook to use the language context
-export function useLanguage() {
-  const context = useContext(LanguageContext);
-
-  if (context === undefined) {
-    throw new Error("useLanguage must be used within a LanguageProvider");
-  }
-
-  return context;
-}
+// Hook is now imported from languageUtils.ts

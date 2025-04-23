@@ -1,33 +1,13 @@
+import { useEffect, useState } from "react";
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
+  ThemeProviderProps,
+  ThemeProviderContext,
+  THEME_STORAGE_KEY,
+  Theme,
+} from "./themeUtils";
 
-export type Theme = "light" | "dark" | "system";
-
-type ThemeProviderProps = {
-  children: ReactNode;
-  defaultTheme?: Theme;
-  storageKey?: string;
-};
-
-type ThemeProviderState = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-};
-
-const initialState: ThemeProviderState = {
-  theme: "light",
-  setTheme: () => null,
-};
-
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
-
-// Consistent storage key for theme
-const THEME_STORAGE_KEY = "budget-tracker-theme";
+// Re-export the hook for convenience
+export { useTheme } from "./themeUtils";
 
 export function ThemeProvider({
   children,
@@ -111,11 +91,4 @@ export function ThemeProvider({
   );
 }
 
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-
-  if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider");
-
-  return context;
-};
+// Hook is now imported from themeUtils.ts
