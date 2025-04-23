@@ -283,12 +283,27 @@ export async function getGroupMembers(groupId: string) {
  * Get a user's role in a group
  */
 export async function getUserRole(groupId: string, userId: string) {
-  return supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", userId)
-    .single();
+  try {
+    console.log(`Getting role for user ${userId} in group ${groupId}`);
+
+    const { data, error } = await supabase
+      .from("group_members")
+      .select("role")
+      .eq("group_id", groupId)
+      .eq("user_id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error getting user role:", error);
+      return { data: null, error };
+    }
+
+    console.log("User role data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getUserRole:", err);
+    return { data: null, error: err as Error };
+  }
 }
 
 /**
@@ -585,23 +600,38 @@ export async function rejectInvitation(token: string) {
  * Get activity log for a budget group
  */
 export async function getGroupActivity(groupId: string, limit = 20) {
-  return supabase
-    .from("group_activity_log")
-    .select(
-      `
-      *,
-      user:user_id(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(`Getting activity for group ${groupId}`);
+
+    const { data, error } = await supabase
+      .from("group_activity_log")
+      .select(
+        `
+        *,
+        user:user_id(
+          id,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `
-    )
-    .eq("group_id", groupId)
-    .order("created_at", { ascending: false })
-    .limit(limit);
+      .eq("group_id", groupId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error("Error getting group activity:", error);
+      return { data: [], error };
+    }
+
+    console.log("Group activity data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupActivity:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 // Shared Resources
@@ -640,22 +670,37 @@ export async function unshareCategory(groupId: string, categoryId: string) {
  * Get shared categories for a group
  */
 export async function getSharedCategories(groupId: string) {
-  return supabase
-    .from("shared_categories")
-    .select(
-      `
-      *,
-      category:category_id(*),
-      shared_by_user:shared_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(`Getting shared categories for group ${groupId}`);
+
+    const { data, error } = await supabase
+      .from("shared_categories")
+      .select(
+        `
+        *,
+        category:category_id(*),
+        shared_by_user:shared_by(
+          id,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `
-    )
-    .eq("group_id", groupId);
+      .eq("group_id", groupId);
+
+    if (error) {
+      console.error("Error getting shared categories:", error);
+      return { data: [], error };
+    }
+
+    console.log("Shared categories data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getSharedCategories:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**

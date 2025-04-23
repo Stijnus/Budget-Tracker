@@ -32,26 +32,17 @@ import { GroupBudgetForm } from "./GroupBudgetForm";
 import {
   deleteGroupBudget,
   calculateGroupBudgetProgress,
+  type GroupBudget as ApiGroupBudget,
 } from "../../../api/supabase/groupBudgets";
 
-interface GroupBudget {
-  id: string;
-  group_id: string;
-  created_by: string;
-  category_id: string;
-  name: string;
-  amount: number;
-  period: "daily" | "weekly" | "monthly" | "yearly";
-  start_date: string;
-  end_date: string | null;
-  created_at: string;
-  updated_at: string;
+// Use the API type and extend it for our component
+type GroupBudget = ApiGroupBudget & {
   category?: {
     id: string;
     name: string;
     type: string;
     color?: string;
-  };
+  } | null;
   creator?: {
     id: string;
     user_profiles?: {
@@ -59,7 +50,7 @@ interface GroupBudget {
       avatar_url: string | null;
     } | null;
   } | null;
-}
+};
 
 interface BudgetProgress {
   budgetAmount: number;
@@ -365,7 +356,7 @@ export function GroupBudgets({
           </DialogHeader>
           <GroupBudgetForm
             groupId={groupId}
-            budget={selectedBudget}
+            budget={selectedBudget || undefined}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               onChange();

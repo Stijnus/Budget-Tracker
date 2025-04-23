@@ -1,56 +1,95 @@
 import { supabase } from "./client";
 import type { Database } from "../../lib/database.types";
 
-export type GroupTransaction = Database["public"]["Tables"]["group_transactions"]["Row"];
-export type GroupTransactionInsert = Database["public"]["Tables"]["group_transactions"]["Insert"];
-export type GroupTransactionUpdate = Database["public"]["Tables"]["group_transactions"]["Update"];
+export type GroupTransaction =
+  Database["public"]["Tables"]["group_transactions"]["Row"];
+export type GroupTransactionInsert =
+  Database["public"]["Tables"]["group_transactions"]["Insert"];
+export type GroupTransactionUpdate =
+  Database["public"]["Tables"]["group_transactions"]["Update"];
 
 /**
  * Get all transactions for a group
  */
 export async function getGroupTransactions(groupId: string) {
-  return supabase
-    .from("group_transactions")
-    .select(`
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(`Fetching transactions for group ID: ${groupId}`);
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .select(
+        `
+        *,
+        category:category_id(*),
+        creator:created_by(
+          id,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `)
-    .eq("group_id", groupId)
-    .order("date", { ascending: false });
+      .eq("group_id", groupId)
+      .order("date", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching group transactions:", error);
+      return { data: [], error };
+    }
+
+    console.log(`Retrieved ${data?.length || 0} transactions`);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupTransactions:", err);
+    return { data: [], error: err as Error };
+  }
 }
 
 /**
  * Get a group transaction by ID
  */
 export async function getGroupTransaction(id: string) {
-  return supabase
-    .from("group_transactions")
-    .select(`
-      *,
-      category:category_id(*),
-      creator:created_by(
-        id,
-        user_profiles!inner(
-          full_name,
-          avatar_url
+  try {
+    console.log(`Fetching transaction with ID: ${id}`);
+
+    const { data, error } = await supabase
+      .from("group_transactions")
+      .select(
+        `
+        *,
+        category:category_id(*),
+        creator:created_by(
+          id,
+          user_profiles(
+            full_name,
+            avatar_url
+          )
         )
+      `
       )
-    `)
-    .eq("id", id)
-    .single();
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching group transaction:", error);
+      return { data: null, error };
+    }
+
+    console.log("Transaction data:", data);
+    return { data, error: null };
+  } catch (err) {
+    console.error("Unexpected error in getGroupTransaction:", err);
+    return { data: null, error: err as Error };
+  }
 }
 
 /**
  * Create a new group transaction
  */
-export async function createGroupTransaction(transaction: GroupTransactionInsert) {
+export async function createGroupTransaction(
+  transaction: GroupTransactionInsert
+) {
   return supabase
     .from("group_transactions")
     .insert(transaction)
@@ -61,7 +100,10 @@ export async function createGroupTransaction(transaction: GroupTransactionInsert
 /**
  * Update a group transaction
  */
-export async function updateGroupTransaction(id: string, updates: GroupTransactionUpdate) {
+export async function updateGroupTransaction(
+  id: string,
+  updates: GroupTransactionUpdate
+) {
   return supabase
     .from("group_transactions")
     .update(updates)
@@ -74,10 +116,7 @@ export async function updateGroupTransaction(id: string, updates: GroupTransacti
  * Delete a group transaction
  */
 export async function deleteGroupTransaction(id: string) {
-  return supabase
-    .from("group_transactions")
-    .delete()
-    .eq("id", id);
+  return supabase.from("group_transactions").delete().eq("id", id);
 }
 
 /**
@@ -90,7 +129,8 @@ export async function getGroupTransactionsByDateRange(
 ) {
   return supabase
     .from("group_transactions")
-    .select(`
+    .select(
+      `
       *,
       category:category_id(*),
       creator:created_by(
@@ -100,7 +140,8 @@ export async function getGroupTransactionsByDateRange(
           avatar_url
         )
       )
-    `)
+    `
+    )
     .eq("group_id", groupId)
     .gte("date", startDate)
     .lte("date", endDate)
@@ -110,10 +151,14 @@ export async function getGroupTransactionsByDateRange(
 /**
  * Get group transactions by category
  */
-export async function getGroupTransactionsByCategory(groupId: string, categoryId: string) {
+export async function getGroupTransactionsByCategory(
+  groupId: string,
+  categoryId: string
+) {
   return supabase
     .from("group_transactions")
-    .select(`
+    .select(
+      `
       *,
       category:category_id(*),
       creator:created_by(
@@ -123,7 +168,8 @@ export async function getGroupTransactionsByCategory(groupId: string, categoryId
           avatar_url
         )
       )
-    `)
+    `
+    )
     .eq("group_id", groupId)
     .eq("category_id", categoryId)
     .order("date", { ascending: false });
@@ -132,10 +178,14 @@ export async function getGroupTransactionsByCategory(groupId: string, categoryId
 /**
  * Get group transactions by type (expense/income)
  */
-export async function getGroupTransactionsByType(groupId: string, type: "expense" | "income") {
+export async function getGroupTransactionsByType(
+  groupId: string,
+  type: "expense" | "income"
+) {
   return supabase
     .from("group_transactions")
-    .select(`
+    .select(
+      `
       *,
       category:category_id(*),
       creator:created_by(
@@ -145,7 +195,8 @@ export async function getGroupTransactionsByType(groupId: string, type: "expense
           avatar_url
         )
       )
-    `)
+    `
+    )
     .eq("group_id", groupId)
     .eq("type", type)
     .order("date", { ascending: false });
@@ -154,10 +205,14 @@ export async function getGroupTransactionsByType(groupId: string, type: "expense
 /**
  * Get group transactions by creator
  */
-export async function getGroupTransactionsByCreator(groupId: string, creatorId: string) {
+export async function getGroupTransactionsByCreator(
+  groupId: string,
+  creatorId: string
+) {
   return supabase
     .from("group_transactions")
-    .select(`
+    .select(
+      `
       *,
       category:category_id(*),
       creator:created_by(
@@ -167,7 +222,8 @@ export async function getGroupTransactionsByCreator(groupId: string, creatorId: 
           avatar_url
         )
       )
-    `)
+    `
+    )
     .eq("group_id", groupId)
     .eq("created_by", creatorId)
     .order("date", { ascending: false });

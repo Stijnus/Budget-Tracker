@@ -28,7 +28,10 @@ import {
   getGroupTransactions,
   getGroupTransactionsSummary,
 } from "../../../api/supabase/groupTransactions";
-import { getGroupBudgets } from "../../../api/supabase/groupBudgets";
+import {
+  getGroupBudgets,
+  type GroupBudget as ApiGroupBudget,
+} from "../../../api/supabase/groupBudgets";
 import { GroupMembers } from "../components/GroupMembers";
 import { GroupTransactions } from "../components/GroupTransactions";
 import { GroupBudgets } from "../components/GroupBudgets";
@@ -86,18 +89,8 @@ interface GroupTransaction {
   } | null;
 }
 
-interface GroupBudget {
-  id: string;
-  group_id: string;
-  created_by: string;
-  category_id: string;
-  name: string;
-  amount: number;
-  period: "daily" | "weekly" | "monthly" | "yearly";
-  start_date: string;
-  end_date: string | null;
-  created_at: string;
-  updated_at: string;
+// Use the API type and extend it for our component
+type GroupBudget = ApiGroupBudget & {
   category?: {
     id: string;
     name: string;
@@ -110,7 +103,7 @@ interface GroupBudget {
       avatar_url: string | null;
     } | null;
   } | null;
-}
+};
 
 interface GroupActivity {
   id: string;
@@ -161,67 +154,122 @@ export function GroupPage() {
 
       try {
         // Fetch group details
+        console.log("Fetching group details for ID:", id);
         const { data: groupData, error: groupError } = await getBudgetGroup(id);
 
-        if (groupError) throw groupError;
-        if (!groupData) throw new Error("Group not found");
+        if (groupError) {
+          console.error("Error fetching group details:", groupError);
+          throw groupError;
+        }
+        if (!groupData) {
+          console.error("Group not found");
+          throw new Error("Group not found");
+        }
 
+        console.log("Group data received:", groupData);
         setGroup(groupData);
 
         // Fetch group members
+        console.log("Fetching group members");
         const { data: membersData, error: membersError } =
           await getGroupMembers(id);
 
-        if (membersError) throw membersError;
+        if (membersError) {
+          console.error("Error fetching group members:", membersError);
+          throw membersError;
+        }
 
+        console.log("Group members received:", membersData);
         // Type assertion to handle API response
         setMembers((membersData || []) as unknown as GroupMember[]);
 
         // Get user's role in the group
+        console.log("Fetching user role");
         const { data: roleData, error: roleError } = await getUserRole(
           id,
           user.id
         );
 
-        if (roleError) throw roleError;
+        if (roleError) {
+          console.error("Error fetching user role:", roleError);
+          throw roleError;
+        }
 
+        console.log("User role received:", roleData);
         setUserRole(roleData?.role || null);
 
         // Fetch group transactions
+        console.log("Fetching group transactions");
         const { data: transactionsData, error: transactionsError } =
           await getGroupTransactions(id);
 
-        if (transactionsError) throw transactionsError;
+        if (transactionsError) {
+          console.error(
+            "Error fetching group transactions:",
+            transactionsError
+          );
+          throw transactionsError;
+        }
 
+        console.log("Group transactions received:", transactionsData);
         // Type assertion to handle API response
         setTransactions(
           (transactionsData || []) as unknown as GroupTransaction[]
         );
 
         // Fetch group budgets
+        console.log("Fetching group budgets");
         const { data: budgetsData, error: budgetsError } =
           await getGroupBudgets(id);
 
-        if (budgetsError) throw budgetsError;
+        if (budgetsError) {
+          console.error("Error fetching group budgets:", budgetsError);
+          throw budgetsError;
+        }
 
-        // Type assertion to handle API response
-        setBudgets((budgetsData || []) as unknown as GroupBudget[]);
+        console.log("Group budgets received:", budgetsData);
+        // Convert API type to component type
+        const convertedBudgets = (budgetsData || []).map((budget) => ({
+          ...budget,
+          category: budget.category
+            ? {
+                id: budget.category.id,
+                name: budget.category.name,
+                type: budget.category.type || "expense",
+                color: budget.category.color || "#000000",
+              }
+            : undefined,
+          creator: budget.creator,
+        }));
+
+        // Set the budgets with the converted data
+        setBudgets(convertedBudgets as unknown as GroupBudget[]);
 
         // Fetch group activity
+        console.log("Fetching group activity");
         const { data: activityData, error: activityError } =
           await getGroupActivity(id);
 
-        if (activityError) throw activityError;
+        if (activityError) {
+          console.error("Error fetching group activity:", activityError);
+          throw activityError;
+        }
 
+        console.log("Group activity received:", activityData);
         // Type assertion to handle API response
         setActivity((activityData || []) as unknown as GroupActivity[]);
 
         // Fetch transactions summary
+        console.log("Fetching transactions summary");
         const { data: summaryData, error: summaryError } =
           await getGroupTransactionsSummary(id);
 
-        if (summaryError) throw summaryError;
+        if (summaryError) {
+          console.error("Error fetching transactions summary:", summaryError);
+          throw summaryError;
+        }
 
+        console.log("Transactions summary received:", summaryData);
         setSummary(summaryData);
       } catch (err) {
         console.error("Error fetching group data:", err);
