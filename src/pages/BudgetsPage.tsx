@@ -6,7 +6,11 @@ import { CalendarIcon, PiggyBank, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+import { useState } from "react";
+import { BudgetModal } from "../features/budgets/components/BudgetModal";
+
 export function BudgetsPage() {
+  const [isAddBudgetOpen, setIsAddBudgetOpen] = useState(false);
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -31,12 +35,21 @@ export function BudgetsPage() {
               Budget Management
             </CardTitle>
             <Button
-              onClick={() => (window.location.href = "/budgets/new")}
+              onClick={() => setIsAddBudgetOpen(true)}
               className="flex items-center gap-1 bg-amber-600 hover:bg-amber-700"
             >
               <Plus size={16} />
               Add Budget
             </Button>
+            {/* Add Budget Sidebar Modal */}
+            <BudgetModal
+              isOpen={isAddBudgetOpen}
+              onClose={() => setIsAddBudgetOpen(false)}
+              onSuccess={() => {
+                setIsAddBudgetOpen(false);
+                // Optionally, trigger a refresh of the BudgetList if needed
+              }}
+            />
           </CardHeader>
           <CardContent>
             <BudgetList showAddButton={false} />

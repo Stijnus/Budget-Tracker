@@ -77,7 +77,15 @@ export async function deleteBankAccount(id: string) {
     .single();
 
   // If this is the default account, find another account to make default
-  if ((data as any)?.is_default) {
+  interface BankAccount {
+  id: string;
+  is_default?: boolean;
+  account_type?: string;
+  current_balance?: number;
+  [key: string]: unknown;
+}
+
+if (data && typeof data === 'object' && 'id' in data && 'is_default' in data && (data as BankAccount).is_default) {
     const { data: otherAccounts } = await supabase
       .from("bank_accounts")
       .select("id")
@@ -88,7 +96,7 @@ export async function deleteBankAccount(id: string) {
       await supabase
         .from("bank_accounts")
         .update({ is_default: true })
-        .eq("id", (otherAccounts[0] as any).id);
+        .eq("id", (otherAccounts[0] as BankAccount).id);
     }
   }
 
@@ -166,12 +174,12 @@ export async function getTotalBalance() {
   }
 
   // Calculate total balance (credit accounts are negative)
-  const totalBalance = data.reduce((sum, account) => {
+  const totalBalance = (data as BankAccount[]).reduce((sum, account) => {
     // For credit accounts, the balance is typically negative (what you owe)
     const balance =
-      (account as any).account_type === "credit"
-        ? -Math.abs((account as any).current_balance)
-        : (account as any).current_balance;
+      account.account_type === "credit"
+        ? -Math.abs(account.current_balance)
+        : account.current_balance;
 
     return sum + balance;
   }, 0);
@@ -180,21 +188,21 @@ export async function getTotalBalance() {
     data: {
       totalBalance,
       // Also calculate totals by account type
-      checking: data
-        .filter((a) => (a as any).account_type === "checking")
-        .reduce((sum, a) => sum + (a as any).current_balance, 0),
-      savings: data
-        .filter((a) => (a as any).account_type === "savings")
-        .reduce((sum, a) => sum + (a as any).current_balance, 0),
-      credit: data
-        .filter((a) => (a as any).account_type === "credit")
-        .reduce((sum, a) => sum + (a as any).current_balance, 0),
-      investment: data
-        .filter((a) => (a as any).account_type === "investment")
-        .reduce((sum, a) => sum + (a as any).current_balance, 0),
-      other: data
-        .filter((a) => (a as any).account_type === "other")
-        .reduce((sum, a) => sum + (a as any).current_balance, 0),
+      checking: (data as BankAccount[])
+        .filter((a) => a.account_type === "checking")
+        .reduce((sum, a) => sum + a.current_balance, 0),
+      savings: (data as BankAccount[])
+        .filter((a) => a.account_type === "savings")
+        .reduce((sum, a) => sum + a.current_balance, 0),
+      credit: (data as BankAccount[])
+        .filter((a) => a.account_type === "credit")
+        .reduce((sum, a) => sum + a.current_balance, 0),
+      investment: (data as BankAccount[])
+        .filter((a) => a.account_type === "investment")
+        .reduce((sum, a) => sum + a.current_balance, 0),
+      other: (data as BankAccount[])
+        .filter((a) => a.account_type === "other")
+        .reduce((sum, a) => sum + a.current_balance, 0),
     },
     error: null,
   };

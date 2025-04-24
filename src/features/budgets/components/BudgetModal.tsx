@@ -1,6 +1,6 @@
 import { Budget } from "../../../api/supabase/budgets";
 import { BudgetForm } from "./BudgetForm";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
 
 interface BudgetModalProps {
   isOpen: boolean;
@@ -16,10 +16,18 @@ export function BudgetModal({
   onSuccess,
 }: BudgetModalProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="p-0 bg-transparent border-none shadow-none max-w-md">
-        <BudgetForm budget={budget} onClose={onClose} onSuccess={onSuccess} />
-      </DialogContent>
-    </Dialog>
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent side="right" className="p-0 sm:max-w-md">
+        <SheetHeader className="p-6 pb-2">
+          <SheetTitle>
+            {budget ? "Edit Budget" : "Add Budget"}
+          </SheetTitle>
+          <SheetClose className="absolute top-4 right-4" />
+        </SheetHeader>
+        <div className="px-6 pb-6">
+          <BudgetForm budget={budget} onClose={onClose} onSuccess={onSuccess} />
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

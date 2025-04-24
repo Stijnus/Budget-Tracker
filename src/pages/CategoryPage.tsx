@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { ChevronLeft, PieChartIcon, Loader2, AlertCircle } from "lucide-react";
+import { ChevronLeft, PieChartIcon, AlertCircle } from "lucide-react";
 import { AppLayout } from "../shared/components/layout";
 import { CategoryForm } from "../features/categories/components";
 import { getCategory } from "../api/supabase/categories";

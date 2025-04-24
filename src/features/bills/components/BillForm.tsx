@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useForm, Controller, FormProvider } from "react-hook-form";
 import { useAuth } from "../../../state/useAuth";
 import { BillWithCategory, BillInsert } from "../../../api/supabase/bills";
 import {
@@ -9,7 +10,6 @@ import {
 import { getCategories } from "../../../api/supabase/categories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -20,15 +20,28 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import {
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from "@/components/ui/form";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 interface BillFormProps {
   bill?: BillWithCategory;
   onSubmit: (bill: BillInsert) => Promise<void>;
   onCancel: () => void;
+  defaultType?: "bill" | "subscription";
 }
 
-export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
+export function BillForm({
+  bill,
+  onSubmit,
+  onCancel,
+  defaultType,
+}: BillFormProps) {
   const { user } = useAuth();
   const [categories, setCategories] = useState<
     Array<{ id: string; name: string; color: string }>
@@ -36,31 +49,39 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form state
-  const [name, setName] = useState(bill?.name || "");
-  const [amount, setAmount] = useState(bill?.amount?.toString() || "");
-  const [dueDate, setDueDate] = useState(
-    bill?.due_date || new Date().toISOString().split("T")[0]
-  );
-  const [frequency, setFrequency] = useState<
-    "one-time" | "daily" | "weekly" | "monthly" | "yearly"
-  >(bill?.frequency || "monthly");
-  const [categoryId, setCategoryId] = useState(bill?.category_id || "none");
-  const [paymentMethod, setPaymentMethod] = useState(
-    bill?.payment_method || ""
-  );
-  const [autoPay, setAutoPay] = useState(bill?.auto_pay || false);
-  const [reminderDays, setReminderDays] = useState(
-    bill?.reminder_days?.toString() || "7"
-  );
-  const [notes, setNotes] = useState(bill?.notes || "");
-  const [status, setStatus] = useState<"active" | "paused" | "cancelled">(
-    bill?.status || "active"
-  );
-  // Determine if this is a bill or subscription based on frequency
-  const [itemType, setItemType] = useState<"bill" | "subscription">(
-    bill?.frequency === "one-time" ? "bill" : "subscription"
-  );
+  // Determine if this is a bill or subscription
+  const isEdit = !!bill;
+  const itemType: "bill" | "subscription" = isEdit
+    ? bill?.frequency === "one-time"
+      ? "bill"
+      : "subscription"
+    : defaultType || "bill";
+
+  // react-hook-form setup
+  const methods = useForm<BillInsert>({
+    mode: "onBlur",
+    defaultValues: {
+      user_id: user?.id || "",
+      name: bill?.name || "",
+      amount: bill?.amount || 0,
+      due_date: bill?.due_date || new Date().toISOString().split("T")[0],
+      frequency: bill?.frequency || "monthly",
+      category_id: bill?.category_id || "none",
+      payment_method: bill?.payment_method || "",
+      auto_pay: bill?.auto_pay || false,
+      reminder_days: bill?.reminder_days || 7,
+      notes: bill?.notes || "",
+      status: bill?.status || "active",
+    },
+  });
+  const { control, register, handleSubmit, formState } = methods;
+  const { errors, isSubmitting, isValid } = formState;
+
+  // Autofocus first input
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
 
   // Fetch categories
   useEffect(() => {
@@ -68,72 +89,43 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
       try {
         const { data, error } = await getCategories();
         if (error) throw error;
-
-        // Filter for expense categories only
         const expenseCategories =
           data?.filter(
             (cat) => cat.type === "expense" || cat.type === "both"
           ) || [];
-
         setCategories(expenseCategories);
-
-        // Set default category if none selected and categories are available
-        if (categoryId === "none" && expenseCategories.length > 0 && !bill) {
-          // Only set a default category for new bills, not when editing
-          setCategoryId(expenseCategories[0].id);
+        if (
+          methods.getValues("category_id") === "none" &&
+          expenseCategories.length > 0 &&
+          !bill
+        ) {
+          methods.setValue("category_id", expenseCategories[0].id);
         }
-      } catch (err) {
-        console.error("Error fetching categories:", err);
+      } catch {
         setError("Failed to load categories");
       }
     }
-
     fetchCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [bill, methods]);
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  // Submission logic
+  const onFormSubmit = async (data: BillInsert) => {
     if (!user) {
       setError("You must be logged in to create a bill");
       return;
     }
-
-    if (!name || !amount || !dueDate) {
-      setError("Please fill in all required fields");
-      return;
-    }
-
     try {
       setIsLoading(true);
       setError(null);
-
-      const billData: BillInsert = {
-        user_id: user.id,
-        name,
-        amount: parseFloat(amount),
-        due_date: dueDate,
-        frequency,
-        category_id: categoryId === "none" ? null : categoryId,
-        payment_method: paymentMethod || null,
-        auto_pay: autoPay,
-        reminder_days: parseInt(reminderDays) || 7,
-        notes: notes || null,
-        status,
-      };
-
-      await onSubmit(billData);
-
-      // Show success toast
+      data.user_id = user.id;
+      if (data.category_id === "none") data.category_id = null;
+      await onSubmit(data);
       if (bill) {
         showItemUpdatedToast(itemType);
       } else {
         showItemCreatedToast(itemType);
       }
-    } catch (err) {
-      console.error("Error submitting bill:", err);
+    } catch {
       setError("Failed to save bill");
       showErrorToast(`Failed to save ${itemType}`);
     } finally {
@@ -142,236 +134,285 @@ export function BillForm({ bill, onSubmit, onCancel }: BillFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Item Type */}
-      <div className="space-y-2">
-        <Label htmlFor="itemType">Type *</Label>
-        <div className="flex space-x-4">
-          <div className="flex items-center space-x-2">
-            <input
-              type="radio"
-              id="typeBill"
-              name="itemType"
-              value="bill"
-              checked={itemType === "bill"}
-              onChange={() => {
-                setItemType("bill");
-                if (frequency !== "one-time") setFrequency("one-time");
-              }}
-              className="h-4 w-4 text-primary"
-            />
-            <Label htmlFor="typeBill" className="cursor-pointer">
-              Bill (One-time)
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <input
-              type="radio"
-              id="typeSubscription"
-              name="itemType"
-              value="subscription"
-              checked={itemType === "subscription"}
-              onChange={() => {
-                setItemType("subscription");
-                if (frequency === "one-time") setFrequency("monthly");
-              }}
-              className="h-4 w-4 text-primary"
-            />
-            <Label htmlFor="typeSubscription" className="cursor-pointer">
-              Subscription (Recurring)
-            </Label>
-          </div>
-        </div>
-      </div>
-
-      {/* Name */}
-      <div className="space-y-2">
-        <Label htmlFor="name">
-          {itemType === "bill" ? "Bill" : "Subscription"} Name *
-        </Label>
-        <Input
-          type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          placeholder={
-            itemType === "bill"
-              ? "e.g., Electricity Bill"
-              : "e.g., Netflix Subscription"
-          }
-        />
-      </div>
-
-      {/* Amount */}
-      <div className="space-y-2">
-        <Label htmlFor="amount">Amount *</Label>
-        <div className="relative">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-            $
+    <div className="bg-card rounded-md border shadow p-6 flex flex-col h-full max-h-[90vh]">
+      <FormProvider {...methods}>
+        {/* Sticky header for mobile */}
+        <div className="sticky top-0 z-10 bg-background/95 border-b p-4 flex items-center justify-between">
+          <span className="font-semibold text-lg">
+            {isEdit
+              ? itemType === "subscription"
+                ? "Edit Subscription"
+                : "Edit Bill"
+              : itemType === "subscription"
+              ? "Add Subscription"
+              : "Add Bill"}
           </span>
-          <Input
-            type="number"
-            id="amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="pl-7"
-            step="0.01"
-            min="0"
-            required
-          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onCancel}
+            aria-label="Close"
+          >
+            ×
+          </Button>
         </div>
-      </div>
+        <form onSubmit={handleSubmit(onFormSubmit)} className="flex flex-col flex-1 min-h-0">
+          {/* Error Alert */}
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      {/* Due Date */}
-      <div className="space-y-2">
-        <Label htmlFor="dueDate">Due Date *</Label>
-        <Input
-          type="date"
-          id="dueDate"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          required
-        />
-      </div>
+          {/* Scrollable Form Fields */}
+          <div className="space-y-4 overflow-y-auto flex-1 px-1 py-2" style={{ maxHeight: '60vh' }}>
+            {/* Name */}
+            <FormItem>
+              <FormLabel>
+                {itemType === "subscription"
+                  ? "Subscription Name"
+                  : "Bill Name"}{" "}
+                <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  {...register("name", { required: "Name is required" })}
+                  placeholder={
+                    itemType === "subscription"
+                      ? "e.g., Netflix Subscription"
+                      : "e.g., Car Repair"
+                  }
+                  required
+                  ref={nameInputRef}
+                  aria-invalid={!!errors.name}
+                  aria-describedby="name-error"
+                />
+              </FormControl>
+              <FormDescription>
+                Give your {itemType} a clear, recognizable name.
+              </FormDescription>
+              <FormMessage>{errors.name?.message}</FormMessage>
+            </FormItem>
 
-      {/* Frequency */}
-      <div className="space-y-2">
-        <Label htmlFor="frequency">Frequency *</Label>
-        <Select
-          value={frequency}
-          onValueChange={(value) => {
-            const newFrequency = value as
-              | "one-time"
-              | "daily"
-              | "weekly"
-              | "monthly"
-              | "yearly";
-            setFrequency(newFrequency);
-            // Update item type based on frequency
-            if (newFrequency === "one-time") {
-              setItemType("bill");
-            } else {
-              setItemType("subscription");
-            }
-          }}
-        >
-          <SelectTrigger id="frequency">
-            <SelectValue placeholder="Select frequency" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="one-time">One-time</SelectItem>
-            <SelectItem value="daily">Daily</SelectItem>
-            <SelectItem value="weekly">Weekly</SelectItem>
-            <SelectItem value="monthly">Monthly</SelectItem>
-            <SelectItem value="yearly">Yearly</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+            {/* Amount */}
+            <FormItem>
+              <FormLabel>
+                Amount <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                    $
+                  </span>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    {...register("amount", {
+                      required: "Amount is required",
+                      valueAsNumber: true,
+                      min: { value: 0.01, message: "Must be greater than 0" },
+                    })}
+                    placeholder="0.00"
+                    required
+                    className="pl-7"
+                    aria-invalid={!!errors.amount}
+                    aria-describedby="amount-error"
+                  />
+                </div>
+              </FormControl>
+              <FormMessage>{errors.amount?.message}</FormMessage>
+            </FormItem>
 
-      {/* Category */}
-      <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
-        <Select
-          value={categoryId}
-          onValueChange={(value) => setCategoryId(value)}
-        >
-          <SelectTrigger id="category">
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">None</SelectItem>
-            {categories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+            {/* Due Date */}
+            <FormItem>
+              <FormLabel>
+                Due Date <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="date"
+                  {...register("due_date", {
+                    required: "Due date is required",
+                  })}
+                  required
+                  aria-invalid={!!errors.due_date}
+                  aria-describedby="due-date-error"
+                />
+              </FormControl>
+              <FormMessage>{errors.due_date?.message}</FormMessage>
+            </FormItem>
 
-      {/* Payment Method */}
-      <div className="space-y-2">
-        <Label htmlFor="paymentMethod">Payment Method</Label>
-        <Input
-          type="text"
-          id="paymentMethod"
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
-          placeholder="e.g., Credit Card, Bank Transfer"
-        />
-      </div>
+            {/* Frequency (Subscription only) */}
+            {itemType === "subscription" && (
+              <FormItem>
+                <FormLabel>
+                  Frequency <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Controller
+                    control={control}
+                    name="frequency"
+                    rules={{ required: "Frequency is required" }}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        required
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select frequency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">Daily</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                          <SelectItem value="yearly">Yearly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </FormControl>
+                <FormMessage>{errors.frequency?.message}</FormMessage>
+              </FormItem>
+            )}
 
-      {/* Auto Pay */}
-      <div className="flex items-center space-x-2">
-        <Switch id="autoPay" checked={autoPay} onCheckedChange={setAutoPay} />
-        <Label htmlFor="autoPay">Auto Pay</Label>
-      </div>
+            {/* Category */}
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <FormControl>
+                <Controller
+                  control={control}
+                  name="category_id"
+                  render={({ field }) => (
+                    <Select value={field.value ?? undefined} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </FormControl>
+            </FormItem>
 
-      {/* Reminder Days */}
-      <div className="space-y-2">
-        <Label htmlFor="reminderDays">Reminder Days Before Due</Label>
-        <Input
-          type="number"
-          id="reminderDays"
-          value={reminderDays}
-          onChange={(e) => setReminderDays(e.target.value)}
-          min="0"
-          max="30"
-        />
-      </div>
+            {/* Payment Method */}
+            <FormItem>
+              <FormLabel>Payment Method</FormLabel>
+              <FormControl>
+                <Input
+                  {...register("payment_method")}
+                  placeholder="e.g., Credit Card"
+                />
+              </FormControl>
+            </FormItem>
 
-      {/* Status */}
-      <div className="space-y-2">
-        <Label htmlFor="status">Status</Label>
-        <Select
-          value={status}
-          onValueChange={(value) =>
-            setStatus(value as "active" | "paused" | "cancelled")
-          }
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="paused">Paused</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+            {/* Auto Pay */}
+            <FormItem>
+              <FormLabel>Auto Pay</FormLabel>
+              <FormControl>
+                <Controller
+                  control={control}
+                  name="auto_pay"
+                  render={({ field }) => (
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="ml-2"
+                    />
+                  )}
+                />
+              </FormControl>
+            </FormItem>
 
-      {/* Notes */}
-      <div className="space-y-2">
-        <Label htmlFor="notes">Notes</Label>
-        <Textarea
-          id="notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={3}
-        />
-      </div>
+            {/* Reminder Days */}
+            <FormItem>
+              <FormLabel>Reminder Days</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min="0"
+                  {...register("reminder_days", { valueAsNumber: true })}
+                  placeholder="Days before due date"
+                />
+              </FormControl>
+            </FormItem>
 
-      {/* Form Actions */}
-      <div className="flex justify-end space-x-3 pt-4">
-        <Button type="button" onClick={onCancel} variant="outline">
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading
-            ? "Saving..."
-            : bill
-            ? `Update ${itemType === "bill" ? "Bill" : "Subscription"}`
-            : `Add ${itemType === "bill" ? "Bill" : "Subscription"}`}
-        </Button>
-      </div>
-    </form>
+            {/* Status */}
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <FormControl>
+                <Controller
+                  control={control}
+                  name="status"
+                  render={({ field }) => (
+                    <Select value={field.value ?? undefined} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="paused">Paused</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </FormControl>
+            </FormItem>
+
+            {/* Notes */}
+            <FormItem>
+              <FormLabel>Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...register("notes")}
+                  placeholder="Optional notes, e.g., login info or payment details"
+                />
+              </FormControl>
+            </FormItem>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-2 mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isLoading || isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading || isSubmitting || !isValid}
+              className="flex items-center"
+            >
+              {isLoading || isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : isEdit ? (
+                "Save"
+              ) : itemType === "subscription" ? (
+                "Add Subscription"
+              ) : (
+                "Add Bill"
+              )}
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
+    </div>
   );
 }

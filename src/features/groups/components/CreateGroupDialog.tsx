@@ -2,13 +2,12 @@ import { useState } from "react";
 // Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -95,16 +94,14 @@ export function CreateGroupDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{"CreateGroup"}</DialogTitle>
-          <DialogDescription>
-            {"CreateGroupDescription"}
-          </DialogDescription>
-        </DialogHeader>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
+      <SheetContent side="right" className="p-0 sm:max-w-md">
+        <SheetHeader className="p-6 pb-2">
+          <SheetTitle>Create Group</SheetTitle>
+          <SheetClose className="absolute top-4 right-4" />
+        </SheetHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+        <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-6">
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
@@ -133,21 +130,21 @@ export function CreateGroupDialog({
             />
           </div>
 
-          <DialogFooter>
+          <div className="flex justify-end gap-2 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => handleOpenChange(false)}
               disabled={isLoading}
             >
-              {"Cancel"}
+              Cancel
             </Button>
             <Button type="submit" disabled={isLoading || !name}>
               {isLoading ? "Creating..." : "Create"}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }

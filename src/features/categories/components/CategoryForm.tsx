@@ -50,11 +50,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose
+} from "@/components/ui/sheet";
 import {
   createCategory,
   updateCategory,
@@ -70,6 +71,31 @@ interface CategoryFormProps {
   onSuccess: () => void;
   defaultType?: "expense" | "income" | "both";
   inPage?: boolean;
+}
+
+// Sidebar modal for Add/Edit Category
+export function CategorySidebarModal({ isOpen, onClose, category, onSuccess, defaultType }: Omit<CategoryFormProps, 'inPage'> & { isOpen: boolean }) {
+  return (
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent side="right" className="p-0 sm:max-w-md">
+        <SheetHeader className="p-6 pb-2">
+          <SheetTitle>
+            {category ? 'Edit Category' : 'Add Category'}
+          </SheetTitle>
+          <SheetClose className="absolute top-4 right-4" />
+        </SheetHeader>
+        <div className="px-6 pb-6">
+          <CategoryForm
+            category={category}
+            onClose={onClose}
+            onSuccess={onSuccess}
+            defaultType={defaultType}
+            inPage={false}
+          />
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
 }
 
 // Icon map for the icon picker
@@ -314,16 +340,6 @@ export function CategoryForm({
   return inPage ? (
     <div>{formContent}</div>
   ) : (
-    <Dialog open={true} onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {category ? "Edit Category" : "Add Category"}
-          </DialogTitle>
-        </DialogHeader>
-
-        {formContent}
-      </DialogContent>
-    </Dialog>
+    formContent
   );
 }

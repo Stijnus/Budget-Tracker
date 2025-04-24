@@ -1,11 +1,12 @@
 import { Transaction } from "../../../api/supabase/transactions";
 import { TransactionForm } from "./TransactionForm";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose
+} from "@/components/ui/sheet";
 
 interface TransactionDialogProps {
   isOpen: boolean;
@@ -25,13 +26,14 @@ export function TransactionDialog({
   title,
 }: TransactionDialogProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] p-0">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle>
-            {title || (transaction ? "Edit Transaction" : "Add Transaction")}
-          </DialogTitle>
-        </DialogHeader>
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent side="right" className="p-0 sm:max-w-md">
+        <SheetHeader className="p-6 pb-2">
+          <SheetTitle>
+            {title || (transaction ? "Edit Transaction" : defaultType === "income" ? "Add Income" : "Add Expense")}
+          </SheetTitle>
+          <SheetClose className="absolute top-4 right-4" />
+        </SheetHeader>
         <div className="px-6 pb-6">
           <TransactionForm
             transaction={transaction}
@@ -40,7 +42,7 @@ export function TransactionDialog({
             defaultType={defaultType}
           />
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }

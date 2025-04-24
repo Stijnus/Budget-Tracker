@@ -23,10 +23,10 @@ import {
   PieChart,
   ArrowRight,
   Users,
-  ArrowUpCircle,
-  ArrowDownCircle,
+
+
   Receipt,
-  Calendar,
+
 } from "lucide-react";
 
 export function DashboardPage() {

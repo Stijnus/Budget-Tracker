@@ -59,7 +59,7 @@ export async function getCurrentBudgets() {
       // Get transactions for this category in the date range
       const { data: transactions, error: transactionsError } = await supabase
         .from("transactions")
-        .select("Amount")
+        .select("amount")
         .eq("category_id", budget.category_id)
         .eq("type", "expense")
         .gte("date", formattedStartDate)
@@ -79,8 +79,13 @@ export async function getCurrentBudgets() {
       }
 
       // Calculate total spent
+// Transaction interface for budgets
+interface Transaction {
+  amount: number;
+  [key: string]: unknown;
+}
       const spent = transactions.reduce(
-        (sum, t) => sum + ((t as any).amount || 0),
+        (sum, t) => sum + ((t as Transaction).amount || 0),
         0
       );
 

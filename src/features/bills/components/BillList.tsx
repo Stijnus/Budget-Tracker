@@ -35,12 +35,16 @@ interface BillListProps {
   showAddButton?: boolean;
   className?: string;
   onAddBill?: () => void;
+  filterType?: 'bill' | 'subscription';
+  onSelectBill?: (id: string) => void;
 }
 
 export function BillList({
   showAddButton = false,
   className = "",
   onAddBill,
+  filterType,
+  onSelectBill,
 }: BillListProps) {
   const navigate = useNavigate();
   const [bills, setBills] = useState<BillWithCategory[]>([]);
@@ -48,6 +52,15 @@ export function BillList({
   const [error, setError] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [billToDelete, setBillToDelete] = useState<string | null>(null);
+
+  // Filter bills by type if filterType is provided
+  const filteredBills: BillWithCategory[] = filterType
+    ? bills.filter((bill: BillWithCategory) => {
+        if (filterType === 'bill') return bill.frequency === 'one-time';
+        if (filterType === 'subscription') return bill.frequency !== 'one-time';
+        return true;
+      })
+    : bills;
 
   // Fetch bills
   useEffect(() => {
@@ -208,7 +221,7 @@ export function BillList({
       {/* Bills List */}
       <Card>
         <CardContent className="p-0">
-          {bills.length === 0 ? (
+          {filteredBills.length === 0 ? (
             <div className="p-6 text-center text-muted-foreground">
               <p className="mb-4">
                 No bills found. Add your first bill to start tracking!
@@ -219,10 +232,11 @@ export function BillList({
             </div>
           ) : (
             <ul className="divide-y divide-border">
-              {bills.map((bill) => (
+              {filteredBills.map((bill) => (
                 <li
                   key={bill.id}
-                  className="p-4 hover:bg-muted/50 transition-colors"
+                  className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => onSelectBill && onSelectBill(bill.id)}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>

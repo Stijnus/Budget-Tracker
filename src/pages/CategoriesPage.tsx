@@ -1,5 +1,5 @@
 // Categories page component
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { AppLayout } from "../shared/components/layout";
 import { CategoryList } from "../features/categories/components";
 import { Category } from "../api/supabase";
@@ -11,32 +11,28 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import {
-  PieChartIcon,
-  ArrowDownCircle,
-  ArrowUpCircle,
-  Plus,
-} from "lucide-react";
+
+import { PieChartIcon, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { CategorySidebarModal } from "../features/categories/components/CategoryForm";
 
 export function CategoriesPage() {
-  const navigate = useNavigate();
+  // --- Sidebar state for add/edit ---
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [defaultType, setDefaultType] = useState<"expense" | "income" | "both">("expense");
 
-  // Handle edit category
-  const handleEditCategory = (category: Category) => {
-    navigate(`/categories/${category.id}`);
+  // Open sidebar for add
+  const openAddSidebar = (type?: "expense" | "income" | "both") => {
+    setSelectedCategory(null);
+    setDefaultType(type || "expense");
+    setIsSidebarOpen(true);
   };
 
-  // Handle add category
-  const handleAddCategory = (type?: "expense" | "income" | "both") => {
-    if (type) {
-      navigate(`/categories/new?type=${type}`);
-    } else {
-      navigate("/categories/new");
-    }
+  // Open sidebar for edit
+  const openEditSidebar = (category: Category) => {
+    setSelectedCategory(category);
+    setIsSidebarOpen(true);
   };
-
-  // No longer need form handlers as we're using page-based navigation
 
   return (
     <AppLayout>
@@ -46,13 +42,7 @@ export function CategoriesPage() {
             <PieChartIcon className="h-6 w-6 text-primary" />
             <h1 className="text-2xl font-bold">Categories</h1>
           </div>
-          <Button
-            onClick={() => handleAddCategory()}
-            className="flex items-center gap-1"
-          >
-            <Plus size={16} />
-            Add Category
-          </Button>
+
         </div>
 
         <Card className="shadow-sm">
@@ -88,15 +78,15 @@ export function CategoriesPage() {
               </div>
               <TabsContent value="expense">
                 <CategoryList
-                  onEdit={handleEditCategory}
-                  onAdd={() => handleAddCategory("expense")}
+                  onEdit={openEditSidebar}
+                  onAdd={() => openAddSidebar("expense")}
                   type="expense"
                 />
               </TabsContent>
               <TabsContent value="income">
                 <CategoryList
-                  onEdit={handleEditCategory}
-                  onAdd={() => handleAddCategory("income")}
+                  onEdit={openEditSidebar}
+                  onAdd={() => openAddSidebar("income")}
                   type="income"
                 />
               </TabsContent>
@@ -104,7 +94,17 @@ export function CategoriesPage() {
           </CardContent>
         </Card>
 
-        {/* Form is now handled in a separate page */}
+        {/* Sidebar for Add/Edit Category */}
+        <CategorySidebarModal
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          onSuccess={() => {
+            setIsSidebarOpen(false);
+            setSelectedCategory(null);
+          }}
+          category={selectedCategory ?? undefined}
+          defaultType={defaultType}
+        />
       </div>
     </AppLayout>
   );

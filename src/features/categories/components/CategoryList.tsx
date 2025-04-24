@@ -51,6 +51,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   Dialog,
   DialogContent,
@@ -62,14 +63,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 interface CategoryListProps {
-  onEdit: (category: Category) => void;
   type?: "expense" | "income" | "both";
-  // onAdd is required by parent components but not used here
   onAdd?: (() => void) | (() => Promise<void>);
+  onEdit?: (category: Category) => void;
 }
 
-export function CategoryList({ onEdit, type = "expense" }: CategoryListProps) {
+import { CategorySidebarModal } from "./CategoryForm";
+
+export function CategoryList({ type = "expense", onAdd, onEdit }: CategoryListProps) {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleteInProgress, setDeleteInProgress] = useState<string | null>(null);
@@ -326,7 +330,14 @@ export function CategoryList({ onEdit, type = "expense" }: CategoryListProps) {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
-                        onClick={() => onEdit(category)}
+                        onClick={() => {
+                          if (onEdit) {
+                            onEdit(category);
+                          } else {
+                            setSelectedCategory(category);
+                            setIsSidebarOpen(true);
+                          }
+                        }}
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
@@ -361,18 +372,41 @@ export function CategoryList({ onEdit, type = "expense" }: CategoryListProps) {
             </Table>
           </div>
         )}
-
-        {/* Delete Confirmation Dialog */}
-        <Dialog
-          open={isDeleteConfirmOpen}
-          onOpenChange={(open) => !open && handleDeleteCancel()}
+        <Button
+          variant="default"
+          onClick={() => {
+            if (onAdd) {
+              onAdd();
+            } else {
+              setIsSidebarOpen(false);
+              setTimeout(() => {
+                setSelectedCategory(null);
+                setIsSidebarOpen(true);
+              }, 0);
+            }
+          }}
+          className="mt-4"
         >
+          Add Category
+        </Button>
+        <CategorySidebarModal
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          onSuccess={() => {
+            setIsSidebarOpen(false);
+            setSelectedCategory(null);
+            loadCategories();
+          }}
+          category={selectedCategory ?? undefined}
+          defaultType={type}
+        />
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteConfirmOpen} onOpenChange={(open) => !open && handleDeleteCancel()}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Confirm Deletion</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete this category? This action
-                cannot be undone.
+                Are you sure you want to delete this category? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

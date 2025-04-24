@@ -13,12 +13,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose
+} from "@/components/ui/sheet";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -39,27 +46,14 @@ import {
 } from "lucide-react";
 import { GroupTransactionForm } from "./GroupTransactionForm";
 import {
-  deleteGroupTransaction,
-  type GroupTransaction as ApiGroupTransaction,
+  deleteGroupTransaction
 } from "../../../api/supabase/groupTransactions";
 
 // Define the transaction interface
 // Extend the API type for our component
-type GroupTransaction = ApiGroupTransaction & {
-  category?: {
-    id: string;
-    name: string;
-    color: string;
-    type?: string;
-  } | null;
-  creator?: {
-    id: string;
-    user_profiles?: {
-      full_name: string | null;
-      avatar_url: string | null;
-    } | null;
-  } | null;
-};
+// Use the canonical GroupTransaction type from the API
+import type { GroupTransaction } from "../../../api/supabase/groupTransactions";
+// No local extension of GroupTransaction needed; use as-is from API
 
 interface GroupTransactionsProps {
   groupId: string;
@@ -318,24 +312,27 @@ export function GroupTransactions({
         </CardContent>
       </Card>
 
-      {/* Transaction Form Dialog */}
-      <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>
+      {/* Transaction Form Sidebar (Sheet) */}
+      <Sheet open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
+        <SheetContent side="right" className="p-0 sm:max-w-md">
+          <SheetHeader className="p-6 pb-2">
+            <SheetTitle>
               {selectedTransaction ? "Edit Transaction" : "Add Transaction"}
-            </DialogTitle>
-          </DialogHeader>
-          <GroupTransactionForm
-            groupId={groupId}
-            transaction={selectedTransaction || undefined}
-            onSuccess={() => {
-              setIsFormDialogOpen(false);
-              onChange();
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+            </SheetTitle>
+            <SheetClose className="absolute top-4 right-4" />
+          </SheetHeader>
+          <div className="px-6 pb-6">
+            <GroupTransactionForm
+              groupId={groupId}
+              transaction={selectedTransaction || undefined}
+              onSuccess={() => {
+                setIsFormDialogOpen(false);
+                onChange();
+              }}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Delete Transaction Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

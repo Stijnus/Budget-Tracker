@@ -30,7 +30,6 @@ import {
 } from "../../../api/supabase/groupTransactions";
 import {
   getGroupBudgets,
-  type GroupBudget as ApiGroupBudget,
 } from "../../../api/supabase/groupBudgets";
 import { GroupMembers } from "../components/GroupMembers";
 import { GroupTransactions } from "../components/GroupTransactions";
@@ -90,21 +89,9 @@ interface GroupTransaction {
   } | null;
 }
 
-// Use the API type and extend it for our component
-type GroupBudget = ApiGroupBudget & {
-  category?: {
-    id: string;
-    name: string;
-    color: string;
-  } | null;
-  creator?: {
-    id: string;
-    user_profiles?: {
-      full_name: string | null;
-      avatar_url: string | null;
-    } | null;
-  } | null;
-};
+// Use the canonical GroupBudget type from the API
+import type { GroupBudget } from "@/api/supabase/groupBudgets";
+// No local extension of GroupBudget needed; use as-is from API
 
 interface GroupActivity {
   id: string;

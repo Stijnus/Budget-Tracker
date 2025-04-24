@@ -13,10 +13,10 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
+
   CardFooter,
 } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -33,14 +33,14 @@ import {
   LayoutDashboard,
   CreditCard,
   PiggyBank,
-  Bell,
-  Target,
-  PieChart,
+
+
+
   ArrowRight,
   Users,
   Receipt,
   Settings,
-  ArrowLeft,
+
   Calendar,
   Activity,
   Home,
@@ -61,7 +61,6 @@ import {
 } from "../api/supabase/groupTransactions";
 import {
   getGroupBudgets,
-  type GroupBudget as ApiGroupBudget,
 } from "../api/supabase/groupBudgets";
 
 // Define TypeScript interfaces for our data structures
@@ -93,44 +92,14 @@ interface GroupMember {
   } | null;
 }
 
-interface GroupTransaction {
-  id: string;
-  group_id: string;
-  created_by: string;
-  category_id: string | null;
-  amount: number;
-  description: string | null;
-  date: string;
-  type: "expense" | "income";
-  payment_method: string | null;
-  status: string | null;
-  notes: string | null;
-  created_at: string;
-  updated_at: string;
-  creator?: {
-    id: string;
-    user_profiles?: {
-      full_name: string | null;
-      avatar_url: string | null;
-    } | null;
-  } | null;
-}
+// Use canonical GroupTransaction type from API
+import type { GroupTransaction } from "../api/supabase/groupTransactions";
 
-// Use the API type and extend it for our component
-type GroupBudget = ApiGroupBudget & {
-  category?: {
-    id: string;
-    name: string;
-    color: string;
-  } | null;
-  creator?: {
-    id: string;
-    user_profiles?: {
-      full_name: string | null;
-      avatar_url: string | null;
-    } | null;
-  } | null;
-};
+
+// Use canonical GroupBudget type from API
+import type { GroupBudget } from "../api/supabase/groupBudgets";
+// No local extension of GroupBudget needed; use as-is from API
+
 
 interface GroupActivity {
   id: string;
@@ -304,19 +273,16 @@ function GroupDashboardPage() {
 
         console.log("Group budgets received:", budgetsData);
         // Convert API type to component type
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const convertedBudgets = (budgetsData || []).map((budget: any) => ({
-          ...budget,
-          category: budget.category
-            ? {
-                id: budget.category.id,
-                name: budget.category.name,
-                type: budget.category.type || "expense",
-                color: budget.category.color || "#000000",
-              }
-            : null,
-          creator: budget.creator || null,
-        }));
+        
+// import types moved to top
+
+
+// ... rest of your imports and code ...
+
+const convertedBudgets = (budgetsData || []).map((budget: GroupBudget) => ({
+  ...budget,
+  // category and creator are not part of canonical GroupBudget; remove if not joined
+}));
 
         // Set the budgets with the converted data
         setBudgets(convertedBudgets as unknown as GroupBudget[]);
@@ -452,7 +418,6 @@ function GroupDashboardPage() {
     navigate(`/group-dashboard/${groupId}`, { replace: true });
   };
 
-  const isAdmin = userRole === "owner" || userRole === "admin";
 
   if (isLoading) {
     return (
@@ -497,7 +462,7 @@ function GroupDashboardPage() {
               <Users className="h-12 w-12 text-muted-foreground" />
               <h2 className="text-2xl font-semibold">No Budget Groups Found</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
-                You don't have any budget groups yet. Create a group to start
+                You don't have unknown budget groups yet. Create a group to start
                 managing household finances together.
               </p>
               <Button onClick={() => navigate("/groups/new")} size="lg">
@@ -664,7 +629,7 @@ function GroupDashboardPage() {
                   <Progress
                     value={summary.totalIncome > 0 ? 100 : 0}
                     className="h-2 bg-green-100"
-                    indicatorClassName="bg-green-500"
+                    
                   />
                 </div>
               </CardContent>
@@ -688,7 +653,7 @@ function GroupDashboardPage() {
                   <Progress
                     value={summary.totalExpenses > 0 ? 100 : 0}
                     className="h-2 bg-red-100"
-                    indicatorClassName="bg-red-500"
+                    
                   />
                 </div>
               </CardContent>
@@ -723,10 +688,7 @@ function GroupDashboardPage() {
                         100,
                         (summary.balance / summary.totalIncome) * 100
                       )}
-                      className="h-2 bg-gray-100"
-                      indicatorClassName={
-                        summary.balance >= 0 ? "bg-green-500" : "bg-red-500"
-                      }
+                      className={`h-2 ${summary.balance >= 0 ? "bg-green-500" : "bg-red-500"}`}
                     />
                   )}
                 </div>
@@ -777,10 +739,13 @@ function GroupDashboardPage() {
                   <CardContent>
                     <GroupTransactions
                       groupId={selectedGroupId || ""}
-                      transactions={transactions.slice(0, 5) as any}
+                      transactions={transactions.slice(0, 5).map(t => ({
+  ...t,
+  status: t.status === "pending" || t.status === "completed" || t.status === "cancelled" ? t.status : "pending"
+})) as GroupTransaction[]}
                       userRole={userRole || ""}
                       onChange={handleTransactionChange}
-                      compact={true}
+                      
                     />
                   </CardContent>
                 </Card>
@@ -805,10 +770,10 @@ function GroupDashboardPage() {
                   <CardContent>
                     <GroupBudgets
                       groupId={selectedGroupId || ""}
-                      budgets={budgets.slice(0, 3) as any}
+                      budgets={budgets.slice(0, 3) as GroupBudget[]}
                       userRole={userRole || ""}
                       onChange={handleBudgetChange}
-                      compact={true}
+                      
                     />
                   </CardContent>
                 </Card>
@@ -837,7 +802,7 @@ function GroupDashboardPage() {
                     members={members}
                     userRole={userRole || ""}
                     currentUserId={user?.id || ""}
-                    compact={true}
+                    
                   />
                 </CardContent>
               </Card>
@@ -855,7 +820,7 @@ function GroupDashboardPage() {
                     <GroupActivityFeed
                       groupId={selectedGroupId || ""}
                       activity={activity.slice(0, 5)}
-                      compact={true}
+                      
                     />
                   </CardContent>
                 </Card>
@@ -875,7 +840,10 @@ function GroupDashboardPage() {
               <CardContent>
                 <GroupTransactions
                   groupId={selectedGroupId || ""}
-                  transactions={transactions as any}
+                  transactions={transactions.map(t => ({
+  ...t,
+  status: t.status === "pending" || t.status === "completed" || t.status === "cancelled" ? t.status : "pending"
+})) as GroupTransaction[]}
                   userRole={userRole || ""}
                   onChange={handleTransactionChange}
                 />
@@ -895,7 +863,7 @@ function GroupDashboardPage() {
               <CardContent>
                 <GroupBudgets
                   groupId={selectedGroupId || ""}
-                  budgets={budgets as any}
+                  budgets={budgets as GroupBudget[]}
                   userRole={userRole || ""}
                   onChange={handleBudgetChange}
                 />

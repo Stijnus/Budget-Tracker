@@ -172,6 +172,10 @@ export function TransactionForm({
       }
 
       // Prepare transaction data
+      if (!user?.id) {
+        setError("You must be logged in to add a transaction");
+        return;
+      }
       const transactionData: TransactionInsert = {
         user_id: user.id,
         amount: parseFloat(amount),
@@ -228,26 +232,32 @@ export function TransactionForm({
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Transaction Type */}
-        <Tabs
-          defaultValue={type}
-          onValueChange={(value) => setType(value as "expense" | "income")}
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger
-              value="expense"
-              className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700"
-            >
-              Expense
-            </TabsTrigger>
-            <TabsTrigger
-              value="income"
-              className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
-            >
-              Income
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {defaultType ? (
+          <div className="mb-2">
+            <span className={`text-sm font-medium ${defaultType === 'expense' ? 'text-red-600' : 'text-green-600'}`}>{defaultType === 'expense' ? 'Expense' : 'Income'}</span>
+          </div>
+        ) : (
+          <Tabs
+            defaultValue={type}
+            onValueChange={(value) => setType(value as "expense" | "income")}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger
+                value="expense"
+                className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700"
+              >
+                Expense
+              </TabsTrigger>
+              <TabsTrigger
+                value="income"
+                className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700"
+              >
+                Income
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
 
         {/* Amount */}
         <div className="space-y-2">

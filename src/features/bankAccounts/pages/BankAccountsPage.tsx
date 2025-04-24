@@ -2,14 +2,14 @@ import { useState } from "react";
 import { BankAccountList } from "../components/BankAccountList";
 import { BankAccountForm } from "../components/BankAccountForm";
 import { BankAccount } from "../../../api/supabase/bankAccounts";
-import { Button } from "@/components/ui/button";
-import { Plus, CreditCard, Wallet } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
+import { CreditCard, Wallet } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose
+} from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "../../../utils/formatters";
@@ -141,24 +141,27 @@ export function BankAccountsPage() {
         </Tabs>
       </div>
 
-      {/* Bank Account Form Dialog */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="sm:max-w-md md:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>
+      {/* Bank Account Form Sidebar */}
+      <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <SheetContent side="right" className="p-0 sm:max-w-md">
+          <SheetHeader className="p-6 pb-2">
+            <SheetTitle>
               {selectedAccount ? "Edit Account" : "Add Account"}
-            </DialogTitle>
-          </DialogHeader>
-          <BankAccountForm
-            account={selectedAccount}
-            onClose={handleFormClose}
-            onSuccess={handleFormSuccess}
-            defaultType={
-              activeTab === "all" ? "checking" : (activeTab as AccountType)
-            }
-          />
-        </DialogContent>
-      </Dialog>
+            </SheetTitle>
+            <SheetClose className="absolute top-4 right-4" />
+          </SheetHeader>
+          <div className="px-6 pb-6">
+            <BankAccountForm
+              account={selectedAccount}
+              onClose={handleFormClose}
+              onSuccess={handleFormSuccess}
+              defaultType={
+                activeTab === "all" ? "checking" : (activeTab as AccountType)
+              }
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

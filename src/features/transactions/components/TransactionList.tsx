@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import {
   getRecentTransactions,
   getTransactionsByDateRange,
@@ -62,7 +62,7 @@ export function TransactionList({
     externalFilters || {}
   );
   const [limit, setLimit] = useState(initialLimit);
-  const navigate = useNavigate();
+  
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(
     null

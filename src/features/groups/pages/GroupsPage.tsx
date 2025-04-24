@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 // Translation imports removed
 import { useAuth } from "../../../state/useAuth";
-import { PageHeader } from "../../../shared/components/PageHeader";
+
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {

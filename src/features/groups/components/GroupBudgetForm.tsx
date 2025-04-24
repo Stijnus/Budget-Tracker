@@ -25,18 +25,12 @@ import { getCategories } from "../../../api/supabase/categories";
 import {
   createGroupBudget,
   updateGroupBudget,
-  type GroupBudget as ApiGroupBudget,
+
 } from "../../../api/supabase/groupBudgets";
 
-// Use the API type and extend it for our component
-type GroupBudget = ApiGroupBudget & {
-  category?: {
-    id: string;
-    name: string;
-    type: string;
-    color?: string;
-  } | null;
-};
+// Use the canonical GroupBudget type from the API
+import type { GroupBudget } from "../../../api/supabase/groupBudgets";
+// No local extension of GroupBudget needed; use as-is from API
 
 interface GroupBudgetFormProps {
   groupId: string;

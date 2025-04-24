@@ -45,13 +45,19 @@ import {
 import { useMediaQuery } from "../hooks/useMediaQuery";
 // Translation imports removed
 
+import { useMemo } from "react";
+
 export function SettingsPage() {
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(tab || "profile");
 
   // Settings tab items
-  const tabItems = [
+  interface TabItem {
+    value: string;
+    label: string;
+  }
+  const tabItems: TabItem[] = useMemo(() => [
     { value: "profile", label: "Profile" },
     { value: "password", label: "Password" },
     { value: "preferences", label: "Preferences" },
@@ -60,11 +66,11 @@ export function SettingsPage() {
     { value: "theme", label: "Theme" },
     { value: "language", label: "Language" },
     { value: "account", label: "Account" },
-  ];
+  ], []);
 
   // Update active tab when URL parameter changes
   useEffect(() => {
-    if (tab && tabItems.some((item) => item.value === tab)) {
+    if (tab && tabItems.some((item: TabItem) => item.value === tab)) {
       setActiveTab(tab);
     }
   }, [tab, tabItems]);
@@ -165,7 +171,7 @@ export function SettingsPage() {
               <CardContent className="p-0">
                 <ScrollArea className="h-auto max-h-[calc(100vh-300px)]">
                   <div className="flex flex-col py-2">
-                    {tabItems.map((item) => (
+                    {tabItems.map((item: TabItem) => (
                       <Button
                         key={item.value}
                         variant="ghost"
@@ -251,7 +257,7 @@ export function SettingsPage() {
                     <div>
                       <CardTitle className="text-xl">
                         {
-                          tabItems.find((item) => item.value === activeTab)
+                          tabItems.find((item: TabItem) => item.value === activeTab)
                             ?.label
                         }
                       </CardTitle>

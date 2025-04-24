@@ -6,10 +6,14 @@ import { AppLayout } from "../shared/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+import { useState } from "react";
+import { GoalModal } from "../features/goals/components/GoalModal";
+
 export function GoalsPage() {
   const { goalId } = useParams<{ goalId: string }>();
   const navigate = useNavigate();
   const pageTitle = "Financial Goals";
+  const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
 
   const handleBackToList = () => {
     navigate("/goals");
@@ -44,7 +48,7 @@ export function GoalsPage() {
             </CardTitle>
             {!goalId && (
               <Button
-                onClick={() => (window.location.href = "/goals/new")}
+                onClick={() => setIsGoalModalOpen(true)}
                 className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700"
               >
                 <Plus size={16} />
@@ -60,6 +64,12 @@ export function GoalsPage() {
             )}
           </CardContent>
         </Card>
+        {/* Goal Modal Sidebar */}
+        <GoalModal
+          isOpen={isGoalModalOpen}
+          onClose={() => setIsGoalModalOpen(false)}
+          onSuccess={() => setIsGoalModalOpen(false)}
+        />
       </div>
     </AppLayout>
   );

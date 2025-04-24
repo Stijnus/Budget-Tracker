@@ -27,25 +27,11 @@ import { getCategories } from "../../../api/supabase/categories";
 import {
   createGroupTransaction,
   updateGroupTransaction,
-  type GroupTransaction as ApiGroupTransaction,
+
 } from "../../../api/supabase/groupTransactions";
 
 // Extend the API type for our component
-type GroupTransaction = ApiGroupTransaction & {
-  category?: {
-    id: string;
-    name: string;
-    type?: string;
-    color?: string;
-  } | null;
-  creator?: {
-    id: string;
-    user_profiles?: {
-      full_name: string | null;
-      avatar_url: string | null;
-    } | null;
-  } | null;
-};
+import type { GroupTransaction } from "../../../api/supabase/groupTransactions";
 
 interface GroupTransactionFormProps {
   groupId: string;

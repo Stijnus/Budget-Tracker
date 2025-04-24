@@ -24,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Plus, MoreHorizontal, Edit, Trash2, Calendar, PiggyBank } from "lucide-react";
@@ -32,25 +32,11 @@ import { GroupBudgetForm } from "./GroupBudgetForm";
 import {
   deleteGroupBudget,
   calculateGroupBudgetProgress,
-  type GroupBudget as ApiGroupBudget,
+
 } from "../../../api/supabase/groupBudgets";
 
-// Use the API type and extend it for our component
-type GroupBudget = ApiGroupBudget & {
-  category?: {
-    id: string;
-    name: string;
-    type: string;
-    color?: string;
-  } | null;
-  creator?: {
-    id: string;
-    user_profiles?: {
-      full_name: string | null;
-      avatar_url: string | null;
-    } | null;
-  } | null;
-};
+// Use the canonical GroupBudget type from the API
+import type { GroupBudget } from "../../../api/supabase/groupBudgets";
 
 interface BudgetProgress {
   budgetAmount: number;
@@ -66,6 +52,7 @@ interface GroupBudgetsProps {
   onChange: () => void;
   compact?: boolean;
 }
+// No local extension of GroupBudget needed; use as-is from API
 
 export function GroupBudgets({
   groupId,
@@ -282,19 +269,10 @@ export function GroupBudgets({
                 </CardHeader>
                 <CardContent className="pb-4">
                   <div className="space-y-4">
-                    {budget.category && (
+                    {budget.category_id && (
                       <div className="flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          style={{
-                            backgroundColor: budget.category.color
-                              ? `${budget.category.color}20`
-                              : undefined,
-                            color: budget.category.color,
-                            borderColor: budget.category.color,
-                          }}
-                        >
-                          {budget.category.name}
+                        <Badge variant="outline">
+                          Category: {budget.category_id}
                         </Badge>
                       </div>
                     )}
@@ -308,31 +286,8 @@ export function GroupBudgets({
                     </div>
 
                     <div className="flex items-center gap-2 text-sm">
-                      <Avatar className="h-6 w-6">
-                        {budget.creator?.user_profiles?.avatar_url && (
-                          <AvatarImage
-                            src={budget.creator.user_profiles.avatar_url}
-                            alt={
-                              budget.creator?.user_profiles?.full_name ||
-                              budget.creator?.id ||
-                              ""
-                            }
-                          />
-                        )}
-                        <AvatarFallback>
-                          {(
-                            budget.creator?.user_profiles?.full_name ||
-                            budget.creator?.id ||
-                            ""
-                          )
-                            .substring(0, 2)
-                            .toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
                       <span className="text-muted-foreground">
-                        Created by{" "}
-                        {budget.creator?.user_profiles?.full_name ||
-                          budget.creator?.id}
+                        Created by: {budget.created_by}
                       </span>
                     </div>
 
@@ -392,7 +347,7 @@ export function GroupBudgets({
               // Show success message
               if (!selectedBudget) {
                 setSuccessMessage("Budget created successfully!");
-                setNewBudgetName(budget?.name || null);
+                setNewBudgetName(budgets?.[0]?.name || null);
                 // Clear success message after 5 seconds
                 setTimeout(() => {
                   setSuccessMessage(null);
