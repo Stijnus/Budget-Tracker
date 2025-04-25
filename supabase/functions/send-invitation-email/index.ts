@@ -10,12 +10,16 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+// @ts-expect-error Deno global
+// Removed unused RESEND_API_KEY to fix ESLint error.
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders, status: 200 });
   }
 
   try {
@@ -50,19 +54,68 @@ serve(async (req) => {
       );
     }
 
-    // For now, we'll just log the email details
-    // In a real implementation, you would use a service like SendGrid or Mailgun
-    console.log(`Sending invitation email to ${email} for group ${groupName}`);
-    console.log(`Invitation link: ${invitationLink}`);
+    // Send the real email using Brevo (Sendinblue)
+    // Requires: BREVO_API_KEY in .env
+    //           BREVO_SENDER (your verified sender email) in .env (or hardcoded below)
+    // @ts-expect-error Deno global
+    const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
+    // @ts-expect-error Deno global
+    const BREVO_SENDER = Deno.env.get("BREVO_SENDER") || "your_verified_sender@example.com"; // <-- Replace with your verified sender!
 
-    // Simulate sending an email
-    // In a real implementation, you would call your email service API here
-    
-    // For demonstration purposes, we'll just return success
+    if (!BREVO_API_KEY) {
+      console.error("BREVO_API_KEY is not set");
+      return new Response(
+        JSON.stringify({ error: "BREVO_API_KEY not set" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        }
+      );
+    }
+
+    console.log("Sending invitation email via Brevo", {
+      to: email,
+      groupName,
+      invitationLink,
+      from: BREVO_SENDER,
+      apiKeySet: !!BREVO_API_KEY
+    });
+
+    const brevoRes = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": BREVO_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: { name: "Budget Tracker", email: BREVO_SENDER },
+        to: [{ email }],
+        subject: `You're invited to join ${groupName}!`,
+        htmlContent: `
+          <p>Hello,</p>
+          <p>You've been invited to join the group <b>${groupName}</b> on Budget Tracker.</p>
+          <p>Click <a href="${invitationLink}">here</a> to accept your invitation.</p>
+          <p>If you did not expect this invitation, you can safely ignore this email.</p>
+        `,
+      }),
+    });
+
+    if (!brevoRes.ok) {
+      const errorText = await brevoRes.text();
+      console.error("Brevo API error:", errorText);
+      return new Response(
+        JSON.stringify({ error: `Failed to send email: ${errorText}` }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        }
+      );
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: `Invitation email would be sent to ${email}` 
+        message: `Invitation email sent to ${email}` 
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -1,5 +1,9 @@
 // Translation imports removed
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Edit, Trash2 } from "lucide-react";
+import { EditGroupDialog } from "./EditGroupDialog";
+import { deleteBudgetGroup } from "../../../api/supabase/budgetGroups";
 import {
   Card,
   CardContent,
@@ -27,10 +31,41 @@ interface GroupListProps {
 }
 
 export function GroupList({ groups }: GroupListProps) {
-  // Translation hooks removed
   const navigate = useNavigate();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editGroupId, setEditGroupId] = useState<string | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [groupToDelete, setGroupToDelete] = useState<string | null>(null);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleEditClick = (groupId: string) => {
+    setEditGroupId(groupId);
+    setEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (groupId: string) => {
+    setGroupToDelete(groupId);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!groupToDelete) return;
+    setLoadingDelete(true);
+    setError(null);
+    const { error } = await deleteBudgetGroup(groupToDelete);
+    setLoadingDelete(false);
+    setDeleteConfirmOpen(false);
+    setGroupToDelete(null);
+    if (error) {
+      setError("Failed to delete group");
+    } else {
+      window.location.reload(); // Or trigger a refresh in parent if possible
+    }
+  };
 
   return (
+    <>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {groups.map((group) => (
         <Card
@@ -76,7 +111,27 @@ export function GroupList({ groups }: GroupListProps) {
               <span>0 members</span>
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col gap-2">
+            <div className="flex gap-2 w-full mb-2">
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Edit Group"
+                onClick={() => handleEditClick(group.id)}
+                className="flex-1"
+              >
+                <Edit className="h-4 w-4" /> Edit
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Delete Group"
+                onClick={() => handleDeleteClick(group.id)}
+                className="flex-1 text-destructive hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4" /> Delete
+              </Button>
+            </div>
             <Button
               variant="default"
               className="w-full bg-blue-600 hover:bg-blue-700"
@@ -89,5 +144,36 @@ export function GroupList({ groups }: GroupListProps) {
         </Card>
       ))}
     </div>
+    {/* Edit Group Dialog */}
+    {editGroupId && (
+      <EditGroupDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        groupId={editGroupId || ""}
+        onEditGroup={() => window.location.reload()} // Or trigger a refresh in parent if possible
+      />
+    )}
+    {/* Delete Confirmation Dialog */}
+    {deleteConfirmOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+          <h2 className="text-lg font-semibold mb-2">Delete Group?</h2>
+          <p className="mb-4">Are you sure you want to delete this group? This action cannot be undone.</p>
+          {error && (
+            <div className="text-red-600 mb-2 text-sm">{error}</div>
+          )}
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)} disabled={loadingDelete}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={loadingDelete}>
+              {loadingDelete ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
+

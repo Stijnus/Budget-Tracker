@@ -80,20 +80,26 @@ export function InviteMemberDialog({
 
       const { error } = await createInvitation(invitationData);
 
-      if (error) throw error;
+      if (error) {
+        setError("Failed to send invitation. Please try again.");
+        setIsLoading(false);
+        return;
+      }
 
       setSuccess("Invitation sent successfully!");
       setInvitedEmail(email);
       setEmail("");
       if (onInvite) onInvite();
 
-      // Close dialog after a short delay
+      // Only close dialog after success
       setTimeout(() => {
+        resetForm();
         onOpenChange(false);
       }, 2000);
     } catch (err) {
       console.error("Error sending invitation:", err);
       setError("Failed to send invitation. Please try again.");
+      // Do not close dialog, keep it open for user to retry
     } finally {
       setIsLoading(false);
     }
