@@ -2,19 +2,18 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-// @ts-expect-error Deno Edge Function import
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-expect-error Deno Edge Function import
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-// @ts-expect-error Deno global
-// Removed unused RESEND_API_KEY to fix ESLint error.
+// Deno global variables are available at runtime in Supabase Edge Functions.
+// Ignore TypeScript errors locally for Deno.env usage.
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -57,20 +56,18 @@ serve(async (req) => {
     // Send the real email using Brevo (Sendinblue)
     // Requires: BREVO_API_KEY in .env
     //           BREVO_SENDER (your verified sender email) in .env (or hardcoded below)
-    // @ts-expect-error Deno global
+    // @ts-expect-error: Deno global is available at runtime in Supabase Edge Functions
     const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
-    // @ts-expect-error Deno global
-    const BREVO_SENDER = Deno.env.get("BREVO_SENDER") || "your_verified_sender@example.com"; // <-- Replace with your verified sender!
+    // @ts-expect-error: Deno global is available at runtime in Supabase Edge Functions
+    const BREVO_SENDER =
+      Deno.env.get("BREVO_SENDER") || "private.winters.bf3@gmail.com"; // <-- Replace with your verified sender!
 
     if (!BREVO_API_KEY) {
       console.error("BREVO_API_KEY is not set");
-      return new Response(
-        JSON.stringify({ error: "BREVO_API_KEY not set" }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 500,
-        }
-      );
+      return new Response(JSON.stringify({ error: "BREVO_API_KEY not set" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
     }
 
     console.log("Sending invitation email via Brevo", {
@@ -78,7 +75,7 @@ serve(async (req) => {
       groupName,
       invitationLink,
       from: BREVO_SENDER,
-      apiKeySet: !!BREVO_API_KEY
+      apiKeySet: !!BREVO_API_KEY,
     });
 
     const brevoRes = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -113,9 +110,9 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: `Invitation email sent to ${email}` 
+      JSON.stringify({
+        success: true,
+        message: `Invitation email sent to ${email}`,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -123,12 +120,21 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
-    );
+    // Enhanced error logging
+    let errorInfo = {};
+    if (error instanceof Error) {
+      errorInfo = {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      };
+    } else {
+      errorInfo = { error: String(error) };
+    }
+    console.error("Unhandled error in send-invitation-email:", errorInfo);
+    return new Response(JSON.stringify({ error: errorInfo }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
   }
 });
