@@ -27,7 +27,13 @@ export function InvitationPage() {
       setError(null);
       try {
         // TODO: Replace with your actual API endpoint for fetching invitation details
-        const res = await fetch(`https://tkjmzixriehtmjhllfhg.supabase.co/functions/v1/get-invitation/${token}`);
+        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+        const res = await fetch(`https://tkjmzixriehtmjhllfhg.supabase.co/functions/v1/get-invitation/${token}`, {
+          headers: {
+            "apikey": SUPABASE_ANON_KEY ?? "",
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY ?? ""}`
+          }
+        });
         if (!res.ok) throw new Error("Invitation not found or expired.");
         const data = await res.json();
         setInvitation(data);

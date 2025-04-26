@@ -16,8 +16,8 @@ serve(async (req) => {
 
   // Query the invitations table by token
   const { data, error } = await supabase
-    .from("invitations")
-    .select("id, group_id, group_name, email, status")
+    .from("group_invitations")
+    .select("id, group_id, email, token, status, invited_by, expires_at, created_at, metadata")
     .eq("token", token)
     .single();
 

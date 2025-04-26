@@ -19,8 +19,8 @@ serve(async (req) => {
 
   // Find the invitation by token
   const { data: invitation, error } = await supabase
-    .from("invitations")
-    .select("id, group_id, email, status")
+    .from("group_invitations")
+    .select("id, group_id, email, status, invited_by, role")
     .eq("token", token)
     .single();
 
@@ -33,7 +33,7 @@ serve(async (req) => {
 
   // Update invitation status to accepted
   const { error: updateError } = await supabase
-    .from("invitations")
+    .from("group_invitations")
     .update({ status: "accepted" })
     .eq("id", invitation.id);
 
@@ -47,16 +47,17 @@ serve(async (req) => {
   // Add the user to the group_members table as 'active' if not already present
   const { data: existingMember } = await supabase
     .from("group_members")
-    .select("id")
+    .select("user_id")
     .eq("group_id", invitation.group_id)
-    .eq("email", invitation.email)
+    .eq("user_id", invitation.invited_by)
     .single();
 
   if (!existingMember) {
     await supabase.from("group_members").insert({
       group_id: invitation.group_id,
-      email: invitation.email,
-      status: "active"
+      user_id: invitation.invited_by, // The inviter becomes a member
+      role: invitation.role || 'member',
+      joined_at: new Date().toISOString()
     });
   }
 
