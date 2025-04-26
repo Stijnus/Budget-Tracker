@@ -25,16 +25,12 @@ interface NotificationContextType {
   clearAll: () => void;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined
-);
+export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function useNotifications() {
   const context = useContext(NotificationContext);
   if (context === undefined) {
-    throw new Error(
-      "useNotifications must be used within NotificationProvider"
-    );
+    throw new Error("useNotifications must be used within NotificationProvider");
   }
   return context;
 }

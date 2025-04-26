@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../../state/useAuth";
 // Language provider import removed
-import { useTheme } from "../../../providers/ThemeProvider";
+import { useTheme } from "../../../providers/themeUtils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { QuickAddMenu } from "../QuickAddMenu";
 import { ThemeToggle } from "../ThemeToggle";

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import {
   ThemeProviderProps,
-  ThemeProviderContext,
   THEME_STORAGE_KEY,
   Theme,
+  ThemeProviderContext
 } from "./themeUtils";
 
-// Re-export the hook for convenience
-export { useTheme } from "./themeUtils";
+// If Theme type is not imported, define it here or import from themeUtils
+// type Theme = "light" | "dark" | "system";
 
 export function ThemeProvider({
   children,
@@ -45,7 +45,6 @@ export function ThemeProvider({
       root.style.colorScheme = theme;
     }
 
-    // Store theme in localStorage
     localStorage.setItem(storageKey, theme);
 
     // Also update userSettings in localStorage if it exists

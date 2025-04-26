@@ -50,7 +50,6 @@ const useFormField = () => {
     ...fieldState,
   };
 };
-
 const FormItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -156,4 +155,3 @@ export {
   FormField,
 };
 
-export { Form } from "./form-utils";

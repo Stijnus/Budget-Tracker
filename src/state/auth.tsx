@@ -2,7 +2,7 @@ import { useEffect, useState, ReactNode, useCallback } from "react";
 import { AuthContext, UserProfile, UserSettings } from "./authContext";
 import { User, AuthError } from "@supabase/supabase-js";
 import * as authApi from "../api/supabase/auth";
-import { useTheme } from "../providers/ThemeProvider";
+import { useTheme } from "../providers/themeUtils";
 import type { Theme } from "../providers/themeUtils";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
