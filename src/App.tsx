@@ -29,6 +29,7 @@ import { GroupsPage } from "./pages/GroupsPage";
 import { GroupPage } from "./pages/GroupPage";
 import GroupDashboardPage from "./pages/GroupDashboardPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { InvitationPage } from "./pages/InvitationPage";
 import { AuthProvider } from "./state/auth"; // Using the AuthProvider from auth.tsx
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { DatabaseCheck } from "./components/DatabaseCheck";
@@ -381,6 +382,9 @@ function App() {
 
                     {/* Database check route */}
                     <Route path="/db-check" element={<DatabaseCheck />} />
+
+                    {/* Invitation route */}
+                    <Route path="/invitations/:token" element={<InvitationPage />} />
 
                     {/* 404 route */}
                     <Route path="*" element={<NotFoundPage />} />

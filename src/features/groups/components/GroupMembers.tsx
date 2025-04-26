@@ -1,5 +1,6 @@
 import { useState } from "react";
 // Translation imports removed
+import { Users, UserMinus, UserCog } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -32,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MoreHorizontal, UserMinus, UserCog, Shield } from "lucide-react";
+import { MoreHorizontal, Shield } from "lucide-react";
 import {
   updateGroupMember,
   removeGroupMember,
@@ -214,12 +215,14 @@ export function GroupMembers({
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Members</CardTitle>
-          <CardDescription>
-            Manage group members and their roles
-          </CardDescription>
+      <Card className="shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div className="flex items-center gap-2">
+            <Users className="h-6 w-6 text-purple-500" />
+            <CardTitle className="text-xl">Members</CardTitle>
+            <span className="ml-2 text-sm text-muted-foreground">({members.length})</span>
+          </div>
+          <CardDescription>Manage group members and their roles</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
@@ -232,64 +235,64 @@ export function GroupMembers({
             {members.map((member) => (
               <div
                 key={member.user_id}
-                className="flex items-center justify-between p-2 rounded-md hover:bg-muted"
+                className="flex items-center justify-between p-4 rounded-lg bg-white shadow-sm border border-muted/40 hover:bg-purple-50 transition"
               >
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    {member.user?.user_profiles?.avatar_url && (
-                      <AvatarImage
-                        src={member.user.user_profiles.avatar_url}
-                        alt={
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <Avatar className="h-12 w-12">
+                      {member.user?.user_profiles?.avatar_url && (
+                        <AvatarImage
+                          src={member.user.user_profiles.avatar_url}
+                          alt={
+                            member.user?.user_profiles?.full_name ||
+                            member.user?.email ||
+                            ""
+                          }
+                        />
+                      )}
+                      <AvatarFallback>
+                        {(
                           member.user?.user_profiles?.full_name ||
                           member.user?.email ||
                           ""
-                        }
-                      />
-                    )}
-                    <AvatarFallback>
-                      {(
-                        member.user?.user_profiles?.full_name ||
-                        member.user?.email ||
-                        ""
-                      )
-                        .substring(0, 2)
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                        )
+                          .substring(0, 2)
+                          .toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    {/* Placeholder for online indicator */}
+                    <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-400 ring-2 ring-white" title="Online (mock)"></span>
+                  </div>
                   <div>
-                    <div className="font-medium">
-                      {member.user?.user_profiles?.full_name ||
-                        member.user?.email}
+                    <div className="font-semibold text-lg flex items-center gap-2">
+                      {member.user?.user_profiles?.full_name || member.user?.email}
                       {member.user_id === currentUserId && (
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          (You)
-                        </span>
+                        <span className="ml-2 text-xs text-purple-500">(You)</span>
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                       {member.user?.email}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Joined {new Date(member.joined_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex flex-col gap-1">
-                    <Badge
-                      variant={getRoleBadgeVariant(member.role)}
-                      className="flex items-center"
-                    >
-                      {getRoleIcon(member.role)}
-                      {member.role.charAt(0).toUpperCase() +
-                        member.role.slice(1)}
+                <div className="flex items-center gap-3">
+                  <Badge
+                    variant={getRoleBadgeVariant(member.role)}
+                    className="flex items-center text-xs px-2 py-1"
+                  >
+                    {getRoleIcon(member.role)}
+                    {member.role.charAt(0).toUpperCase() +
+                      member.role.slice(1)}
+                  </Badge>
+                  {member.family_role && (
+                    <Badge variant="outline" className="flex items-center">
+                      {member.family_role.charAt(0).toUpperCase() +
+                        member.family_role.slice(1)}
                     </Badge>
-
-                    {member.family_role && (
-                      <Badge variant="outline" className="flex items-center">
-                        {member.family_role.charAt(0).toUpperCase() +
-                          member.family_role.slice(1)}
-                      </Badge>
-                    )}
-                  </div>
-
+                  )}
                   {isAdmin && canManageMember(member) && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -129,57 +129,80 @@ export function GroupActivityFeed(props: GroupActivityFeedProps) {
     }`;
   };
 
+  // Group activities by day
+  const groupedByDay = activity.reduce((acc: Record<string, typeof activity>, item) => {
+    const day = new Date(item.created_at).toLocaleDateString();
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(item);
+    return acc;
+  }, {} as Record<string, typeof activity>);
+
   return (
-    <Card>
+    <Card className="shadow-md">
       <CardHeader>
-        <CardTitle>Activity Feed</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Activity className="h-6 w-6 text-purple-500" />
+          Activity Feed
+        </CardTitle>
         <CardDescription>Recent activity in this group</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-8">
+        <div className="relative pl-8">
+          {/* Timeline bar */}
+          <div className="absolute left-3 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-200 to-blue-200 rounded-full" style={{ zIndex: 0 }} />
           {!activity || activity.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
               No activity recorded yet
             </p>
           ) : (
-            activity.map((item) => (
-              <div key={item.id} className="flex">
-                <div className="mr-4 flex flex-col items-center">
-                  <Avatar className="h-9 w-9">
-                    {item.user?.user_profiles?.avatar_url && (
-                      <AvatarImage
-                        src={item.user.user_profiles.avatar_url}
-                        alt={
-                          item.user?.user_profiles?.full_name ||
-                          item.user?.id ||
-                          ""
-                        }
-                      />
-                    )}
-                    <AvatarFallback>
-                      {(
-                        item.user?.user_profiles?.full_name ||
-                        item.user?.id ||
-                        ""
-                      )
-                        .substring(0, 2)
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="h-full w-px bg-border mt-2" />
+            Object.entries(groupedByDay).map(([day, items]) => (
+              <div key={day} className="mb-8">
+                <div className="mb-4 text-xs font-semibold text-purple-700 uppercase tracking-wide">
+                  {day}
                 </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <div className="rounded-full bg-muted p-1">
-                      {getActivityIcon(item.action, item.entity_type)}
+                <div className="space-y-6">
+                  {items.map((item) => (
+                    <div key={item.id} className="flex items-start gap-4 relative z-10">
+                      <div className="flex flex-col items-center">
+                        <Avatar className="h-10 w-10 shadow border-2 border-white">
+                          {item.user?.user_profiles?.avatar_url && (
+                            <AvatarImage
+                              src={item.user.user_profiles.avatar_url}
+                              alt={
+                                item.user?.user_profiles?.full_name ||
+                                item.user?.id ||
+                                ""
+                              }
+                            />
+                          )}
+                          <AvatarFallback>
+                            {(
+                              item.user?.user_profiles?.full_name ||
+                              item.user?.id ||
+                              ""
+                            )
+                              .substring(0, 2)
+                              .toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        {/* Timeline dot */}
+                        <span className="block w-3 h-3 rounded-full bg-purple-400 border-2 border-white mt-1" />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-full bg-purple-100 text-purple-700 p-1">
+                            {getActivityIcon(item.action, item.entity_type)}
+                          </span>
+                          <p className="text-sm font-medium">
+                            {getActivityMessage(item)}
+                          </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(item.created_at)}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-sm font-medium">
-                      {getActivityMessage(item)}
-                    </p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formatDate(item.created_at)}
-                  </p>
+                  ))}
                 </div>
               </div>
             ))

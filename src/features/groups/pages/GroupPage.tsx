@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import { useGroupRealtime } from "../hooks/useGroupRealtime";
 import { useParams, useNavigate } from "react-router-dom";
 // Translation imports removed
 import { useAuth } from "../../../state/useAuth";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// Card components are used in child components
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -118,7 +119,6 @@ interface TransactionSummary {
 }
 
 export function GroupPage() {
-  // Translation hooks removed
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -129,173 +129,131 @@ export function GroupPage() {
   const [activity, setActivity] = useState<GroupActivity[]>([]);
   const [summary, setSummary] = useState<TransactionSummary | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [userFamilyRole, setUserFamilyRole] = useState<string | null>(null);
+  // Family role will be used in future updates
+  const [, setUserFamilyRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
-  useEffect(() => {
-    async function fetchGroupData() {
-      if (!user || !id) return;
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // Fetch group details
-        console.log("Fetching group details for ID:", id);
-        const { data: groupData, error: groupError } = await getBudgetGroup(id);
-
-        if (groupError) {
-          console.error("Error fetching group details:", groupError);
-          throw groupError;
-        }
-        if (!groupData) {
-          console.error("Group not found");
-          throw new Error("Group not found");
-        }
-
-        console.log("Group data received:", groupData);
-        setGroup(groupData);
-
-        // Fetch group members
-        console.log("Fetching group members");
-        const { data: membersData, error: membersError } =
-          await getGroupMembers(id);
-
-        if (membersError) {
-          console.error("Error fetching group members:", membersError);
-          throw membersError;
-        }
-
-        console.log("Group members received:", membersData);
-        // Type assertion to handle API response
-        setMembers((membersData || []) as unknown as GroupMember[]);
-
-        // Get user's role in the group
-        console.log("Fetching user role");
-        const { data: roleData, error: roleError } = await getUserRole(
-          id,
-          user.id
-        );
-
-        if (roleError) {
-          console.error("Error fetching user role:", roleError);
-          throw roleError;
-        }
-
-        console.log("User role received:", roleData);
-        setUserRole(roleData?.role || null);
-
-        // Find the current user's member record to get family role
-        const currentUserMember = membersData?.find(
-          (member) => member.user_id === user.id
-        );
-        if (currentUserMember) {
-          setUserFamilyRole(currentUserMember.family_role || null);
-          console.log("User family role:", currentUserMember.family_role);
-        }
-
-        // Fetch group transactions
-        console.log("Fetching group transactions");
-        const { data: transactionsData, error: transactionsError } =
-          await getGroupTransactions(id);
-
-        if (transactionsError) {
-          console.error(
-            "Error fetching group transactions:",
-            transactionsError
-          );
-          throw transactionsError;
-        }
-
-        console.log("Group transactions received:", transactionsData);
-        // Type assertion to handle API response
-        setTransactions(
-          (transactionsData || []) as unknown as GroupTransaction[]
-        );
-
-        // Fetch group budgets
-        console.log("Fetching group budgets");
-        const { data: budgetsData, error: budgetsError } =
-          await getGroupBudgets(id);
-
-        if (budgetsError) {
-          console.error("Error fetching group budgets:", budgetsError);
-          throw budgetsError;
-        }
-
-        console.log("Group budgets received:", budgetsData);
-        // Convert API type to component type
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const convertedBudgets = (budgetsData || []).map((budget: any) => ({
-          ...budget,
-          category: budget.category
-            ? {
-                id: budget.category.id,
-                name: budget.category.name,
-                type: budget.category.type || "expense",
-                color: budget.category.color || "#000000",
-              }
-            : null,
-          creator: budget.creator || null,
-        }));
-
-        // Set the budgets with the converted data
-        setBudgets(convertedBudgets as unknown as GroupBudget[]);
-
-        // Fetch group activity
-        console.log("Fetching group activity");
-        try {
-          const { data: activityData, error: activityError } =
-            await getGroupActivity(id);
-
-          if (activityError) {
-            console.error("Error fetching group activity:", activityError);
-            // Don't throw, just log the error and continue
-            console.warn("Continuing without activity data");
-          } else {
-            console.log("Group activity received:", activityData);
-            // Type assertion to handle API response
-            setActivity((activityData || []) as unknown as GroupActivity[]);
-          }
-        } catch (activityErr) {
-          console.error("Exception fetching group activity:", activityErr);
-          // Don't throw, just log the error and continue
-          console.warn("Continuing without activity data");
-        }
-
-        // Fetch transactions summary
-        console.log("Fetching transactions summary");
-        const { data: summaryData, error: summaryError } =
-          await getGroupTransactionsSummary(id);
-
-        if (summaryError) {
-          console.error("Error fetching transactions summary:", summaryError);
-          throw summaryError;
-        }
-
-        console.log("Transactions summary received:", summaryData);
-        setSummary(summaryData);
-      } catch (err) {
-        console.error("Error fetching group data:", err);
-        setError("Failed to load group data. Please try again.");
-      } finally {
-        setIsLoading(false);
+  // Fetch group data
+  const fetchGroupData = async () => {
+    if (!user || !id) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Fetch group details
+      const { data: groupData, error: groupError } = await getBudgetGroup(id);
+      if (groupError) {
+        console.error("Error fetching group details:", groupError);
+        throw groupError;
       }
+      if (!groupData) {
+        console.error("Group not found");
+        throw new Error("Group not found");
+      }
+      setGroup(groupData);
+      
+      // Fetch group members
+      const { data: membersData, error: membersError } = await getGroupMembers(id);
+      if (membersError) {
+        console.error("Error fetching group members:", membersError);
+        throw membersError;
+      }
+      setMembers((membersData || []) as unknown as GroupMember[]);
+      
+      // Get user's role in the group
+      const { data: roleData, error: roleError } = await getUserRole(id, user.id);
+      if (roleError) {
+        console.error("Error fetching user role:", roleError);
+        throw roleError;
+      }
+      setUserRole(roleData?.role || null);
+      
+      // Find the current user's member record to get family role
+      const currentUserMember = membersData?.find(
+        (member) => member.user_id === user.id
+      );
+      if (currentUserMember) {
+        setUserFamilyRole(currentUserMember.family_role || null);
+      }
+      
+      // Fetch group transactions
+      const { data: transactionsData, error: transactionsError } = await getGroupTransactions(id);
+      if (transactionsError) {
+        console.error("Error fetching group transactions:", transactionsError);
+        throw transactionsError;
+      }
+      setTransactions((transactionsData || []) as unknown as GroupTransaction[]);
+      
+      // Fetch group budgets
+      const { data: budgetsData, error: budgetsError } = await getGroupBudgets(id);
+      if (budgetsError) {
+        console.error("Error fetching group budgets:", budgetsError);
+        throw budgetsError;
+      }
+      
+      // Convert API type to component type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const convertedBudgets = (budgetsData || []).map((budget: any) => ({
+        ...budget,
+        category: budget.category
+          ? {
+              id: budget.category.id,
+              name: budget.category.name,
+              type: budget.category.type || "expense",
+              color: budget.category.color || "#000000",
+            }
+          : null,
+        creator: budget.creator || null,
+      }));
+      setBudgets(convertedBudgets as unknown as GroupBudget[]);
+      
+      // Fetch group activity - non-critical, don't throw if it fails
+      try {
+        const activityResponse = await getGroupActivity(id);
+        if (!activityResponse.error) {
+          setActivity((activityResponse.data || []) as unknown as GroupActivity[]);
+        } else {
+          console.warn("Non-critical: Error fetching activity:", activityResponse.error);
+        }
+      } catch (activityErr) {
+        console.warn("Non-critical: Exception fetching activity:", activityErr);
+      }
+      
+      // Fetch transactions summary
+      const { data: summaryData, error: summaryError } = await getGroupTransactionsSummary(id);
+      if (summaryError) {
+        console.error("Error fetching transactions summary:", summaryError);
+        throw summaryError;
+      }
+      setSummary(summaryData);
+    } catch (err) {
+      console.error("Error fetching group data:", err);
+      setError("Failed to load group data. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchGroupData();
   }, [user, id]);
+
+  // Real-time updates for group, members, and activity
+  useGroupRealtime({
+    groupId: id || "",
+    onMembers: fetchGroupData,
+    onActivity: fetchGroupData,
+    onGroupInfo: fetchGroupData,
+  });
 
   const handleInviteMember = async () => {
     // Refresh members after invitation
     try {
       const { data, error } = await getGroupMembers(id || "");
-
       if (error) throw error;
-
-      // Type assertion to handle API response
       setMembers((data || []) as unknown as GroupMember[]);
       setIsInviteDialogOpen(false);
     } catch (err) {
@@ -310,78 +268,43 @@ export function GroupPage() {
 
   const handleTransactionChange = async () => {
     try {
-      // Refresh transactions
-      const { data: transactionsData, error: transactionsError } =
-        await getGroupTransactions(id || "");
-
+      const { data: transactionsData, error: transactionsError } = await getGroupTransactions(id || "");
       if (transactionsError) throw transactionsError;
+      setTransactions((transactionsData || []) as unknown as GroupTransaction[]);
 
-      // Type assertion to handle API response
-      setTransactions(
-        (transactionsData || []) as unknown as GroupTransaction[]
-      );
-
-      // Refresh summary
-      const { data: summaryData, error: summaryError } =
-        await getGroupTransactionsSummary(id || "");
-
+      const { data: summaryData, error: summaryError } = await getGroupTransactionsSummary(id || "");
       if (summaryError) throw summaryError;
-
       setSummary(summaryData);
-
-      // Refresh activity
-      try {
-        const { data: activityData, error: activityError } =
-          await getGroupActivity(id || "");
-
-        if (activityError) {
-          console.warn("Error refreshing activity data:", activityError);
-          // Don't throw, just log the error and continue
-        } else {
-          // Type assertion to handle API response
-          setActivity((activityData || []) as unknown as GroupActivity[]);
-        }
-      } catch (activityErr) {
-        console.warn("Exception refreshing activity data:", activityErr);
-        // Don't throw, just log the error and continue
-      }
     } catch (err) {
-      console.error("Error refreshing data after transaction change:", err);
-      setError("Failed to refresh data. Please try again.");
+      console.error("Error refreshing transactions:", err);
+      setError("Failed to refresh transactions. Please try again.");
     }
   };
 
   const handleBudgetChange = async () => {
     try {
-      // Refresh budgets
-      const { data: budgetsData, error: budgetsError } = await getGroupBudgets(
-        id || ""
-      );
-
+      const { data: budgetsData, error: budgetsError } = await getGroupBudgets(id || "");
       if (budgetsError) throw budgetsError;
 
-      // Type assertion to handle API response
-      setBudgets((budgetsData || []) as unknown as GroupBudget[]);
+      // Convert API type to component type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const convertedBudgets = (budgetsData || []).map((budget: any) => ({
+        ...budget,
+        category: budget.category
+          ? {
+              id: budget.category.id,
+              name: budget.category.name,
+              type: budget.category.type || "expense",
+              color: budget.category.color || "#000000",
+            }
+          : null,
+        creator: budget.creator || null,
+      }));
 
-      // Refresh activity
-      try {
-        const { data: activityData, error: activityError } =
-          await getGroupActivity(id || "");
-
-        if (activityError) {
-          console.warn("Error refreshing activity data:", activityError);
-          // Don't throw, just log the error and continue
-        } else {
-          // Type assertion to handle API response
-          setActivity((activityData || []) as unknown as GroupActivity[]);
-        }
-      } catch (activityErr) {
-        console.warn("Exception refreshing activity data:", activityErr);
-        // Don't throw, just log the error and continue
-      }
+      setBudgets(convertedBudgets as unknown as GroupBudget[]);
     } catch (err) {
-      console.error("Error refreshing data after budget change:", err);
-      setError("Failed to refresh data. Please try again.");
+      console.error("Error refreshing budgets:", err);
+      setError("Failed to refresh budgets. Please try again.");
     }
   };
 
@@ -397,15 +320,15 @@ export function GroupPage() {
           </Button>
         </div>
         <div className="space-y-4">
-          <Skeleton className="h-12 w-3/4" />
-          <Skeleton className="h-6 w-1/2" />
-          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full" />
         </div>
       </div>
     );
   }
 
-  if (error || !group) {
+  if (error) {
     return (
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex items-center space-x-4">
@@ -416,9 +339,9 @@ export function GroupPage() {
         </div>
         <Alert variant="destructive">
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error || "Group not found"}</AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
-        <Button onClick={() => navigate("/groups")}>{"GoBack"}</Button>
+        <Button onClick={() => fetchGroupData()}>Retry</Button>
       </div>
     );
   }
@@ -432,92 +355,80 @@ export function GroupPage() {
         </Button>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            {group.avatar_url && (
-              <AvatarImage src={group.avatar_url} alt={group.name} />
-            )}
-            <AvatarFallback>
-              {group.name.substring(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              {group.name}
-              {!group.is_active && (
-                <Badge variant="outline" className="ml-2">
-                  Inactive
-                </Badge>
+      {/* Group Header */}
+      <div className="relative rounded-xl overflow-hidden">
+        {/* Banner with gradient background */}
+        <div className="h-32 bg-gradient-to-r from-purple-500 to-blue-500"></div>
+        
+        {/* Group info overlay */}
+        <div className="absolute -bottom-12 left-0 right-0 px-6">
+          <div className="flex items-end">
+            {/* Group avatar */}
+            <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+              {group?.avatar_url ? (
+                <AvatarImage src={group.avatar_url} alt={group.name} />
+              ) : (
+                <AvatarFallback className="text-2xl">
+                  {group?.name?.substring(0, 2).toUpperCase() || "BG"}
+                </AvatarFallback>
               )}
-            </h1>
-            <div className="flex items-center gap-2">
-              <p className="text-muted-foreground">{group.description}</p>
-              {userRole && (
-                <Badge variant="secondary" className="ml-1">
-                  {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
-                </Badge>
-              )}
-              {userFamilyRole && (
-                <Badge variant="outline" className="ml-1 bg-blue-50">
-                  {userFamilyRole.charAt(0).toUpperCase() +
-                    userFamilyRole.slice(1)}
-                </Badge>
-              )}
+            </Avatar>
+            
+            {/* Group name and description */}
+            <div className="ml-4 mb-2">
+              <h1 className="text-2xl font-bold text-white drop-shadow-md">
+                {group?.name}
+              </h1>
+              <p className="text-white/80 drop-shadow-md">
+                {group?.description || "No description"}
+              </p>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Spacer for the avatar overlap */}
+      <div className="h-12"></div>
+
+      {/* Group Info Card */}
+      <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row gap-2 md:items-center">
+          <div className="flex items-center">
+            <Badge variant="outline" className="mr-2">
+              Created {new Date(group?.created_at || "").toLocaleDateString()}
+            </Badge>
+            {userRole && (
+              <Badge className="bg-purple-500">
+                {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+              </Badge>
+            )}
+          </div>
+          
+          {summary && (
+            <div className="flex gap-2 text-sm">
+              <span className="text-green-600">
+                Income: ${summary.totalIncome.toFixed(2)}
+              </span>
+              <span className="text-red-600">
+                Expenses: ${summary.totalExpenses.toFixed(2)}
+              </span>
+              <span className="font-medium">
+                Balance: ${summary.balance.toFixed(2)}
+              </span>
+            </div>
+          )}
+        </div>
 
         {isAdmin && (
-          <Button onClick={() => setIsInviteDialogOpen(true)}>
+          <Button
+            onClick={() => setIsInviteDialogOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
             <UserPlus className="mr-2 h-4 w-4" />
             Invite Member
           </Button>
         )}
       </div>
-
-      {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Income
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                ${summary.totalIncome.toFixed(2)}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Expenses
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                ${summary.totalExpenses.toFixed(2)}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Balance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div
-                className={`text-2xl font-bold ${
-                  summary.balance >= 0 ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                ${summary.balance.toFixed(2)}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
 
       <Tabs defaultValue="transactions">
         <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
@@ -585,7 +496,11 @@ export function GroupPage() {
 
         {isAdmin && (
           <TabsContent value="settings" className="mt-6">
-            <GroupSettings group={group} onUpdateGroup={handleUpdateGroup} />
+            <GroupSettings 
+              // Using type assertion to satisfy the component props requirement
+              group={group as unknown as import("../../../api/supabase/budgetGroups").BudgetGroup} 
+              onUpdateGroup={handleUpdateGroup} 
+            />
           </TabsContent>
         )}
       </Tabs>

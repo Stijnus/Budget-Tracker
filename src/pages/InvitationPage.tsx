@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle } from "lucide-react";
+import { supabase } from "../api/supabase/client";
 
 interface Invitation {
   id: string;
@@ -23,39 +24,71 @@ export function InvitationPage() {
 
   useEffect(() => {
     async function fetchInvitation() {
+      if (!token) return;
+      
       setLoading(true);
       setError(null);
+      
       try {
-        // TODO: Replace with your actual API endpoint for fetching invitation details
-        const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-        const res = await fetch(`https://tkjmzixriehtmjhllfhg.supabase.co/functions/v1/get-invitation/${token}`, {
-          headers: {
-            "apikey": SUPABASE_ANON_KEY ?? "",
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY ?? ""}`
-          }
+        // Use Supabase directly to avoid CORS issues
+        const { data, error } = await supabase
+          .from("group_invitations")
+          .select(`
+            id,
+            group_id,
+            email,
+            status,
+            budget_groups(name)
+          `)
+          .eq("token", token)
+          .single();
+        
+        if (error) throw new Error("Invitation not found or expired.");
+        if (!data) throw new Error("Invitation not found.");
+        
+        // Format the data to match our Invitation interface
+        setInvitation({
+          id: data.id,
+          group_id: data.group_id,
+          group_name: data.budget_groups?.name || "Budget Group",
+          email: data.email,
+          status: (data.status === 'rejected' ? 'expired' : data.status) as 'pending' | 'accepted' | 'expired'
         });
-        if (!res.ok) throw new Error("Invitation not found or expired.");
-        const data = await res.json();
-        setInvitation(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err) || "Unknown error");
       } finally {
         setLoading(false);
       }
     }
-    if (token) fetchInvitation();
+    
+    fetchInvitation();
   }, [token]);
 
   const handleAccept = async () => {
     if (!invitation) return;
     setAccepting(true);
     setError(null);
+    
     try {
-      // TODO: Replace with your actual API endpoint for accepting invitations
-      const res = await fetch(`https://tkjmzixriehtmjhllfhg.supabase.co/functions/v1/accept-invitation/${token}`, { method: "POST" });
-      if (!res.ok) throw new Error("Failed to accept invitation.");
+      // Use the Edge Function to accept the invitation
+      // This function handles all the necessary database operations with proper permissions
+      const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const res = await fetch(`https://tkjmzixriehtmjhllfhg.supabase.co/functions/v1/accept-invitation/${token}`, { 
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY ?? "",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY ?? ""}`,
+          "Content-Type": "application/json"
+        }
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to accept invitation");
+      }
+      
       setAccepted(true);
-      // Optionally redirect to the group dashboard
+      // Redirect to the group dashboard
       setTimeout(() => {
         navigate(`/groups/${invitation.group_id}`);
       }, 1200);
