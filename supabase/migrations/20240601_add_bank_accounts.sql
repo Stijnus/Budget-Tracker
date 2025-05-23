@@ -21,18 +21,22 @@ CREATE TABLE IF NOT EXISTS bank_accounts (
 ALTER TABLE bank_accounts ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for bank_accounts
+DROP POLICY IF EXISTS "Users can view their own bank accounts" ON bank_accounts;
 CREATE POLICY "Users can view their own bank accounts"
     ON bank_accounts FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create their own bank accounts" ON bank_accounts;
 CREATE POLICY "Users can create their own bank accounts"
     ON bank_accounts FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own bank accounts" ON bank_accounts;
 CREATE POLICY "Users can update their own bank accounts"
     ON bank_accounts FOR UPDATE
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own bank accounts" ON bank_accounts;
 CREATE POLICY "Users can delete their own bank accounts"
     ON bank_accounts FOR DELETE
     USING (auth.uid() = user_id);
